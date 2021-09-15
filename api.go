@@ -31,7 +31,10 @@ func (c *apiClient) Health(ctx context.Context) (Health, error) {
 	}
 
 	health := Health{}
-	json.NewDecoder(res.Body).Decode(&health)
+	err = json.NewDecoder(res.Body).Decode(&health)
+	if err != nil {
+		return Health{}, err
+	}
 	return health, nil
 }
 
@@ -55,7 +58,10 @@ func (c *apiClient) Info(ctx context.Context) (Info, error) {
 	}
 
 	info := Info{}
-	json.NewDecoder(res.Body).Decode(&info)
+	err = json.NewDecoder(res.Body).Decode(&info)
+	if err != nil {
+		return Info{}, err
+	}
 	return info, nil
 
 }
@@ -82,8 +88,75 @@ func (c *apiClient) HealthClock(ctx context.Context) (HealthClock, error) {
 	}
 
 	healthClock := HealthClock{}
-	json.NewDecoder(res.Body).Decode(&healthClock)
+	err = json.NewDecoder(res.Body).Decode(&healthClock)
+	if err != nil {
+		return HealthClock{}, err
+	}
 	return healthClock, nil
+}
+
+func (c *apiClient) Metrics(ctx context.Context) ([]Metric, error) {
+	var metrics []Metric
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceMetrics))
+	if err != nil {
+		return metrics, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return metrics, err
+	}
+	req.WithContext(ctx)
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return metrics, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return metrics, handleAPIErrorResponse(res)
+	}
+
+	err = json.NewDecoder(res.Body).Decode(&metrics)
+	if err != nil {
+		return []Metric{}, err
+	}
+	return metrics, nil
+}
+
+// History of your Blockfrost usage metrics per endpoint in the past 30 days.
+func (c *apiClient) MetricsEndpoints(ctx context.Context) ([]MetricsEndpoint, error) {
+	var metricsEndpoints []MetricsEndpoint
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceMetricsEndpoint))
+	if err != nil {
+		return metricsEndpoints, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return metricsEndpoints, err
+	}
+
+	req.Header.Add("project_id", c.projectId)
+	req.WithContext(ctx)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return metricsEndpoints, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return metricsEndpoints, handleAPIErrorResponse(res)
+	}
+
+	err = json.NewDecoder(res.Body).Decode(&metricsEndpoints)
+	if err != nil {
+		return []MetricsEndpoint{}, err
+	}
+	return metricsEndpoints, nil
 }
 
 func handleAPIErrorResponse(res *http.Response) error {

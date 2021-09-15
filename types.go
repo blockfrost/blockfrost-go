@@ -9,22 +9,11 @@ const (
 )
 
 const (
-	resourceHealth      = "health"
-	resourceHealthClock = "health/clock"
+	resourceHealth          = "health"
+	resourceHealthClock     = "health/clock"
+	resourceMetrics         = "metrics"
+	resourceMetricsEndpoint = "metrics/endpoints"
 )
-
-type Info struct {
-	Url     string `json:"url,omitempty"`
-	Version string `json:"version,omitempty"`
-}
-
-type Health struct {
-	IsHealthy bool `json:"is_healthy,omitempty"`
-}
-
-type HealthClock struct {
-	ServerTime int64 `json:"server_time,omitempty"`
-}
 
 // Errors returned by API
 type APIError struct {
@@ -75,4 +64,37 @@ type UnauthorizedError struct {
 	Error      string `json:"error"`
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`
+}
+
+// Health Group types
+type Info struct {
+	Url     string `json:"url,omitempty"`
+	Version string `json:"version,omitempty"`
+}
+
+type Health struct {
+	IsHealthy bool `json:"is_healthy,omitempty"`
+}
+
+type HealthClock struct {
+	ServerTime int64 `json:"server_time,omitempty"`
+}
+
+type Metric struct {
+	// Sum of all calls for a particular day
+	Calls int `json:"calls,omitempty"`
+
+	// Starting time of the call count interval (ends midnight UTC) in UNIX time
+	Time int `json:"time,omitempty"`
+}
+
+type MetricsEndpoint struct {
+	// Sum of all calls for a particular day and endpoint
+	Calls int `json:"calls,omitempty"`
+
+	// Endpoint parent name
+	Endpoint string `json:"endpoint,omitempty"`
+
+	// Starting time of the call count interval (ends midnight UTC) in UNIX time
+	Time int `json:"time,omitempty"`
 }

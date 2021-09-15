@@ -55,3 +55,25 @@ func TestResourceHealthClock(t *testing.T) {
 
 	t.Logf("HealthClock: %+v", healthClock)
 }
+
+func TestResourceMetric(t *testing.T) {
+	t.Parallel()
+
+	metrics, err := api.Metrics(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("Metric: %+v", metrics)
+}
+
+func TestResourceMetricsEndpoints(t *testing.T) {
+	t.Parallel()
+
+	metricsEndpoints, err := api.MetricsEndpoints(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("MetricEndpoints: %+v", metricsEndpoints)
+}

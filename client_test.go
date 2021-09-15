@@ -1,7 +1,6 @@
 package blockfrost_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
@@ -13,5 +12,5 @@ func TestClientInit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Printf("client: %v\n", client)
+	t.Logf("client: %v\n", client)
 }
