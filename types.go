@@ -9,7 +9,8 @@ const (
 )
 
 const (
-	resourceHealth = "health"
+	resourceHealth      = "health"
+	resourceHealthClock = "health/clock"
 )
 
 type Info struct {

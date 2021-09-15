@@ -2,7 +2,6 @@ package blockfrost_test
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"testing"
 
@@ -39,5 +38,20 @@ func TestResourceHealth(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Printf("health: %v\n", health)
+	t.Logf("health: %v\n", health)
+}
+
+func TestResourceHealthClock(t *testing.T) {
+	t.Parallel()
+
+	healthClock, err := api.HealthClock(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if healthClock == (blockfrost.HealthClock{}) {
+		t.Logf("got nil healthClock %+v", healthClock)
+	}
+
+	t.Logf("HealthClock: %+v", healthClock)
 }

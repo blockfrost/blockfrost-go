@@ -62,4 +62,5 @@ func NewAPIClient(opts ...ClientOption) (APIClient, error) {
 type APIClient interface {
 	Info(ctx context.Context) (Info, error)
 	Health(ctx context.Context) (Health, error)
+	HealthClock(ctx context.Context) (HealthClock, error)
 }

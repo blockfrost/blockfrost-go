@@ -60,6 +60,32 @@ func (c *apiClient) Info(ctx context.Context) (Info, error) {
 
 }
 
+func (c *apiClient) HealthClock(ctx context.Context) (HealthClock, error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceHealthClock))
+	if err != nil {
+		return HealthClock{}, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req.Header.Add("project_id", c.projectId)
+	req.WithContext(ctx)
+
+	res, err := c.client.Do(req)
+
+	if err != nil {
+		return HealthClock{}, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return HealthClock{}, handleAPIErrorResponse(res)
+	}
+
+	healthClock := HealthClock{}
+	json.NewDecoder(res.Body).Decode(&healthClock)
+	return healthClock, nil
+}
+
 func handleAPIErrorResponse(res *http.Response) error {
 	var err error
 	switch res.StatusCode {
