@@ -58,7 +58,7 @@ func (c *client) Info(ctx context.Context) (AppInfo, error) {
 }
 
 func (c *client) Health(ctx context.Context) (HealthStatus, error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.url, healthStatusPath))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.url, healthPath))
 	if err != nil {
 		return HealthStatus{}, err
 	}
@@ -84,7 +84,7 @@ func (c *client) Health(ctx context.Context) (HealthStatus, error) {
 }
 
 func (c *client) HealthClock(ctx context.Context) (HealthClock, error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.url, healthClockPath))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.url, healthPath, "clock"))
 	if err != nil {
 		return HealthClock{}, err
 	}

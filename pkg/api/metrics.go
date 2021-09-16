@@ -23,7 +23,7 @@ type MetricEndpoint struct {
 
 func (c *client) Metrics(ctx context.Context) ([]Metric, error) {
 	var metrics []Metric
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.url, metricsPath))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/", c.url, metricsPath))
 	if err != nil {
 		return metrics, err
 	}
@@ -50,7 +50,7 @@ func (c *client) Metrics(ctx context.Context) ([]Metric, error) {
 
 func (c *client) MetricsEndpoints(ctx context.Context) ([]MetricEndpoint, error) {
 	var metrics []MetricEndpoint
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.url, metricsEndpointsPath))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.url, metricsPath, "endpoints"))
 	if err != nil {
 		return metrics, err
 	}
