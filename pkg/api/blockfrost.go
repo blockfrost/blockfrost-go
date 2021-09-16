@@ -19,12 +19,19 @@ const (
 )
 
 var (
-	healthStatusPath      = "health"
-	healthClockPath       = "health/clock"
-	metricsPath           = "metrics/"
-	metricsEndpointsPath  = "metrics/endpoints"
-	accountsByAddressPath = "accounts" // accounts/{stake_address} parameter
+	healthStatusPath        = "health"
+	healthClockPath         = "health/clock"
+	metricsPath             = "metrics/"
+	metricsEndpointsPath    = "metrics/endpoints"
+	accountsPath            = "accounts" // accounts/{stake_address} parameter
+	accountsRewardsHistPath = "rewards"  // accounts/{stake_address}/rewards parameter
 )
+
+type QueryParmasAPI struct {
+	Count int32
+	Page  int32
+	Order string //"asc|desc"
+}
 
 // Client is an interface that implements https://blockfrost.io
 type BlockfrostAPI interface {
@@ -40,6 +47,7 @@ type BlockfrostAPI interface {
 
 	// Accounts
 	Account(ctx context.Context, stakeAddr string) (Account, error)
+	AccountRewards(ctx context.Context, stakeAddr string, query QueryParmasAPI) ([]AccountRewardsHist, error)
 }
 
 // Client represents a blockfrost client. If the Debug field is set to an io.Writer
