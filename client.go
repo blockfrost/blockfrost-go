@@ -65,4 +65,5 @@ type APIClient interface {
 	HealthClock(ctx context.Context) (HealthClock, error)
 	Metrics(ctx context.Context) ([]Metric, error)
 	MetricsEndpoints(ctx context.Context) ([]MetricsEndpoint, error)
+	BlocksLatest(ctx context.Context) (Block, error)
 }

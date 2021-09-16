@@ -13,6 +13,7 @@ const (
 	resourceHealthClock     = "health/clock"
 	resourceMetrics         = "metrics"
 	resourceMetricsEndpoint = "metrics/endpoints"
+	resourceBlocksLatest    = "blocks/latest"
 )
 
 // Errors returned by API
@@ -80,6 +81,7 @@ type HealthClock struct {
 	ServerTime int64 `json:"server_time,omitempty"`
 }
 
+// Metric Group types
 type Metric struct {
 	// Sum of all calls for a particular day
 	Calls int `json:"calls,omitempty"`
@@ -97,4 +99,23 @@ type MetricsEndpoint struct {
 
 	// Starting time of the call count interval (ends midnight UTC) in UNIX time
 	Time int `json:"time,omitempty"`
+}
+
+// Blocks Group types
+type Block struct {
+	Time          int    `json:"time,omitempty"`
+	Height        int    `json:"height,omitempty"`
+	Hash          string `json:"hash,omitempty"`
+	Slot          int    `json:"slot,omitempty"`
+	Epoch         int    `json:"epoch,omitempty"`
+	EpochSlot     int    `json:"epoch_slot,omitempty"`
+	SlotLeader    string `json:"slot_leader"`
+	Size          int    `json:"size,omitempty"`
+	TxCount       int    `json:"tx_count,omitempty"`
+	Output        string `json:"output,omitempty"`
+	Fees          string `json:"fees,omitempty"`
+	BlockVRF      string `json:"block_vrf,omitempty"`
+	PreviousBlock string `json:"previous_block,omitempty"`
+	NextBlock     string `json:"next_block,omitempty"`
+	Confirmations int    `json:"confirmations,omitempty"`
 }

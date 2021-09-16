@@ -77,3 +77,12 @@ func TestResourceMetricsEndpoints(t *testing.T) {
 
 	t.Logf("MetricEndpoints: %+v", metricsEndpoints)
 }
+
+func TestResourceBlocksLatest(t *testing.T) {
+	t.Parallel()
+	block, err := api.BlocksLatest(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("BlocksLatest: %+v", block)
+}
