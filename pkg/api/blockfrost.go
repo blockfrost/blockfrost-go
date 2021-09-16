@@ -19,12 +19,9 @@ const (
 )
 
 var (
-	healthStatusPath        = "health"
-	healthClockPath         = "health/clock"
-	metricsPath             = "metrics/"
-	metricsEndpointsPath    = "metrics/endpoints"
-	accountsPath            = "accounts" // accounts/{stake_address} parameter
-	accountsRewardsHistPath = "rewards"  // accounts/{stake_address}/rewards parameter
+	healthPath   = "health"
+	metricsPath  = "metrics"
+	accountsPath = "accounts" // accounts/{stake_address} parameter
 )
 
 type QueryParmasAPI struct {
@@ -37,17 +34,69 @@ type QueryParmasAPI struct {
 type BlockfrostAPI interface {
 	// Health endpoints
 
-	Info(ctx context.Context) (AppInfo, error)
-	Health(ctx context.Context) (HealthStatus, error)
-	HealthClock(ctx context.Context) (HealthClock, error)
+	Info(
+		ctx context.Context,
+	) (AppInfo, error)
+	Health(
+		ctx context.Context,
+	) (HealthStatus, error)
+	HealthClock(
+		ctx context.Context,
+	) (HealthClock, error)
 
 	// Metrics
-	Metrics(ctx context.Context) ([]Metric, error)
-	MetricsEndpoints(ctx context.Context) ([]MetricEndpoint, error)
+	Metrics(
+		ctx context.Context,
+	) ([]Metric, error)
+	MetricsEndpoints(
+		ctx context.Context,
+	) ([]MetricEndpoint, error)
 
 	// Accounts
-	Account(ctx context.Context, stakeAddr string) (Account, error)
-	AccountRewards(ctx context.Context, stakeAddr string, query QueryParmasAPI) ([]AccountRewardsHist, error)
+	Account(
+		ctx context.Context,
+		stakeAddr string,
+	) (Account, error)
+	AccountRewards(
+		ctx context.Context,
+		stakeAddr string,
+		query QueryParmasAPI,
+	) ([]AccountRewardsHist, error)
+	AccountHistory(
+		ctx context.Context,
+		stakeAddr string,
+		query QueryParmasAPI,
+	) ([]AccountHistory, error)
+	AccountDelegations(
+		ctx context.Context,
+		stakeAddr string,
+		query QueryParmasAPI,
+	) ([]AccountDelegation, error)
+	AccountRegistrations(
+		ctx context.Context,
+		stakeAddr string,
+		query QueryParmasAPI,
+	) ([]AccountRegistration, error)
+	AccountWithdrawals(
+		ctx context.Context,
+		stakeAddr string,
+		query QueryParmasAPI,
+	) ([]AccountWithdrawal, error)
+	AccountMIRHistory(
+		ctx context.Context,
+		stakeAddr string,
+		query QueryParmasAPI,
+	) ([]AccountMIR, error)
+	AccountAssociatedAddress(
+		ctx context.Context,
+		stakeAddr string,
+		query QueryParmasAPI,
+	) ([]AccountAssociated, error)
+	AccountAssetsWithAddress(
+		ctx context.Context,
+		stakeAddr string,
+		query QueryParmasAPI,
+	) ([]AccountAssets, error)
 }
 
 // Client represents a blockfrost client. If the Debug field is set to an io.Writer
