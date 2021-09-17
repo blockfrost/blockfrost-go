@@ -33,6 +33,13 @@ func WithTestNet() ClientOption {
 	}
 }
 
+func WithHTTPServer(server string) ClientOption {
+	return func(c *apiClient) error {
+		c.server = server
+		return nil
+	}
+}
+
 func WithHTTPClient(doer HttpRequestDoer) ClientOption {
 	return func(c *apiClient) error {
 		c.client = doer
@@ -65,5 +72,10 @@ type APIClient interface {
 	HealthClock(ctx context.Context) (HealthClock, error)
 	Metrics(ctx context.Context) ([]Metric, error)
 	MetricsEndpoints(ctx context.Context) ([]MetricsEndpoint, error)
-	BlocksLatest(ctx context.Context) (Block, error)
+	Block(ctx context.Context, hashOrNumber string) (Block, error)
+	BlockLatest(ctx context.Context) (Block, error)
+	BlockLatestTransactions(ctx context.Context) ([]Transaction, error)
+	BlockTransactions(ctx context.Context, hashOrNumer string) ([]Transaction, error)
+	BlocksNext(ctx context.Context, hashOrNumber string) ([]Block, error)
+	BlocksPrevious(ctx context.Context, hashOrNumber string) ([]Block, error)
 }
