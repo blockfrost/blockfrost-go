@@ -8,12 +8,17 @@ const (
 	IPFS           = "https://ipfs.blockfrost.io/api/v0"
 )
 
+// resource paths
 const (
-	resourceHealth          = "health"
-	resourceHealthClock     = "health/clock"
-	resourceMetrics         = "metrics"
-	resourceMetricsEndpoint = "metrics/endpoints"
-	resourceBlocksLatest    = "blocks/latest"
+	resourceHealth                   = "health"
+	resourceHealthClock              = "health/clock"
+	resourceMetrics                  = "metrics"
+	resourceMetricsEndpoint          = "metrics/endpoints"
+	resourceBlock                    = "blocks"
+	resourceBlocksLatest             = "blocks/latest"
+	resourceBlocksLatestTransactions = "blocks/latest/txs"
+	resourceBlocksSlot               = "blocks/slot"
+	resourceBlocksEpoch              = "blocks/epoch"
 )
 
 // APIError is used to describe errors from the API.
@@ -122,4 +127,12 @@ type Block struct {
 	PreviousBlock string `json:"previous_block,omitempty"`
 	NextBlock     string `json:"next_block,omitempty"`
 	Confirmations int    `json:"confirmations,omitempty"`
+}
+
+type Transaction string
+
+type APIPagingParams struct {
+	Count int
+	Page  int
+	Order string
 }

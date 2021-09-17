@@ -78,4 +78,6 @@ type APIClient interface {
 	BlockTransactions(ctx context.Context, hashOrNumer string) ([]Transaction, error)
 	BlocksNext(ctx context.Context, hashOrNumber string) ([]Block, error)
 	BlocksPrevious(ctx context.Context, hashOrNumber string) ([]Block, error)
+	BlockBySlot(ctx context.Context, slotNumber int) (Block, error)
+	BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (Block, error)
 }
