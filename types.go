@@ -16,7 +16,8 @@ const (
 	resourceBlocksLatest    = "blocks/latest"
 )
 
-// Errors returned by API
+// APIError is used to describe errors from the API.
+// See https://docs.blockfrost.io/#section/Errors
 type APIError struct {
 	Response interface{}
 }
@@ -25,63 +26,65 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("API Error, %+v", e.Response)
 }
 
-// Autobanned defines model for autobanned.
+// Autobanned defines model for HTTP `418` (Auto Banned).
 type AutoBanned struct {
 	Error      string `json:"error"`
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`
 }
 
-// BadRequest defines model for bad_request.
+// BadRequest defines model for HTTP `400` (Bad Request)
 type BadRequest struct {
 	Error      string `json:"error"`
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`
 }
 
-// InternalServerError defines model for internal_server_error.
+// InternalServerError defines model for HTTP `500` (Internal Server Error)
 type InternalServerError struct {
 	Error      string `json:"error"`
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`
 }
 
-// NotFound defines model for not_found.
+// NotFound defines model for HTTP `404` (Resource Not Found).
 type NotFound struct {
 	Error      string `json:"error"`
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`
 }
 
-// OverusageLimit defines model for overusage_limit.
+// OverusageLimit defines model for HTTP `429` (Over Usage).
 type OverusageLimit struct {
 	Error      string `json:"error"`
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`
 }
 
-// Unauthorized defines model for unauthorized_error.
+// UnauthorizedEror defines model for HTTP `403` (Unauthorized).
 type UnauthorizedError struct {
 	Error      string `json:"error"`
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`
 }
 
-// Health Group types
+// Info defines model for root endpoint `/`
 type Info struct {
 	Url     string `json:"url,omitempty"`
 	Version string `json:"version,omitempty"`
 }
 
+// Health describes boolean for backend server health status.
 type Health struct {
 	IsHealthy bool `json:"is_healthy,omitempty"`
 }
 
+// HealthClock describes current UNIX time
 type HealthClock struct {
 	ServerTime int64 `json:"server_time,omitempty"`
 }
 
-// Metric Group types
+// Metric describes the Blockfrost usage metrics
 type Metric struct {
 	// Sum of all calls for a particular day
 	Calls int `json:"calls,omitempty"`
@@ -90,6 +93,7 @@ type Metric struct {
 	Time int `json:"time,omitempty"`
 }
 
+// MetricsEndpoint
 type MetricsEndpoint struct {
 	// Sum of all calls for a particular day and endpoint
 	Calls int `json:"calls,omitempty"`
@@ -101,7 +105,7 @@ type MetricsEndpoint struct {
 	Time int `json:"time,omitempty"`
 }
 
-// Blocks Group types
+// Block defines content of a block
 type Block struct {
 	Time          int    `json:"time,omitempty"`
 	Height        int    `json:"height,omitempty"`

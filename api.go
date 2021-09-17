@@ -8,6 +8,9 @@ import (
 	"net/url"
 )
 
+// Health returns the backend health status
+// Return backend status as a boolean. Your application
+// should handle situations when backend for the given chain is unavailable.
 func (c *apiClient) Health(ctx context.Context) (Health, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceHealth))
 	if err != nil {
@@ -38,6 +41,8 @@ func (c *apiClient) Health(ctx context.Context) (Health, error) {
 	return health, nil
 }
 
+// Info returns the root endpoint `/`. Root endpoint has
+// no other function than to point end users to documentation.
 func (c *apiClient) Info(ctx context.Context) (Info, error) {
 	req, err := http.NewRequest(http.MethodGet, c.server, nil)
 	if err != nil {
@@ -66,6 +71,8 @@ func (c *apiClient) Info(ctx context.Context) (Info, error) {
 
 }
 
+// HealthClock returns the current UNIX time. Your application might
+// use this to verify if the client clock is not out of sync.
 func (c *apiClient) HealthClock(ctx context.Context) (HealthClock, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceHealthClock))
 	if err != nil {
@@ -95,6 +102,7 @@ func (c *apiClient) HealthClock(ctx context.Context) (HealthClock, error) {
 	return healthClock, nil
 }
 
+// Metrics returns the history of your Blockfrost usage metrics in the past 30 days.
 func (c *apiClient) Metrics(ctx context.Context) ([]Metric, error) {
 	var metrics []Metric
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceMetrics))
@@ -126,6 +134,7 @@ func (c *apiClient) Metrics(ctx context.Context) ([]Metric, error) {
 	return metrics, nil
 }
 
+// MetricsEndpoints returns history of your blockfrost usage metrics
 // History of your Blockfrost usage metrics per endpoint in the past 30 days.
 func (c *apiClient) MetricsEndpoints(ctx context.Context) ([]MetricsEndpoint, error) {
 	var metricsEndpoints []MetricsEndpoint
@@ -159,6 +168,8 @@ func (c *apiClient) MetricsEndpoints(ctx context.Context) ([]MetricsEndpoint, er
 	return metricsEndpoints, nil
 }
 
+// BlocksLatest returns the latest block available to the backends,
+// also known as the tip of the blockchain.
 func (c *apiClient) BlocksLatest(ctx context.Context) (Block, error) {
 	requestUrl, err := url.Parse((fmt.Sprintf("%s/%s", c.server, resourceBlocksLatest)))
 	if err != nil {
