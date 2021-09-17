@@ -10,15 +10,24 @@ const (
 
 // resource paths
 const (
-	resourceHealth                   = "health"
-	resourceHealthClock              = "health/clock"
-	resourceMetrics                  = "metrics"
-	resourceMetricsEndpoint          = "metrics/endpoints"
-	resourceBlock                    = "blocks"
-	resourceBlocksLatest             = "blocks/latest"
-	resourceBlocksLatestTransactions = "blocks/latest/txs"
-	resourceBlocksSlot               = "blocks/slot"
-	resourceBlocksEpoch              = "blocks/epoch"
+	resourceHealth                             = "health"
+	resourceHealthClock                        = "health/clock"
+	resourceMetrics                            = "metrics"
+	resourceMetricsEndpoint                    = "metrics/endpoints"
+	resourceBlock                              = "blocks"
+	resourceBlocksLatest                       = "blocks/latest"
+	resourceBlocksLatestTransactions           = "blocks/latest/txs"
+	resourceBlocksSlot                         = "blocks/slot"
+	resourceBlocksEpoch                        = "blocks/epoch"
+	resourceAccount                            = "accounts"
+	resourceAccountHistory                     = "history"
+	resourceAccountRewardsHistory              = "rewards"
+	resourceAccountDelegationHistory           = "delegations"
+	resourceAccountRegistrationHistory         = "registrations"
+	resourceAccountWithdrawalHistory           = "withdrawals"
+	resourceAccountMIRHistory                  = "mirs"
+	resourceAccountAssociatedAddress           = "addresses"
+	resourceAccountAddressWithAssetsAssociated = "addresses/assets"
 )
 
 // APIError is used to describe errors from the API.
@@ -135,4 +144,79 @@ type APIPagingParams struct {
 	Count int
 	Page  int
 	Order string
+}
+
+// Account return Specific account address
+// Obtain information about a specific stake account.
+type Account struct {
+	StakeAddress       string `json:"stake_address,omitempty"`
+	Active             bool   `json:"active,omitempty"`
+	ActiveEpoch        int64  `json:"active_epoch,omitempty"`
+	ControlledAmount   string `json:"controlled_amount,omitempty"`
+	RewardsSum         string `json:"rewards_sum,omitempty"`
+	WithdrawalsSum     string `json:"withdrawals_sum,omitempty"`
+	ReservesSum        string `json:"reserves_sum,omitempty"`
+	TreasurySum        string `json:"treasury_sum,omitempty"`
+	WithdrawableAmount string `json:"withdrawable_amount,omitempty"`
+	PoolID             string `json:"pool_id,omitempty"`
+}
+
+// AccountRewardsHist return Account reward history
+// Obtain information about the reward history of a specific account.
+type AccountRewardsHistory struct {
+	Epoch  int32  `json:"epoch,omitempty"`
+	Amount string `json:"amount,omitempty"`
+	PoolID string `json:"pool_id,omitempty"`
+}
+
+// AccountHistory return Account history
+// Obtain information about the history of a specific account.
+type AccountHistory struct {
+	ActiveEpoch int32  `json:"active_epoch,omitempty"`
+	Amount      string `json:"amount,omitempty"`
+	PoolID      string `json:"pool_id,omitempty"`
+}
+
+// AccountDelegationHistory return Account delegation history
+// Obtain information about the delegation of a specific account.
+type AccountDelegationHistory struct {
+	ActiveEpoch int32  `json:"active_epoch,omitempty"`
+	TXHash      string `json:"tx_hash,omitempty"`
+	Amount      string `json:"amount,omitempty"`
+	PoolID      string `json:"pool_id,omitempty"`
+}
+
+// AccountRegistrationHistory return Account registration history
+// Obtain information about the registrations and deregistrations of a specific account.
+type AccountRegistrationHistory struct {
+	TXHash string `json:"tx_hash,omitempty"`
+	Action string `json:"action,omitempty"`
+}
+
+// AccountWithdrawalHistory return Account withdrawal history
+// Obtain information about the withdrawals of a specific account.
+type AccountWithdrawalHistory struct {
+	TXHash string `json:"tx_hash,omitempty"`
+	Amount string `json:"amount,omitempty"`
+}
+
+// AccountMIRHistory return Account MIR history
+// Obtain information about the MIRs of a specific account.
+type AccountMIRHistory struct {
+	TXHash string `json:"tx_hash,omitempty"`
+	Amount string `json:"amount,omitempty"`
+}
+
+// AccountAssociatedAddress return Account associated addresses
+// Obtain information about the addresses of a specific account.
+type AccountAssociatedAddress struct {
+	Address string `json:"address,omitempty"`
+}
+
+// AccountAssetsWithAddress return Assets associated with the account addresses
+// Obtain information about assets associated with addresses of a specific account.
+// Be careful, as an account could be part of a mangled address and does not necessarily mean the addresses are owned by user as the account.
+type AccountAssetsWithAddress struct {
+	Unit     string `json:"unit,omitempty"`
+	Quantity string `json:"quantity,omitempty"`
 }

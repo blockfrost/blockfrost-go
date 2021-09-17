@@ -64,4 +64,13 @@ type APIClient interface {
 	BlocksPrevious(ctx context.Context, hashOrNumber string) ([]Block, error)
 	BlockBySlot(ctx context.Context, slotNumber int) (Block, error)
 	BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (Block, error)
+	Account(ctx context.Context, stakeAddress string) (Account, error)
+	AccountHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountHistory, error)
+	AccountRewardsHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountRewardsHistory, error)
+	AccountDelegationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountDelegationHistory, error)
+	AccountRegistrationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountRegistrationHistory, error)
+	AccountWithdrawalHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountWithdrawalHistory, error)
+	AccountMIRHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountMIRHistory, error)
+	AccountAssociatedAddress(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAddress, error)
+	AccountAssetsWithAddress(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssetsWithAddress, error)
 }
