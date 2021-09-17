@@ -9,7 +9,9 @@ import (
 )
 
 func main() {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{}, // Add ProjectID or exclude to load from env:BLOCKFROST_PROJECT_ID
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
