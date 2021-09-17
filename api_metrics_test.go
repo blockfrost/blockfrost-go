@@ -28,7 +28,9 @@ func TestResourceMetrics(t *testing.T) {
 			))
 	}))
 
-	api, err := blockfrost.NewAPIClient(blockfrost.WithHTTPServer(s.URL))
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{Server: s.URL},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +69,9 @@ func TestResourceMetricsEndpoints(t *testing.T) {
 				  ]`,
 			))
 	}))
-	api, err := blockfrost.NewAPIClient(blockfrost.WithHTTPServer(s.URL))
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{Server: s.URL},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}

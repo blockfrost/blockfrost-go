@@ -22,7 +22,9 @@ func TestResourceInfo(t *testing.T) {
 			))
 	}))
 
-	api, err := blockfrost.NewAPIClient(blockfrost.WithHTTPServer(s.URL))
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{Server: s.URL},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,7 +50,9 @@ func TestResourceHealth(t *testing.T) {
 			))
 	}))
 
-	api, err := blockfrost.NewAPIClient(blockfrost.WithHTTPServer(s.URL))
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{Server: s.URL},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +79,9 @@ func TestResourceHealthClock(t *testing.T) {
 			))
 	}))
 
-	api, err := blockfrost.NewAPIClient(blockfrost.WithHTTPServer(s.URL))
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{Server: s.URL},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}

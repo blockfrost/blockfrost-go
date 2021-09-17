@@ -36,7 +36,9 @@ func TestResourceBlocksLatest(t *testing.T) {
 	}))
 
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(blockfrost.WithHTTPServer(s.URL))
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{Server: s.URL},
+	)
 
 	block, err := api.BlockLatest(context.TODO())
 	if err != nil {
@@ -78,7 +80,9 @@ func TestResourceBlock(t *testing.T) {
 			))
 	}))
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(blockfrost.WithHTTPServer(s.URL))
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{Server: s.URL},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,7 +123,9 @@ func TestResourceBlockBySlot(t *testing.T) {
 	}))
 	defer s.Close()
 
-	api, err := blockfrost.NewAPIClient(blockfrost.WithHTTPServer(s.URL))
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{Server: s.URL},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -160,7 +166,9 @@ func TestResourceBlockBySlotAndEpoch(t *testing.T) {
 	}))
 	defer s.Close()
 
-	api, err := blockfrost.NewAPIClient(blockfrost.WithHTTPServer(s.URL))
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{Server: s.URL},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}

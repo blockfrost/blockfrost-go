@@ -17,52 +17,36 @@ type HttpRequestDoer interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-type ClientOption func(*apiClient) error
-
-func WithProjectID(projectId string) ClientOption {
-	return func(c *apiClient) error {
-		c.projectId = projectId
-		return nil
-	}
+type APIClientOptions struct {
+	// The project_id to use from blockfrost. If not set
+	// `BLOCKFROST_PROJECT_ID` is loaded from env
+	ProjectID string
+	// Configures server to use. Can be toggled for test servers
+	Server string
+	// Interface implementing Do method such *http.Client
+	Client HttpRequestDoer
 }
 
-func WithTestNet() ClientOption {
-	return func(c *apiClient) error {
-		c.server = CardanoTestNet
-		return nil
+func NewAPIClient(options APIClientOptions) (APIClient, error) {
+	if options.Server == "" {
+		options.Server = CardanoMainNet
 	}
-}
 
-func WithHTTPServer(server string) ClientOption {
-	return func(c *apiClient) error {
-		c.server = server
-		return nil
+	if options.Client == nil {
+		// TODO: Make configurable. Timeout, retries ...
+		options.Client = &http.Client{Timeout: time.Second * 5}
 	}
-}
 
-func WithHTTPClient(doer HttpRequestDoer) ClientOption {
-	return func(c *apiClient) error {
-		c.client = doer
-		return nil
+	if options.ProjectID == "" {
+		options.ProjectID = os.Getenv("BLOCKFROST_PROJECT_ID")
 	}
-}
-func NewAPIClient(opts ...ClientOption) (APIClient, error) {
+
 	client := &apiClient{
-		server: CardanoMainNet,
+		server:    options.Server,
+		client:    options.Client,
+		projectId: options.ProjectID,
 	}
 
-	for _, opt := range opts {
-		if err := opt(client); err != nil {
-			return nil, err
-		}
-	}
-
-	// TODO: Make configurable. Timeout, retries ...
-	client.client = &http.Client{Timeout: time.Second * 10}
-
-	if client.projectId == "" {
-		client.projectId = os.Getenv("BLOCKFROST_PROJECT_ID")
-	}
 	return client, nil
 }
 
