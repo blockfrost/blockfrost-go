@@ -5,6 +5,9 @@
 *.so
 *.dylib
 
+# Environment files
+*.env
+
 # Test binary, built with `go test -c`
 *.test
 
@@ -13,5 +16,6 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-.env
-.vscode
+
+# Editor Files
+.vscode/
