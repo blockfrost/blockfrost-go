@@ -165,7 +165,4 @@ func TestResourceAddressDetails(t *testing.T) {
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("expected %v got %v", want, got)
 	}
-
-	t.Logf("Got: %v", got)
-	t.Logf("Want: %v", want)
 }
