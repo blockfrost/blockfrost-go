@@ -157,7 +157,7 @@ func TestResourceAddressDetails(t *testing.T) {
 		WriteGoldenFile(t, fp, data)
 	}
 	bytes := ReadOrGenerateGoldenFile(t, fp, got)
-	want := blockfrost.Address{}
+	want := blockfrost.AddressDetails{}
 	if err = json.Unmarshal(bytes, &want); err != nil {
 		t.Fatal(err)
 	}
