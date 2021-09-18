@@ -2,7 +2,9 @@ package blockfrost
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 )
 
 func handleAPIErrorResponse(res *http.Response) error {
@@ -59,4 +61,19 @@ func handleAPIErrorResponse(res *http.Response) error {
 	default:
 		return &APIError{}
 	}
+}
+
+func formatParams(v url.Values, query APIPagingParams) url.Values {
+	if query.Count > 0 && query.Count <= 100 {
+		v.Add("count", fmt.Sprintf("%d", query.Count))
+	}
+	if query.Page > 0 {
+		v.Add("page", fmt.Sprintf("%d", query.Page))
+	}
+	if query.Order == "asc" || query.Order == "desc" {
+		v.Add("order", query.Order)
+	}
+
+	v.Encode()
+	return v
 }
