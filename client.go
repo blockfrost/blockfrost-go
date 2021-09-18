@@ -64,4 +64,8 @@ type APIClient interface {
 	BlocksPrevious(ctx context.Context, hashOrNumber string) ([]Block, error)
 	BlockBySlot(ctx context.Context, slotNumber int) (Block, error)
 	BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (Block, error)
+	Address(ctx context.Context, address string) (Address, error)
+	AddressDetails(ctx context.Context, address string) (AddressDetails, error)
+	// AddressTransactions(ctx context.Context, address string, query APIPagingParams) ([]AddressTransactions, error)
+	//AddressUTXOs(ctx context.Context, address string, query APIPagingParams) ([]AddressUTXO, error)
 }
