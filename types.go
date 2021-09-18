@@ -213,10 +213,10 @@ type AccountAssociatedAddress struct {
 	Address string `json:"address,omitempty"`
 }
 
-// AccountAssetsWithAddress return Assets associated with the account addresses
+// AccountAssociatedAsset return Assets associated with the account addresses
 // Obtain information about assets associated with addresses of a specific account.
 // Be careful, as an account could be part of a mangled address and does not necessarily mean the addresses are owned by user as the account.
-type AccountAssetsWithAddress struct {
+type AccountAssociatedAsset struct {
 	Unit     string `json:"unit,omitempty"`
 	Quantity string `json:"quantity,omitempty"`
 }

@@ -71,6 +71,6 @@ type APIClient interface {
 	AccountRegistrationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountRegistrationHistory, error)
 	AccountWithdrawalHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountWithdrawalHistory, error)
 	AccountMIRHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountMIRHistory, error)
-	AccountAssociatedAddress(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAddress, error)
-	AccountAssetsWithAddress(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssetsWithAddress, error)
+	AccountAssociatedAddresses(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAddress, error)
+	AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAsset, error)
 }
