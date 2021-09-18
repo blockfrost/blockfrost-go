@@ -123,7 +123,7 @@ func (c *apiClient) AddressDetails(ctx context.Context, address string) (Address
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return AddressDetails{}, err
+		return AddressDetails{}, handleAPIErrorResponse(res)
 	}
 
 	det := AddressDetails{}
