@@ -137,3 +137,32 @@ func TestResourceAddress(t *testing.T) {
 		t.Fatalf("expected %v got %v", want, got)
 	}
 }
+
+func TestResourceAddressDetails(t *testing.T) {
+	addr := "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.AddressDetails(context.TODO(), addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	if *update {
+		data, err := json.Marshal(got)
+		if err != nil {
+			t.Fatal(err)
+		}
+		WriteGoldenFile(t, fp, data)
+	}
+	bytes := ReadOrGenerateGoldenFile(t, fp, got)
+	want := blockfrost.Address{}
+	if err = json.Unmarshal(bytes, &want); err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("expected %v got %v", want, got)
+	}
+}
