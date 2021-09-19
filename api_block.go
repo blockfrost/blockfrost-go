@@ -8,20 +8,19 @@ import (
 	"net/url"
 )
 
-// BlocksLatest returns the latest block available to the backends,
-// also known as the tip of the blockchain.
+// BlocksLatest Return the latest block available to the backends, also known as the
+// tip of the blockchain.
 func (c *apiClient) BlockLatest(ctx context.Context) (Block, error) {
 	requestUrl, err := url.Parse((fmt.Sprintf("%s/%s", c.server, resourceBlocksLatest)))
 	if err != nil {
 		return Block{}, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return Block{}, err
 	}
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
@@ -46,13 +45,12 @@ func (c *apiClient) Block(ctx context.Context, hashOrNumber string) (Block, erro
 	if err != nil {
 		return Block{}, err
 	}
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return Block{}, err
 	}
 
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
@@ -80,9 +78,9 @@ func (c *apiClient) BlocksNext(ctx context.Context, hashorNumber string) ([]Bloc
 		return blocks, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
+
 	if err != nil {
 		return blocks, err
 	}
@@ -112,9 +110,8 @@ func (c *apiClient) BlocksPrevious(ctx context.Context, hashorNumber string) ([]
 		return blocks, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 	if err != nil {
 		return blocks, err
 	}
@@ -135,15 +132,19 @@ func (c *apiClient) BlocksPrevious(ctx context.Context, hashorNumber string) ([]
 	return blocks, nil
 }
 
+// BlocksTransactions returns slice of Transaction within the block specified
+// by a hash or block number
 func (c *apiClient) BlockTransactions(ctx context.Context, hashOrNumber string) ([]Transaction, error) {
 	var txs []Transaction
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceBlock, hashOrNumber, "txs"))
 	if err != nil {
 		return txs, err
 	}
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return txs, err
+	}
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
@@ -162,15 +163,18 @@ func (c *apiClient) BlockTransactions(ctx context.Context, hashOrNumber string) 
 	return txs, nil
 }
 
+// BlockLatestTransactions returns the transactions within the latest block.
 func (c *apiClient) BlockLatestTransactions(ctx context.Context) ([]Transaction, error) {
 	var txs []Transaction
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceBlocksLatestTransactions))
 	if err != nil {
 		return txs, err
 	}
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return txs, err
+	}
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
@@ -189,18 +193,18 @@ func (c *apiClient) BlockLatestTransactions(ctx context.Context) ([]Transaction,
 	return txs, nil
 }
 
+// BlocksBySlot returns the content of a requested block for a specific slot.
 func (c *apiClient) BlockBySlot(ctx context.Context, slotNumber int) (Block, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d", c.server, resourceBlocksSlot, slotNumber))
 	if err != nil {
 		return Block{}, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return Block{}, err
 	}
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
@@ -220,17 +224,17 @@ func (c *apiClient) BlockBySlot(ctx context.Context, slotNumber int) (Block, err
 
 }
 
+// BlocksBySlotAndEpoch returns a Block for a specific slot and epoch
 func (c *apiClient) BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (Block, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%d/%s/%d", c.server, epochNumber, "slot", slotNumber))
 	if err != nil {
 		return Block{}, err
 	}
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return Block{}, err
 	}
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
