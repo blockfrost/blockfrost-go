@@ -147,7 +147,11 @@ type APIPagingParams struct {
 	Count int
 	Page  int
 	Order string
+	From  string
+	To    string
 }
+
+type APIQueryParams APIPagingParams
 
 // Account return Specific account address
 // Obtain information about a specific stake account.

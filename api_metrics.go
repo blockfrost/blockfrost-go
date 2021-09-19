@@ -16,11 +16,10 @@ func (c *apiClient) Metrics(ctx context.Context) ([]Metric, error) {
 		return metrics, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return metrics, err
 	}
-	req.WithContext(ctx)
 	req.Header.Add("project_id", c.projectId)
 
 	res, err := c.client.Do(req)
@@ -49,13 +48,12 @@ func (c *apiClient) MetricsEndpoints(ctx context.Context) ([]MetricsEndpoint, er
 		return metricsEndpoints, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return metricsEndpoints, err
 	}
 
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
