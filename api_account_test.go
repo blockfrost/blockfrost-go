@@ -318,7 +318,7 @@ func TestResourceAccountMIRHistory(t *testing.T) {
 
 }
 
-func TestResourceAccountAssociatedAddress(t *testing.T) {
+func TestResourceAccountAssociatedAddresses(t *testing.T) {
 	t.Parallel()
 
 	expectedElement := blockfrost.AccountAssociatedAddress{
@@ -350,7 +350,7 @@ func TestResourceAccountAssociatedAddress(t *testing.T) {
 	q := blockfrost.APIPagingParams{
 		Count: 1,
 	}
-	accountArray, err := api.AccountAssociatedAddress(context.TODO(), inputStakeAddr, q)
+	accountArray, err := api.AccountAssociatedAddresses(context.TODO(), inputStakeAddr, q)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -358,10 +358,10 @@ func TestResourceAccountAssociatedAddress(t *testing.T) {
 
 }
 
-func TestResourceAccountAssetsWithAddress(t *testing.T) {
+func TestResourceAccountAssociatedAssets(t *testing.T) {
 	t.Parallel()
 
-	expectedElement := blockfrost.AccountAssetsWithAddress{
+	expectedElement := blockfrost.AccountAssociatedAsset{
 		Unit:     "d5e6bf0500378d4f0da4e8dde6becec7621cd8cbf5cbb9b87013d4cc537061636542756433343132",
 		Quantity: "1",
 	}
@@ -393,7 +393,7 @@ func TestResourceAccountAssetsWithAddress(t *testing.T) {
 	q := blockfrost.APIPagingParams{
 		Count: 1,
 	}
-	accountArray, err := api.AccountAssetsWithAddress(context.TODO(), inputStakeAddr, q)
+	accountArray, err := api.AccountAssociatedAssets(context.TODO(), inputStakeAddr, q)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}

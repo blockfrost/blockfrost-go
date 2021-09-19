@@ -345,9 +345,9 @@ func (c *apiClient) AccountMIRHistory(
 	return accounts, nil
 }
 
-// AccountAssociatedAddress returns the content of a requested Account by the specific stake account.
+// AccountAssociatedAddresses returns the content of a requested Account by the specific stake account.
 // Obtain information about the addresses of a specific account.
-func (c *apiClient) AccountAssociatedAddress(
+func (c *apiClient) AccountAssociatedAddresses(
 	ctx context.Context,
 	stakeAddress string,
 	query APIPagingParams,
@@ -396,16 +396,16 @@ func (c *apiClient) AccountAssociatedAddress(
 	return accounts, nil
 }
 
-// AccountAssetsWithAddress returns the content of a requested Account by the specific stake account.
+// AccountAssociatedAssets returns the content of a requested Account by the specific stake account.
 // Obtain information about the addresses of a specific account.
-func (c *apiClient) AccountAssetsWithAddress(
+func (c *apiClient) AccountAssociatedAssets(
 	ctx context.Context,
 	stakeAddress string,
 	query APIPagingParams,
-) ([]AccountAssetsWithAddress, error) {
+) ([]AccountAssociatedAsset, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountAddressWithAssetsAssociated))
 	if err != nil {
-		return []AccountAssetsWithAddress{}, err
+		return []AccountAssociatedAsset{}, err
 	}
 
 	v := url.Values{}
@@ -424,7 +424,7 @@ func (c *apiClient) AccountAssetsWithAddress(
 
 	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return []AccountAssetsWithAddress{}, err
+		return []AccountAssociatedAsset{}, err
 	}
 
 	req.Header.Add("project_id", c.projectId)
@@ -432,17 +432,17 @@ func (c *apiClient) AccountAssetsWithAddress(
 
 	res, err := c.client.Do(req)
 	if err != nil {
-		return []AccountAssetsWithAddress{}, err
+		return []AccountAssociatedAsset{}, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return []AccountAssetsWithAddress{}, handleAPIErrorResponse(res)
+		return []AccountAssociatedAsset{}, handleAPIErrorResponse(res)
 	}
-	accounts := []AccountAssetsWithAddress{}
+	accounts := []AccountAssociatedAsset{}
 	err = json.NewDecoder(res.Body).Decode(&accounts)
 	if err != nil {
-		return []AccountAssetsWithAddress{}, err
+		return []AccountAssociatedAsset{}, err
 	}
 	return accounts, nil
 }
