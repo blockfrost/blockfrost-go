@@ -1,10 +1,12 @@
 package blockfrost_test
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
@@ -33,6 +35,38 @@ func TestNetworkUnmarshal(t *testing.T) {
 	got := blockfrost.NetworkInfo{}
 	if err := json.Unmarshal(bytes, &got); err != nil {
 		t.Fatalf("failed to unmarshal %s with err %v", fp, err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("expected %v got %v", want, got)
+	}
+}
+
+func TestResourceNetworkIntegration(t *testing.T) {
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := api.Network(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	if *update {
+		data, err := json.Marshal(got)
+		if err != nil {
+			t.Fatal(err)
+		}
+		WriteGoldenFile(t, fp, data)
+	}
+	bytes := ReadOrGenerateGoldenFile(t, fp, got)
+	want := blockfrost.NetworkInfo{}
+	if err = json.Unmarshal(bytes, &want); err != nil {
+		t.Fatal(err)
 	}
 
 	if !reflect.DeepEqual(got, want) {
