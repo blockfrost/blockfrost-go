@@ -78,4 +78,8 @@ type APIClient interface {
 	AccountAssociatedAddresses(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAddress, error)
 	AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAsset, error)
 	Genesis(ctx context.Context) (GenesisBlock, error)
+	MetadataTxLabels(ctx context.Context, query APIPagingParams) ([]MetadataTxLabel, error)
+	MetadataTxContentInJSON(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInJSON, error)
+	MetadataTxContentInJSONRaw(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInJSONRaw, error)
+	MetadataTxContentInCBOR(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInCBOR, error)
 }
