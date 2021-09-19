@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
@@ -43,8 +44,23 @@ func TestNetworkUnmarshal(t *testing.T) {
 }
 
 func TestResourceNetworkIntegration(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "network", "network.json")
+	bytes, err := ioutil.ReadFile(fp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := blockfrost.NetworkInfo{}
+	if err = json.Unmarshal(bytes, &want); err != nil {
+		t.Fatal(err)
+	}
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(bytes)
+	}))
+	defer s.Close()
 	api, err := blockfrost.NewAPIClient(
-		blockfrost.APIClientOptions{},
+		blockfrost.APIClientOptions{
+			Server: s.URL,
+		},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -55,21 +71,8 @@ func TestResourceNetworkIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
-	if *update {
-		data, err := json.Marshal(got)
-		if err != nil {
-			t.Fatal(err)
-		}
-		WriteGoldenFile(t, fp, data)
-	}
-	bytes := ReadOrGenerateGoldenFile(t, fp, got)
-	want := blockfrost.NetworkInfo{}
-	if err = json.Unmarshal(bytes, &want); err != nil {
-		t.Fatal(err)
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("expected  %v got %v", want, got)
 	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
-	}
 }
