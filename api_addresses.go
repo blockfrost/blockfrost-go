@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	resourceAddresses = "addresses"
-	resourceTotal     = "total"
+	resourceAddresses    = "addresses"
+	resourceTotal        = "total"
+	resourceTransactions = "transactions"
 )
 
 type AddressAmount struct {
@@ -35,8 +36,8 @@ type AddressDetails struct {
 
 type AddressTransactions struct {
 	TxHash      string `json:"tx_hash,omitempty"`
-	TxIndex     string `json:"tx_index,omitempty"`
-	BlockHeight string `json:"block_height,omitempty"`
+	TxIndex     int    `json:"tx_index,omitempty"`
+	BlockHeight int    `json:"block_height,omitempty"`
 }
 
 type AddressUTXO struct {
@@ -75,7 +76,7 @@ func (c *apiClient) Address(ctx context.Context, address string) (Address, error
 
 func (c *apiClient) AddressTransactions(ctx context.Context, address string, query APIPagingParams) ([]AddressTransactions, error) {
 	var txs []AddressTransactions
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, address, resourceAddresses))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAddresses, address, resourceTransactions))
 	if err != nil {
 		return txs, err
 	}
@@ -84,7 +85,7 @@ func (c *apiClient) AddressTransactions(ctx context.Context, address string, que
 		return txs, err
 	}
 	v := req.URL.Query()
-	v = formatParams(v, APIPagingParams{})
+	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 	req = req.WithContext(ctx)

@@ -73,6 +73,12 @@ func formatParams(v url.Values, query APIPagingParams) url.Values {
 	if query.Order == "asc" || query.Order == "desc" {
 		v.Add("order", query.Order)
 	}
+	if query.From != "" {
+		v.Add("from", query.From)
+	}
+	if query.From != "" {
+		v.Add("to", query.From)
+	}
 
 	v.Encode()
 	return v

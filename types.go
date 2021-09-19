@@ -135,4 +135,8 @@ type APIPagingParams struct {
 	Count int
 	Page  int
 	Order string
+	From  string
+	To    string
 }
+
+type APIQueryParams APIPagingParams
