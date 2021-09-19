@@ -82,5 +82,5 @@ type APIClient interface {
 	MetadataTxContentInJSONRaw(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInJSONRaw, error)
 	MetadataTxContentInCBOR(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInCBOR, error)
 	Genesis(ctx context.Context) (GenesisBlock, error)
-
+	Network(ctx context.Context) (NetworkInfo, error)
 }

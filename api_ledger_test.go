@@ -26,7 +26,7 @@ func TestGenesisMarshall(t *testing.T) {
 		SecurityParam:          2160,
 	}
 
-	fp := filepath.Join(testdata, "json", "address", "genesis.json")
+	fp := filepath.Join(testdata, "json", "genesis", "genesis.json")
 	bytes, err := ioutil.ReadFile(fp)
 	if err != nil {
 		t.Fatalf("an error ocurred while trying to read json test file %s", fp)
