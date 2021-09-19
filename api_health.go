@@ -11,12 +11,11 @@ import (
 // Info returns the root endpoint `/`. Root endpoint has
 // no other function than to point end users to documentation.
 func (c *apiClient) Info(ctx context.Context) (Info, error) {
-	req, err := http.NewRequest(http.MethodGet, c.server, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.server, nil)
 	if err != nil {
 		return Info{}, err
 	}
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 
@@ -46,12 +45,11 @@ func (c *apiClient) Health(ctx context.Context) (Health, error) {
 	if err != nil {
 		return Health{}, err
 	}
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return Health{}, err
 	}
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
@@ -79,9 +77,11 @@ func (c *apiClient) HealthClock(ctx context.Context) (HealthClock, error) {
 		return HealthClock{}, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return HealthClock{}, err
+	}
 	req.Header.Add("project_id", c.projectId)
-	req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 
