@@ -67,5 +67,5 @@ type APIClient interface {
 	Address(ctx context.Context, address string) (Address, error)
 	AddressDetails(ctx context.Context, address string) (AddressDetails, error)
 	AddressTransactions(ctx context.Context, address string, query APIPagingParams) ([]AddressTransactions, error)
-	//AddressUTXOs(ctx context.Context, address string, query APIPagingParams) ([]AddressUTXO, error)
+	AddressUTXOs(ctx context.Context, address string, query APIPagingParams) ([]AddressUTXO, error)
 }

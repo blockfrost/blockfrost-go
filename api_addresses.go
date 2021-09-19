@@ -12,6 +12,7 @@ const (
 	resourceAddresses    = "addresses"
 	resourceTotal        = "total"
 	resourceTransactions = "transactions"
+	resourceUTXOs        = "utxos"
 )
 
 type AddressAmount struct {
@@ -41,6 +42,11 @@ type AddressTransactions struct {
 }
 
 type AddressUTXO struct {
+	TxHash      string          `json:"tx_hash,omitempty"`
+	OutputIndex int             `json:"output_index,omitempty"`
+	Amount      []AddressAmount `json:"amount,omitempty"`
+	Block       string          `json:"block,omitempty"`
+	DataHash    string          `json:"data_hash,omitempty"`
 }
 
 // Address ret
@@ -50,12 +56,11 @@ func (c *apiClient) Address(ctx context.Context, address string) (Address, error
 		return Address{}, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return Address{}, err
 	}
 	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
@@ -80,7 +85,7 @@ func (c *apiClient) AddressTransactions(ctx context.Context, address string, que
 	if err != nil {
 		return txs, err
 	}
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return txs, err
 	}
@@ -88,7 +93,6 @@ func (c *apiClient) AddressTransactions(ctx context.Context, address string, que
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
@@ -111,12 +115,11 @@ func (c *apiClient) AddressDetails(ctx context.Context, address string) (Address
 	if err != nil {
 		return AddressDetails{}, err
 	}
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return AddressDetails{}, err
 	}
 	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
 
 	res, err := c.client.Do(req)
 	if err != nil {
@@ -132,4 +135,36 @@ func (c *apiClient) AddressDetails(ctx context.Context, address string) (Address
 		return det, err
 	}
 	return det, nil
+}
+
+func (c *apiClient) AddressUTXOs(ctx context.Context, address string, query APIPagingParams) ([]AddressUTXO, error) {
+	var utxos []AddressUTXO
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAddresses, address, resourceUTXOs))
+	if err != nil {
+		return utxos, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return utxos, err
+	}
+	v := req.URL.Query()
+	query.From = ""
+	query.To = ""
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return utxos, err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return utxos, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&utxos); err != nil {
+		return utxos, err
+	}
+	return utxos, nil
 }
