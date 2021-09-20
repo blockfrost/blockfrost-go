@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 )
 
 const (
-	resourceScripts = "scripts"
+	resourceScripts   = "scripts"
+	resourceRedeemers = "redeemers"
 )
 
 type Script struct {
@@ -84,4 +86,32 @@ func (c *apiClient) Script(ctx context.Context, address string) (script Script, 
 		return script, err
 	}
 	return script, nil
+}
+
+func (c *apiClient) ScriptRedeemers(ctx context.Context, address string, query APIPagingParams) (sr []ScriptRedeemer, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceScripts, address, resourceRedeemers))
+	if err != nil {
+		return
+	}
+	log.Println(requestUrl.String())
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return sr, handleAPIErrorResponse(res)
+	}
+
+	if err := json.NewDecoder(res.Body).Decode(&sr); err != nil {
+		return sr, err
+	}
+	return sr, nil
 }

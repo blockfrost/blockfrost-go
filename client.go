@@ -81,4 +81,5 @@ type APIClient interface {
 	Network(ctx context.Context) (NetworkInfo, error)
 	Script(ctx context.Context, address string) (Script, error)
 	Scripts(ctx context.Context, query APIPagingParams) ([]Script, error)
+	ScriptRedeemers(ctx context.Context, address string, query APIPagingParams) ([]ScriptRedeemer, error)
 }
