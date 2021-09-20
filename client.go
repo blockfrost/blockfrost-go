@@ -79,4 +79,6 @@ type APIClient interface {
 	AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAsset, error)
 	Genesis(ctx context.Context) (GenesisBlock, error)
 	Network(ctx context.Context) (NetworkInfo, error)
+	Script(ctx context.Context, address string) (Script, error)
+	Scripts(ctx context.Context, query APIPagingParams) ([]Script, error)
 }
