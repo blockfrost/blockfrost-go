@@ -1,10 +1,16 @@
 package blockfrost
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
-	"time"
+	"path/filepath"
 )
 
 const (
@@ -47,7 +53,7 @@ func NewIPFSClient(options IPFSClientOptions) (IPFSClient, error) {
 	}
 
 	if options.Client == nil {
-		options.Client = &http.Client{Timeout: time.Second * 5}
+		options.Client = &http.Client{}
 	}
 
 	if options.ProjectID == "" {
@@ -72,7 +78,50 @@ type IPFSClient interface {
 }
 
 func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject, err error) {
-	return
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", ip.server, resourceIPFSAdd))
+	if err != nil {
+		return
+	}
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	body := &bytes.Buffer{}
+	wr := multipart.NewWriter(body)
+	part, err := wr.CreateFormFile("file", filepath.Base(filePath))
+	if err != nil {
+		return
+	}
+	if _, err = io.Copy(part, file); err != nil {
+		return
+	}
+	if err = wr.Close(); err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl.String(), body)
+	if err != nil {
+		return
+	}
+
+	req.Header.Add("project_id", ip.projectId)
+	req.Header.Add("Content-Type", wr.FormDataContentType())
+
+	res, err := ip.client.Do(req)
+	if err != nil {
+		return
+	}
+	ipo = IPFSObject{}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return ipo, handleAPIErrorResponse(res)
+	}
+	if err = json.NewDecoder(res.Body).Decode(&ipo); err != nil {
+		return
+	}
+
+	return ipo, nil
 }
 
 func (ip *ipfsClient) Pin(ctx context.Context, path string) (ipo IPFSPinnedObject, err error) {
