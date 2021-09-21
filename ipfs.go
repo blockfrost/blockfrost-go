@@ -3,6 +3,7 @@ package blockfrost
 import (
 	"context"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -32,6 +33,14 @@ type IPFSObject struct {
 	Size     string `json:"size,omitempty"`
 }
 
+type IPFSPinnedObject struct {
+	TimeCreated int    `json:"time_created,omitempty"`
+	TimePinned  int    `json:"time_pinned,omitempty"`
+	IPFSHash    string `json:"ipfs_hash,omitempty"`
+	State       string `json:"state,omitempty"`
+	Size        string `json:"size,omitempty"`
+}
+
 func NewIPFSClient(options IPFSClientOptions) (IPFSClient, error) {
 	if options.Server == "" {
 		options.Server = IPFSNet
@@ -39,6 +48,10 @@ func NewIPFSClient(options IPFSClientOptions) (IPFSClient, error) {
 
 	if options.Client == nil {
 		options.Client = &http.Client{Timeout: time.Second * 5}
+	}
+
+	if options.ProjectID == "" {
+		options.ProjectID = os.Getenv("BLOCKFROST_IPFS_PROJECT_ID")
 	}
 
 	client := &ipfsClient{
@@ -51,8 +64,33 @@ func NewIPFSClient(options IPFSClientOptions) (IPFSClient, error) {
 
 type IPFSClient interface {
 	Add(ctx context.Context, filePath string) (IPFSObject, error)
+	Pin(ctx context.Context, path string) (IPFSPinnedObject, error)
+	PinnedObject(ctx context.Context, path string) (IPFSPinnedObject, error)
+	PinnedObjects(ctx context.Context, query APIPagingParams) ([]IPFSPinnedObject, error)
+	Remove(ctx context.Context, path string) ([]IPFSObject, error)
+	Gateway(ctx context.Context, path string) ([]IPFSObject, error)
 }
 
-func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipfso IPFSObject, err error) {
+func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject, err error) {
+	return
+}
+
+func (ip *ipfsClient) Pin(ctx context.Context, path string) (ipo IPFSPinnedObject, err error) {
+	return
+}
+
+func (ip *ipfsClient) PinnedObject(ctx context.Context, path string) (ipo IPFSPinnedObject, err error) {
+	return
+}
+
+func (ip *ipfsClient) PinnedObjects(ctx context.Context, query APIPagingParams) (ipos []IPFSPinnedObject, err error) {
+	return
+}
+
+func (ip *ipfsClient) Remove(ctx context.Context, path string) (ipo []IPFSObject, err error) {
+	return
+}
+
+func (ip *ipfsClient) Gateway(ctx context.Context, path string) (ipo []IPFSObject, err error) {
 	return
 }
