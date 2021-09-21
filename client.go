@@ -81,4 +81,6 @@ type APIClient interface {
 	Network(ctx context.Context) (NetworkInfo, error)
 	Nutlink(ctx context.Context, address string) (NutlinkAddress, error)
 	Tickers(ctx context.Context, address string, query APIPagingParams) ([]Ticker, error)
+	TickerRecords(ctx context.Context, ticker string) (trs []TickerRecord, err error)
+	AddressTickerRecords(ctx context.Context, address string, ticker string) (trs []TickerRecord, err error)
 }

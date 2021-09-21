@@ -29,5 +29,12 @@ func main() {
 	if len(tickers) == 0 {
 		return
 	}
-	fmt.Printf("\nTickers(%d): \n\t%+v\n...", len(tickers), tickers[0])
+	fmt.Printf("\nTickers(%d): \n\t%+v\n\t...", len(tickers), tickers[0])
+
+	adtickers, err := api.AddressTickerRecords(context.TODO(), addr, tickers[0].Name)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("\nAddress Tickers (%d): \n\t%s : %+v\n\t...", len(adtickers), tickers[0].Name, adtickers[0])
 }

@@ -34,6 +34,12 @@ type Ticker struct {
 	LatestBlock int    `json:"latest_block,omitempty"`
 }
 
+type TickerRecord struct {
+	TxHash      string `json:"tx_hash,omitempty"`
+	BlockHeight int    `json:"block_height,omitempty"`
+	TxIndex     int    `json:"tx_index,omitempty"`
+}
+
 func (c *apiClient) Nutlink(ctx context.Context, address string) (nu NutlinkAddress, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceNutLink, address))
 	if err != nil {
@@ -92,4 +98,60 @@ func (c *apiClient) Tickers(ctx context.Context, address string, query APIPaging
 		return ti, err
 	}
 	return ti, nil
+}
+
+func (c *apiClient) TickerRecords(ctx context.Context, ticker string) (trs []TickerRecord, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceNutLink, resourceTickers, ticker))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return trs, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&trs); err != nil {
+		return
+	}
+	return trs, nil
+}
+
+func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ticker string) (trs []TickerRecord, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceNutLink, address, resourceTickers, ticker))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return trs, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&trs); err != nil {
+		return
+	}
+	return trs, nil
 }
