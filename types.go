@@ -19,9 +19,6 @@ const (
 	resourceBlocksLatestTransactions = "blocks/latest/txs"
 	resourceBlocksSlot               = "blocks/slot"
 	resourceBlocksEpoch              = "blocks/epoch"
-	resourceMetadataTxLabels         = "metadata/txs/labels"
-	resourceMetadataTxContentInJSON  = "metadata/txs/labels" // and {label_parameter}
-	resourceMetadataTxContentInCBOR  = "metadata/txs/labels" // and {label_parameter}/cbor
 	resourcePool                     = "pools"
 	resourcePoolRetired              = "pools/retired"
 	resourcePoolRetiring             = "pools/retiring"
@@ -152,48 +149,6 @@ type APIPagingParams struct {
 }
 
 type APIQueryParams APIPagingParams
-
-// MetadataTxLabel return Transaction metadata labels
-// List of all used transaction metadata labels.
-type MetadataTxLabel struct {
-	Label string `json:"label,omitempty"`
-	Cip10 string `json:"cip10,omitempty"`
-	Count string `json:"count,omitempty"`
-}
-
-// MetadataTxContentInJSONRaw Transaction metadata content raw in JSON
-// Transaction metadata per label.
-// This struct are more flexible on JSONMetadata field
-type MetadataTxContentInJSONRaw struct {
-	TxHash string `json:"tx_hash,omitempty"`
-	// 	string or object or Array of any or integer or number or boolean Nullable
-	// Content of the JSON metadata
-	JSONMetadata map[string]interface{} `json:"json_metadata,omitempty"`
-}
-
-// MetadataTxContentInJSON return Transaction metadata content in JSON
-// Transaction metadata per label.
-// This struct are stronger typed on JSONMetadata field
-type MetadataTxContentInJSON struct {
-	TxHash       string       `json:"tx_hash,omitempty"`
-	JSONMetadata JSONMetadata `json:"json_metadata,omitempty"`
-}
-
-type JSONMetadata struct {
-	Adausd []Adausd `json:"ADAUSD,omitempty"`
-}
-
-type Adausd struct {
-	Value  string `json:"value,omitempty"`
-	Source string `json:"source,omitempty"`
-}
-
-// MetadataTxContentInCBOR return Transaction metadata content in CBOR
-// Transaction metadata per label.
-type MetadataTxContentInCBOR struct {
-	TxHash       string `json:"tx_hash,omitempty"`
-	CborMetadata string `json:"cbor_metadata,omitempty"`
-}
 
 // List of stake pools
 // List of registered stake pools.

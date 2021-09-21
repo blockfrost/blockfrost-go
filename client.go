@@ -80,7 +80,6 @@ type APIClient interface {
 	Genesis(ctx context.Context) (GenesisBlock, error)
 	MetadataTxLabels(ctx context.Context, query APIPagingParams) ([]MetadataTxLabel, error)
 	MetadataTxContentInJSON(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInJSON, error)
-	MetadataTxContentInJSONRaw(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInJSONRaw, error)
 	MetadataTxContentInCBOR(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInCBOR, error)
 	Network(ctx context.Context) (NetworkInfo, error)
 	Pools(ctx context.Context, query APIPagingParams) (Pools, error)
