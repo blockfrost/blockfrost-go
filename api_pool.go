@@ -8,6 +8,111 @@ import (
 	"net/url"
 )
 
+const (
+	resourcePool          = "pools"
+	resourcePoolRetired   = "pools/retired"
+	resourcePoolRetiring  = "pools/retiring"
+	resourcePoolHistory   = "history"
+	resourcePoolMetadata  = "metadata"
+	resourcePoolRelay     = "relays"
+	resourcePoolDelegator = "delegators"
+	resourcePoolBlocks    = "blocks"
+	resourcePoolUpdate    = "updates"
+)
+
+// List of stake pools
+// List of registered stake pools.
+type Pools []string
+
+// List of retired stake pools
+// List of already retired pools.
+type PoolRetired struct {
+	PoolID string `json:"pool_id,omitempty"`
+	Epoch  int    `json:"epoch,omitempty"`
+}
+
+type PoolRetiring struct {
+	PoolID string `json:"pool_id,omitempty"`
+	Epoch  int    `json:"epoch,omitempty"`
+}
+
+// PoolSpecific return Specific stake pool
+// Pool information.
+type PoolSpecific struct {
+	PoolID         string   `json:"pool_id,omitempty"`
+	Hex            string   `json:"hex,omitempty"`
+	VrfKey         string   `json:"vrf_key,omitempty"`
+	BlocksMinted   int64    `json:"blocks_minted,omitempty"`
+	LiveStake      string   `json:"live_stake,omitempty"`
+	LiveSize       float64  `json:"live_size,omitempty"`
+	LiveSaturation float64  `json:"live_saturation,omitempty"`
+	LiveDelegators int64    `json:"live_delegators,omitempty"`
+	ActiveStake    string   `json:"active_stake,omitempty"`
+	ActiveSize     float64  `json:"active_size,omitempty"`
+	DeclaredPledge string   `json:"declared_pledge,omitempty"`
+	LivePledge     string   `json:"live_pledge,omitempty"`
+	MarginCost     float64  `json:"margin_cost,omitempty"`
+	FixedCost      string   `json:"fixed_cost,omitempty"`
+	RewardAccount  string   `json:"reward_account,omitempty"`
+	Owners         []string `json:"owners,omitempty"`
+	Registration   []string `json:"registration,omitempty"`
+	Retirement     []string `json:"retirement,omitempty"`
+}
+
+// PoolHistory return Stake pool history
+// History of stake pool parameters over epochs.
+type PoolHistory struct {
+	Epoch           int64   `json:"epoch,omitempty"`
+	Blocks          int64   `json:"blocks,omitempty"`
+	ActiveStake     string  `json:"active_stake,omitempty"`
+	ActiveSize      float64 `json:"active_size,omitempty"`
+	DelegatorsCount int64   `json:"delegators_count,omitempty"`
+	Rewards         string  `json:"rewards,omitempty"`
+	Fees            string  `json:"fees,omitempty"`
+}
+
+// PoolMetadata return Stake pool metadata
+// Stake pool registration metadata.
+type PoolMetadata struct {
+	PoolID      string `json:"pool_id,omitempty"`
+	Hex         string `json:"hex,omitempty"`
+	URL         string `json:"url,omitempty"`
+	Hash        string `json:"hash,omitempty"`
+	Ticker      string `json:"ticker,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Homepage    string `json:"homepage,omitempty"`
+}
+
+// PoolRelay return Stake pool relays
+// Relays of a stake pool.
+type PoolRelay struct {
+	Ipv4   string `json:"ipv4,omitempty"`
+	Ipv6   string `json:"ipv6,omitempty"`
+	DNS    string `json:"dns,omitempty"`
+	DNSSrv string `json:"dns_srv,omitempty"`
+	Port   int64  `json:"port,omitempty"`
+}
+
+// PoolDelegator return Stake pool delegators
+// List of current stake pools delegators.
+type PoolDelegator struct {
+	Address   string `json:"address"`
+	LiveStake string `json:"live_stake"`
+}
+
+// PoolBlocks return Stake pool blocks
+// List of stake pools blocks.
+type PoolBlocks []string
+
+// PoolUpdate return Stake pool updates
+// List of certificate updates to the stake pool.
+type PoolUpdate struct {
+	TxHash    string `json:"tx_hash,omitempty"`
+	CERTIndex int64  `json:"cert_index,omitempty"`
+	Action    string `json:"action,omitempty"`
+}
+
 // Pools returns the List of stake pools
 // List of registered stake pools.
 func (c *apiClient) Pools(ctx context.Context, query APIPagingParams) (Pools, error) {
