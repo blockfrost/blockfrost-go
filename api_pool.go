@@ -418,7 +418,7 @@ func (c *apiClient) PoolMetadata(
 
 // PoolRelay returns the Stake pool relays
 // Relays of a stake pool.
-func (c *apiClient) PoolRelay(
+func (c *apiClient) PoolRelays(
 	ctx context.Context,
 	poolID string,
 	query APIPagingParams,
@@ -471,7 +471,7 @@ func (c *apiClient) PoolRelay(
 
 // PoolDelegator returns the Stake pool delegators
 // List of current stake pools delegators.
-func (c *apiClient) PoolDelegator(
+func (c *apiClient) PoolDelegators(
 	ctx context.Context,
 	poolID string,
 	query APIPagingParams,

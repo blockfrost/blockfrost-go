@@ -88,8 +88,8 @@ type APIClient interface {
 	PoolSpecific(ctx context.Context, poolID string, query APIPagingParams) (PoolSpecific, error)
 	PoolHistory(ctx context.Context, poolID string, query APIPagingParams) ([]PoolHistory, error)
 	PoolMetadata(ctx context.Context, poolID string, query APIPagingParams) (PoolMetadata, error)
-	PoolRelay(ctx context.Context, poolID string, query APIPagingParams) ([]PoolRelay, error)
-	PoolDelegator(ctx context.Context, poolID string, query APIPagingParams) ([]PoolDelegator, error)
+	PoolRelays(ctx context.Context, poolID string, query APIPagingParams) ([]PoolRelay, error)
+	PoolDelegators(ctx context.Context, poolID string, query APIPagingParams) ([]PoolDelegator, error)
 	PoolBlocks(ctx context.Context, poolID string, query APIPagingParams) (PoolBlocks, error)
 	PoolUpdate(ctx context.Context, poolID string, query APIPagingParams) ([]PoolUpdate, error)
 }

@@ -236,7 +236,7 @@ func TestResourcePoolMetadata(t *testing.T) {
 	}
 	assert.Equal(t, expectedElement, pool)
 }
-func TestResourcePoolRelay(t *testing.T) {
+func TestResourcePoolRelays(t *testing.T) {
 	t.Parallel()
 	inputPoolID := "pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy"
 	expectedElement := blockfrost.PoolRelay{
@@ -265,13 +265,13 @@ func TestResourcePoolRelay(t *testing.T) {
 		t.Fatalf(err.Error())
 	}
 	q := blockfrost.APIPagingParams{}
-	pool, err := api.PoolRelay(context.TODO(), inputPoolID, q)
+	pool, err := api.PoolRelays(context.TODO(), inputPoolID, q)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 	assert.Equal(t, expectedElement, pool[0])
 }
-func TestResourcePoolDelegator(t *testing.T) {
+func TestResourcePoolDelegators(t *testing.T) {
 	t.Parallel()
 	inputPoolID := "pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy"
 	expectedElement := blockfrost.PoolDelegator{
@@ -297,7 +297,7 @@ func TestResourcePoolDelegator(t *testing.T) {
 		t.Fatalf(err.Error())
 	}
 	q := blockfrost.APIPagingParams{}
-	pool, err := api.PoolDelegator(context.TODO(), inputPoolID, q)
+	pool, err := api.PoolDelegators(context.TODO(), inputPoolID, q)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
