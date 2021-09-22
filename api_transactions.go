@@ -14,6 +14,9 @@ const (
 	resourceTxWithdrawals = "withdrawals"
 	resourceTxMetadata    = "metadata"
 	resourceCbor          = "cbor"
+	resourceTxDelegations = "delegations"
+	resourceTxPoolUpdates = "pool_updates"
+	resourceTxPoolRetires = "pool_retires"
 )
 
 type TransactionContent struct {
@@ -123,7 +126,7 @@ type TransactionStakeAddressCert struct {
 	Registration bool `json:"registration"`
 }
 
-type TransactionDelegations struct {
+type TransactionDelegation struct {
 	// Epoch in which the delegation becomes active
 	ActiveEpoch int `json:"active_epoch"`
 
@@ -162,7 +165,7 @@ type TransactionMIR struct {
 	Pot string `json:"pot"`
 }
 
-type TransactionPoolCerts []struct {
+type TransactionPoolCert struct {
 	// Epoch that the delegation becomes active
 	ActiveEpoch int `json:"active_epoch"`
 
@@ -431,4 +434,84 @@ func (c *apiClient) TransactionRedeemers(ctx context.Context, hash string) (tm [
 		return
 	}
 	return tm, nil
+}
+
+func (c *apiClient) TransactionDelegationCerts(ctx context.Context, hash string) (td []TransactionDelegation, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxDelegations))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&td); err != nil {
+		return
+	}
+	return td, nil
+}
+
+func (c *apiClient) TransactionPoolUpdates(ctx context.Context, hash string) (td []TransactionPoolCert, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxDelegations))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&td); err != nil {
+		return
+	}
+	return td, nil
+}
+
+func (c *apiClient) TransactionPoolUpdateCerts(ctx context.Context, hash string) (tcs []TransactionPoolCert, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxPoolUpdates))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tcs); err != nil {
+		return
+	}
+	return tcs, nil
+}
+
+func (c *apiClient) TransactionPoolRetirementCerts(ctx context.Context, hash string) (tcs []TransactionPoolCert, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxPoolRetires))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tcs); err != nil {
+		return
+	}
+	return tcs, nil
 }
