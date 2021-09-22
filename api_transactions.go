@@ -1,5 +1,21 @@
 package blockfrost
 
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
+)
+
+const (
+	resourceTxs           = "txs"
+	resourceTxUTXOs       = "utxos"
+	resourceTxWithdrawals = "withdrawals"
+	resourceTxMetadata    = "metadata"
+	resourceCbor          = "cbor"
+)
+
 type TransactionContent struct {
 	// Count of asset mints and burns within the transaction
 	AssetMintOrBurnCount int `json:"asset_mint_or_burn_count"`
@@ -124,7 +140,7 @@ type TransactionDelegations struct {
 	PoolId string `json:"pool_id"`
 }
 
-type TransactionWidrawal struct {
+type TransactionWidthrawal struct {
 	// Bech32 withdrawal address
 	Address string `json:"address"`
 
@@ -132,7 +148,7 @@ type TransactionWidrawal struct {
 	Amount string `json:"amount"`
 }
 
-type TransactionContentMirs struct {
+type TransactionMIR struct {
 	// Bech32 stake address
 	Address string `json:"address"`
 
@@ -146,7 +162,7 @@ type TransactionContentMirs struct {
 	Pot string `json:"pot"`
 }
 
-type TransactionContentPoolCerts []struct {
+type TransactionPoolCerts []struct {
 	// Epoch that the delegation becomes active
 	ActiveEpoch int `json:"active_epoch"`
 
@@ -208,7 +224,7 @@ type TransactionContentPoolCerts []struct {
 	VrfKey string `json:"vrf_key"`
 }
 
-type TransactionContentPoolRetires struct {
+type TransactionPoolRetires struct {
 	// Index of the certificate within the transaction
 	CertIndex int `json:"cert_index"`
 
@@ -219,7 +235,7 @@ type TransactionContentPoolRetires struct {
 	RetiringEpoch int `json:"retiring_epoch"`
 }
 
-type TransactionContentMetadata struct {
+type TransactionMetadata struct {
 	// Content of the metadata
 	JsonMetadata interface{} `json:"json_metadata"`
 
@@ -227,7 +243,7 @@ type TransactionContentMetadata struct {
 	Label string `json:"label"`
 }
 
-type TransactionContentMetadataCbor struct {
+type TransactionMetadataCbor struct {
 	// Content of the CBOR metadata
 	CborMetadata *string `json:"cbor_metadata"`
 
@@ -241,4 +257,178 @@ type TransactionRedeemer struct {
 	UnitMem   string `json:"unit_mem"`
 	UnitSteps string `json:"unit_steps"`
 	Fee       string `json:"fee"`
+}
+
+func (c *apiClient) handleRequest(req *http.Request) (res *http.Response, err error) {
+	req.Header.Add("project_id", c.projectId)
+	res, err = c.client.Do(req)
+	if err != nil {
+		return
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return res, handleAPIErrorResponse(res)
+	}
+
+	return res, nil
+}
+
+func (c *apiClient) Transaction(ctx context.Context, hash string) (tc TransactionContent, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceTxs, hash))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tc); err != nil {
+		return
+	}
+	return tc, nil
+}
+
+func (c *apiClient) TransactionUTXOs(ctx context.Context, hash string) (tu TransactionUTXOs, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxUTXOs))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tu); err != nil {
+		return
+	}
+	return tu, nil
+}
+
+func (c *apiClient) TransactionStakeAddressCerts(ctx context.Context, hash string) (tc []TransactionStakeAddressCert, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxUTXOs))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tc); err != nil {
+		return
+	}
+	return tc, nil
+}
+
+func (c *apiClient) TransactionWithdrawals(ctx context.Context, hash string) (tw []TransactionWidthrawal, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxWithdrawals))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tw); err != nil {
+		return
+	}
+	return tw, nil
+}
+
+func (c *apiClient) TransactionMIRs(ctx context.Context, hash string) (tw []TransactionMIR, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxWithdrawals))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tw); err != nil {
+		return
+	}
+	return tw, nil
+}
+
+func (c *apiClient) TransactionMetadata(ctx context.Context, hash string) (tm []TransactionMetadata, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tm); err != nil {
+		return
+	}
+	return tm, nil
+}
+
+func (c *apiClient) TransactionMetadataInCBORs(ctx context.Context, hash string) (tmc []TransactionMetadataCbor, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tmc); err != nil {
+		return
+	}
+	return tmc, nil
+}
+
+func (c *apiClient) TransactionRedeemers(ctx context.Context, hash string) (tm []TransactionMetadata, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata, resourceCbor))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tm); err != nil {
+		return
+	}
+	return tm, nil
 }
