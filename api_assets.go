@@ -1,6 +1,20 @@
 package blockfrost
 
-import "context"
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
+)
+
+const (
+	resourceAssets            = "assets"
+	resourceAssetHistory      = "history"
+	resourceAssetTransactions = "transactions"
+	resourceAssetAddresses    = "addresses"
+	resourcePolicyAssets      = "assets/policy"
+)
 
 type Asset struct {
 	Asset             string      `json:"asset,omitempty"`
@@ -31,26 +45,165 @@ type AssetAddress struct {
 	Quantity string `json:"quantity,omitempty"`
 }
 
-func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset, err error) {
-	return
+func (c *apiClient) Assets(ctx context.Context, query APIPagingParams) (a []Asset, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceAssets))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return a, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&a); err != nil {
+		return
+	}
+	return a, nil
 }
 
 func (c *apiClient) Asset(ctx context.Context, asset string) (a Asset, err error) {
-	return
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceAssets, asset))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return a, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&a); err != nil {
+		return
+	}
+	return a, nil
 }
 
 func (c *apiClient) AssetHistory(ctx context.Context, asset string) (hist []AssetHistory, err error) {
-	return
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetHistory))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return hist, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&hist); err != nil {
+		return
+	}
+	return hist, nil
 }
 
 func (c *apiClient) AssetTransactions(ctx context.Context, asset string) (trs []AssetTransaction, err error) {
-	return
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetTransactions))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return trs, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&trs); err != nil {
+		return
+	}
+	return trs, nil
 }
 
 func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []AssetAddress, err error) {
-	return
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetHistory))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return addrs, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&addrs); err != nil {
+		return
+	}
+	return addrs, nil
 }
 
-func (c *apiClient) PolicyAssets(ctx context.Context, asset string) (a []Asset, err error) {
-	return
+func (c *apiClient) PolicyAssets(ctx context.Context, policyId string) (a []Asset, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, resourceAssets, policyId))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	req.Header.Add("project_id", c.projectId)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return a, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&a); err != nil {
+		return
+	}
+	return a, nil
 }
