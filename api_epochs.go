@@ -119,7 +119,7 @@ type EpochParameters struct {
 }
 
 func (c *apiClient) EpochLatest(ctx context.Context) (ep Epoch, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceEpochs, resourceEpochsLatest))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceEpochs, resourceEpochsLatest, resourceEpochParameters))
 	if err != nil {
 		return
 	}
@@ -145,37 +145,254 @@ func (c *apiClient) EpochLatest(ctx context.Context) (ep Epoch, err error) {
 }
 
 func (c *apiClient) LatestEpochParameters(ctx context.Context) (epr EpochParameters, err error) {
-	return
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceEpochs, resourceEpochsLatest))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return epr, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&epr); err != nil {
+		return
+	}
+	return epr, nil
 }
 
 func (c *apiClient) Epoch(ctx context.Context, epochNumber int) (ep Epoch, err error) {
-	return
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d", c.server, resourceEpochs, epochNumber))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return ep, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&ep); err != nil {
+		return
+	}
+	return ep, nil
 }
 
-func (c *apiClient) EpochsNext(ctx context.Context, epochNumber int) (eps []Epoch, err error) {
-	return
+func (c *apiClient) EpochsNext(ctx context.Context, epochNumber int, query APIPagingParams) (eps []Epoch, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsNext))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return eps, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
+		return
+	}
+	return eps, nil
 }
 
-func (c *apiClient) EpochsPrevious(ctx context.Context, epochNumber int) (eps []Epoch, err error) {
-	return
+func (c *apiClient) EpochsPrevious(ctx context.Context, epochNumber int, query APIPagingParams) (eps []Epoch, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsPrevious))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return eps, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
+		return
+	}
+	return eps, nil
 }
 
-func (c *apiClient) EpochStakeDistribution(ctx context.Context, epochNumber int) (s []EpochStake, err error) {
-	return
+func (c *apiClient) EpochStakeDistribution(ctx context.Context, epochNumber int, query APIPagingParams) (eps []EpochStake, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return eps, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
+		return
+	}
+	return eps, nil
 }
 
-func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string) (s []EpochStake, err error) {
-	return
+func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIPagingParams) (eps []EpochStake, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes, poolId))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return eps, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
+		return
+	}
+	return eps, nil
 }
 
-func (c *apiClient) EpochBlockDistribution(ctx context.Context, epochNumber int) (bd []string, err error) {
-	return
+func (c *apiClient) EpochBlockDistribution(ctx context.Context, epochNumber int, query APIPagingParams) (bd []string, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return bd, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&bd); err != nil {
+		return
+	}
+	return bd, nil
 }
 
-func (c *apiClient) EpochBlockDistributionByPool(ctx context.Context, epochNumber int, poolId string) (bd []string, err error) {
-	return
+func (c *apiClient) EpochBlockDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIPagingParams) (bd []string, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return bd, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&bd); err != nil {
+		return
+	}
+	return bd, nil
 }
 
-func (c *apiClient) EpochParameters(ctx context.Context, epochNumber int) (EpochParameters, err error) {
-	return
+func (c *apiClient) EpochParameters(ctx context.Context, epochNumber int) (eps EpochParameters, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	req.Header.Add("project_id", c.projectId)
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return eps, handleAPIErrorResponse(res)
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
+		return
+	}
+	return eps, nil
 }
