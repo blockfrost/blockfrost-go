@@ -1,8 +1,11 @@
 package blockfrost_test
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -56,4 +59,90 @@ func TestUnmarshalRedeemer(t *testing.T) {
 	got := []blockfrost.ScriptRedeemer{}
 
 	testStructGotWant(t, fp, &got, &want)
+}
+
+func TestIntegrationResourceRedeemers(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "script", "redeemer.json")
+	data, err := ioutil.ReadFile(fp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []blockfrost.ScriptRedeemer{}
+	if err = json.Unmarshal(data, &want); err != nil {
+		t.Fatal(err)
+	}
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(data)
+	}))
+
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: s.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	addr := "e1457a0c47dfb7a2f6b8fbb059bdceab163c05d34f195b87b9f2b30e"
+	got, err := api.ScriptRedeemers(context.TODO(), addr, blockfrost.APIPagingParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("expected  %v got %v", want, got)
+	}
+}
+
+func TestIntegrationResourceScripts(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "script", "scripts.json")
+	data, err := ioutil.ReadFile(fp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []blockfrost.Script{}
+	if err = json.Unmarshal(data, &want); err != nil {
+		t.Fatal(err)
+	}
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(data)
+	}))
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: s.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := api.Scripts(context.TODO(), blockfrost.APIPagingParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("expected  %v got %v", want, got)
+	}
+}
+
+func TestIntegrationResourceScript(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "script", "script.json")
+	data, err := ioutil.ReadFile(fp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := blockfrost.Script{}
+	if err = json.Unmarshal(data, &want); err != nil {
+		t.Fatal(err)
+	}
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(data)
+	}))
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: s.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := api.Script(context.TODO(), "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("expected  %v got %v", want, got)
+	}
 }

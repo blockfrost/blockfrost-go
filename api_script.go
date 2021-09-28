@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -93,7 +92,6 @@ func (c *apiClient) ScriptRedeemers(ctx context.Context, address string, query A
 	if err != nil {
 		return
 	}
-	log.Println(requestUrl.String())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return

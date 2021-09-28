@@ -29,6 +29,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Script: %+v", script)
-
+	fmt.Printf("Script: %+v\n", script)
 }
