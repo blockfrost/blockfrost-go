@@ -1,0 +1,9 @@
+[
+    {
+        "ipv4": "4.4.4.4",
+        "ipv6": "https://stakenuts.com/mainnet.json",
+        "dns": "relay1.stakenuts.com",
+        "dns_srv": "_relays._tcp.relays.stakenuts.com",
+        "port": 3001
+    }
+]
