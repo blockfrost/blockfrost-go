@@ -29,7 +29,7 @@ func TestScriptUnmarshal(t *testing.T) {
 func testStructGotWant(t *testing.T, fp string, got interface{}, want interface{}) {
 	bytes, err := ioutil.ReadFile(fp)
 	if err != nil {
-		t.Fatalf("an error ocurred while trying to read json test file %s", fp)
+		t.Fatalf("failed to open json test file %s with err %v", fp, err)
 	}
 
 	if err := json.Unmarshal(bytes, got); err != nil {
