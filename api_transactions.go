@@ -45,10 +45,10 @@ type TransactionContent struct {
 	Index int `json:"index"`
 
 	// Left (included) endpoint of the timelock validity intervals
-	InvalidBefore *string `json:"invalid_before"`
+	InvalidBefore string `json:"invalid_before"`
 
 	// Right (excluded) endpoint of the timelock validity intervals
-	InvalidHereafter *string `json:"invalid_hereafter"`
+	InvalidHereafter string `json:"invalid_hereafter"`
 
 	// Count of the MIR certificates within the transaction
 	MirCertCount int `json:"mir_cert_count"`
