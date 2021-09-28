@@ -78,7 +78,7 @@ type IPFSClient interface {
 	PinnedObject(ctx context.Context, path string) (IPFSPinnedObject, error)
 	PinnedObjects(ctx context.Context, query APIPagingParams) ([]IPFSPinnedObject, error)
 	Remove(ctx context.Context, path string) ([]IPFSObject, error)
-	Gateway(ctx context.Context, path string) ([]IPFSObject, error)
+	Gateway(ctx context.Context, path string) ([]byte, error)
 }
 
 func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject, err error) {
