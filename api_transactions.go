@@ -82,19 +82,21 @@ type TransactionContent struct {
 	WithdrawalCount int `json:"withdrawal_count"`
 }
 
+type TxAmount struct {
+	// The quantity of the unit
+	Quantity string `json:"quantity"`
+
+	// The unit of the value
+	Unit string `json:"unit"`
+}
+
 type TransactionUTXOs struct {
 	// Transaction hash
 	Hash   string `json:"hash"`
 	Inputs []struct {
 		// Input address
-		Address string `json:"address"`
-		Amount  []struct {
-			// The quantity of the unit
-			Quantity string `json:"quantity"`
-
-			// The unit of the value
-			Unit string `json:"unit"`
-		} `json:"amount"`
+		Address string     `json:"address"`
+		Amount  []TxAmount `json:"amount"`
 
 		// UTXO index in the transaction
 		OutputIndex float32 `json:"output_index"`
@@ -104,14 +106,8 @@ type TransactionUTXOs struct {
 	} `json:"inputs"`
 	Outputs []struct {
 		// Output address
-		Address string `json:"address"`
-		Amount  []struct {
-			// The quantity of the unit
-			Quantity string `json:"quantity"`
-
-			// The unit of the value
-			Unit string `json:"unit"`
-		} `json:"amount"`
+		Address string   `json:"address"`
+		Amount  TxAmount `json:"amount"`
 	} `json:"outputs"`
 }
 
@@ -248,7 +244,7 @@ type TransactionMetadata struct {
 
 type TransactionMetadataCbor struct {
 	// Content of the CBOR metadata
-	CborMetadata *string `json:"cbor_metadata"`
+	CborMetadata string `json:"cbor_metadata"`
 
 	// Metadata label
 	Label string `json:"label"`

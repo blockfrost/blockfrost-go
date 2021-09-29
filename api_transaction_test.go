@@ -31,3 +31,69 @@ func TestTransactionContentUnmarshal(t *testing.T) {
 	got := blockfrost.TransactionContent{}
 	testStructGotWant(t, fp, &got, &want)
 }
+
+func TestTransactionStakeAddressCertUnmarshall(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "transactions", "tx_stakeaddr_cert.json")
+	want := []blockfrost.TransactionStakeAddressCert{
+		{
+			Address:      "stake1u9t3a0tcwune5xrnfjg4q7cpvjlgx9lcv0cuqf5mhfjwrvcwrulda",
+			CertIndex:    0,
+			Registration: true,
+		},
+	}
+	got := []blockfrost.TransactionStakeAddressCert{}
+	testStructGotWant(t, fp, &got, &want)
+}
+
+func TestTransactionDelegationUnmarshal(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "transactions", "tx_delegations.json")
+	want := []blockfrost.TransactionDelegation{
+		{
+			Index:       0,
+			CertIndex:   0,
+			Address:     "stake1u9r76ypf5fskppa0cmttas05cgcswrttn6jrq4yd7jpdnvc7gt0yc",
+			PoolId:      "pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy",
+			ActiveEpoch: 210,
+		},
+	}
+	got := []blockfrost.TransactionDelegation{}
+	testStructGotWant(t, fp, &got, &want)
+}
+
+func TestTransactionWithdrawalsUnmarshal(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "transactions", "tx_withdrawals.json")
+	want := []blockfrost.TransactionWidthrawal{
+		{
+			Address: "stake1u9r76ypf5fskppa0cmttas05cgcswrttn6jrq4yd7jpdnvc7gt0yc",
+			Amount:  "431833601",
+		},
+	}
+	got := []blockfrost.TransactionWidthrawal{}
+	testStructGotWant(t, fp, &got, &want)
+}
+
+func TestTransactionMIRsUnmarshal(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "transactions", "tx_mirs.json")
+	want := []blockfrost.TransactionMIR{
+		{
+			Pot:       "reserve",
+			CertIndex: 0,
+			Address:   "stake1u9r76ypf5fskppa0cmttas05cgcswrttn6jrq4yd7jpdnvc7gt0yc",
+			Amount:    "431833601",
+		},
+	}
+	got := []blockfrost.TransactionMIR{}
+	testStructGotWant(t, fp, &got, &want)
+}
+
+func TestTransactionMetadataCborUnmarshal(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "transactions", "tx_cbor.json")
+	want := []blockfrost.TransactionMetadataCbor{
+		{
+			Label:        "1968",
+			CborMetadata: "\\xa100a16b436f6d62696e6174696f6e8601010101010c",
+		},
+	}
+	got := []blockfrost.TransactionMetadataCbor{}
+	testStructGotWant(t, fp, &got, &want)
+}
