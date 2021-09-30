@@ -8,6 +8,93 @@ import (
 	"net/url"
 )
 
+const (
+	resourceAccount                            = "accounts"
+	resourceAccountHistory                     = "history"
+	resourceAccountRewardsHistory              = "rewards"
+	resourceAccountDelegationHistory           = "delegations"
+	resourceAccountRegistrationHistory         = "registrations"
+	resourceAccountWithdrawalHistory           = "withdrawals"
+	resourceAccountMIRHistory                  = "mirs"
+	resourceAccountAssociatedAddress           = "addresses"
+	resourceAccountAddressWithAssetsAssociated = "addresses/assets"
+)
+
+// Account return Specific account address
+// Obtain information about a specific stake account.
+type Account struct {
+	StakeAddress       string `json:"stake_address,omitempty"`
+	Active             bool   `json:"active,omitempty"`
+	ActiveEpoch        int64  `json:"active_epoch,omitempty"`
+	ControlledAmount   string `json:"controlled_amount,omitempty"`
+	RewardsSum         string `json:"rewards_sum,omitempty"`
+	WithdrawalsSum     string `json:"withdrawals_sum,omitempty"`
+	ReservesSum        string `json:"reserves_sum,omitempty"`
+	TreasurySum        string `json:"treasury_sum,omitempty"`
+	WithdrawableAmount string `json:"withdrawable_amount,omitempty"`
+	PoolID             string `json:"pool_id,omitempty"`
+}
+
+// AccountRewardsHist return Account reward history
+// Obtain information about the reward history of a specific account.
+type AccountRewardsHistory struct {
+	Epoch  int32  `json:"epoch,omitempty"`
+	Amount string `json:"amount,omitempty"`
+	PoolID string `json:"pool_id,omitempty"`
+}
+
+// AccountHistory return Account history
+// Obtain information about the history of a specific account.
+type AccountHistory struct {
+	ActiveEpoch int32  `json:"active_epoch,omitempty"`
+	Amount      string `json:"amount,omitempty"`
+	PoolID      string `json:"pool_id,omitempty"`
+}
+
+// AccountDelegationHistory return Account delegation history
+// Obtain information about the delegation of a specific account.
+type AccountDelegationHistory struct {
+	ActiveEpoch int32  `json:"active_epoch,omitempty"`
+	TXHash      string `json:"tx_hash,omitempty"`
+	Amount      string `json:"amount,omitempty"`
+	PoolID      string `json:"pool_id,omitempty"`
+}
+
+// AccountRegistrationHistory return Account registration history
+// Obtain information about the registrations and deregistrations of a specific account.
+type AccountRegistrationHistory struct {
+	TXHash string `json:"tx_hash,omitempty"`
+	Action string `json:"action,omitempty"`
+}
+
+// AccountWithdrawalHistory return Account withdrawal history
+// Obtain information about the withdrawals of a specific account.
+type AccountWithdrawalHistory struct {
+	TXHash string `json:"tx_hash,omitempty"`
+	Amount string `json:"amount,omitempty"`
+}
+
+// AccountMIRHistory return Account MIR history
+// Obtain information about the MIRs of a specific account.
+type AccountMIRHistory struct {
+	TXHash string `json:"tx_hash,omitempty"`
+	Amount string `json:"amount,omitempty"`
+}
+
+// AccountAssociatedAddress return Account associated addresses
+// Obtain information about the addresses of a specific account.
+type AccountAssociatedAddress struct {
+	Address string `json:"address,omitempty"`
+}
+
+// AccountAssociatedAsset return Assets associated with the account addresses
+// Obtain information about assets associated with addresses of a specific account.
+// Be careful, as an account could be part of a mangled address and does not necessarily mean the addresses are owned by user as the account.
+type AccountAssociatedAsset struct {
+	Unit     string `json:"unit,omitempty"`
+	Quantity string `json:"quantity,omitempty"`
+}
+
 // Account returns the content of a requested Account by the specific stake account.
 func (c *apiClient) Account(ctx context.Context, stakeAddress string) (Account, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceAccount, stakeAddress))
@@ -51,25 +138,14 @@ func (c *apiClient) AccountRewardsHistory(
 		return []AccountRewardsHistory{}, err
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
 	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return []AccountRewardsHistory{}, err
 	}
 
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 	req = req.WithContext(ctx)
 
@@ -102,25 +178,14 @@ func (c *apiClient) AccountHistory(
 		return []AccountHistory{}, err
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
 	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return []AccountHistory{}, err
 	}
 
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 	req = req.WithContext(ctx)
 
@@ -153,25 +218,14 @@ func (c *apiClient) AccountDelegationHistory(
 		return []AccountDelegationHistory{}, err
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
 	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return []AccountDelegationHistory{}, err
 	}
 
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 	req = req.WithContext(ctx)
 
@@ -204,25 +258,14 @@ func (c *apiClient) AccountRegistrationHistory(
 		return []AccountRegistrationHistory{}, err
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
 	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return []AccountRegistrationHistory{}, err
 	}
 
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 	req = req.WithContext(ctx)
 
@@ -255,25 +298,14 @@ func (c *apiClient) AccountWithdrawalHistory(
 		return []AccountWithdrawalHistory{}, err
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
 	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return []AccountWithdrawalHistory{}, err
 	}
 
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 	req = req.WithContext(ctx)
 
@@ -306,25 +338,14 @@ func (c *apiClient) AccountMIRHistory(
 		return []AccountMIRHistory{}, err
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
 	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return []AccountMIRHistory{}, err
 	}
 
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 	req = req.WithContext(ctx)
 
@@ -357,25 +378,13 @@ func (c *apiClient) AccountAssociatedAddresses(
 		return []AccountAssociatedAddress{}, err
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
 	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return []AccountAssociatedAddress{}, err
 	}
-
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 	req = req.WithContext(ctx)
 
@@ -408,25 +417,13 @@ func (c *apiClient) AccountAssociatedAssets(
 		return []AccountAssociatedAsset{}, err
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
 	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return []AccountAssociatedAsset{}, err
 	}
-
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 	req = req.WithContext(ctx)
 
