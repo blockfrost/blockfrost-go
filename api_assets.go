@@ -16,16 +16,30 @@ const (
 	resourcePolicyAssets      = "assets/policy"
 )
 
+type AssetOnchainMetadata struct {
+	Name  string `json:"name,omitempty"`
+	Image string `json:"image,omitempty"`
+}
+
+type AssetMetadata struct {
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Ticker      string `json:"ticker,omitempty"`
+	URL         string `json:"url,omitempty"`
+	Logo        string `json:"logo,omitempty"`
+	Decimals    int    `json:"decimals,omitempty"`
+}
+
 type Asset struct {
-	Asset             string      `json:"asset,omitempty"`
-	PolicyId          string      `json:"policy_id,omitempty"`
-	AssetName         string      `json:"asset_name,omitempty"`
-	Fingerprint       string      `json:"fingerprint,omitempty"`
-	Quantity          string      `json:"quantity,omitempty"`
-	InitialMintTxHash string      `json:"initial_mint_tx_hash,omitempty"`
-	MintOrBurnCount   int         `json:"mint_or_burn_count,omitempty"`
-	OnchainMetadata   interface{} `json:"onchain_metadata,omitempty"`
-	Metadata          interface{} `json:"metadata,omitempty"`
+	Asset             string               `json:"asset,omitempty"`
+	PolicyId          string               `json:"policy_id,omitempty"`
+	AssetName         string               `json:"asset_name,omitempty"`
+	Fingerprint       string               `json:"fingerprint,omitempty"`
+	Quantity          string               `json:"quantity,omitempty"`
+	InitialMintTxHash string               `json:"initial_mint_tx_hash,omitempty"`
+	MintOrBurnCount   int                  `json:"mint_or_burn_count,omitempty"`
+	OnchainMetadata   AssetOnchainMetadata `json:"onchain_metadata,omitempty"`
+	Metadata          AssetMetadata        `json:"metadata,omitempty"`
 }
 
 type AssetHistory struct {
