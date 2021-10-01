@@ -11,6 +11,7 @@ type apiClient struct {
 	server    string
 	projectId string
 	client    HttpRequestDoer
+	routines  int
 }
 
 type HttpRequestDoer interface {
@@ -25,6 +26,8 @@ type APIClientOptions struct {
 	Server string
 	// Interface implementing Do method such *http.Client
 	Client HttpRequestDoer
+	// Number of goroutines to use for *All methods
+	Routines int
 }
 
 func NewAPIClient(options APIClientOptions) (APIClient, error) {
@@ -34,17 +37,22 @@ func NewAPIClient(options APIClientOptions) (APIClient, error) {
 
 	if options.Client == nil {
 		// TODO: Make configurable. Timeout, retries ...
-		options.Client = &http.Client{Timeout: time.Second * 5}
+		options.Client = &http.Client{Timeout: time.Second * 10}
 	}
 
 	if options.ProjectID == "" {
 		options.ProjectID = os.Getenv("BLOCKFROST_PROJECT_ID")
 	}
 
+	if options.Routines == 0 {
+		options.Routines = 10
+	}
+
 	client := &apiClient{
 		server:    options.Server,
 		client:    options.Client,
 		projectId: options.ProjectID,
+		routines:  options.Routines,
 	}
 
 	return client, nil
@@ -84,7 +92,9 @@ type APIClient interface {
 	Network(ctx context.Context) (NetworkInfo, error)
 	Script(ctx context.Context, address string) (Script, error)
 	Scripts(ctx context.Context, query APIPagingParams) ([]Script, error)
+	ScriptsAll(ctx context.Context) <-chan ScriptAllResult
 	ScriptRedeemers(ctx context.Context, address string, query APIPagingParams) ([]ScriptRedeemer, error)
+	ScriptRedeemersAll(ctx context.Context, address string) <-chan ScriptRedeemerResult
 	Pools(ctx context.Context, query APIPagingParams) (Pools, error)
 	PoolsRetired(ctx context.Context, query APIPagingParams) ([]PoolRetired, error)
 	PoolsRetiring(ctx context.Context, query APIPagingParams) ([]PoolRetiring, error)
