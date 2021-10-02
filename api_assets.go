@@ -195,7 +195,7 @@ func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []A
 	return addrs, nil
 }
 
-func (c *apiClient) PolicyAssets(ctx context.Context, policyId string) (a []Asset, err error) {
+func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []Asset, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, resourceAssets, policyId))
 	if err != nil {
 		return
