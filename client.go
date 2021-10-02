@@ -108,16 +108,23 @@ type APIClient interface {
 	ScriptsAll(ctx context.Context) <-chan ScriptAllResult
 	ScriptRedeemers(ctx context.Context, address string, query APIPagingParams) ([]ScriptRedeemer, error)
 	ScriptRedeemersAll(ctx context.Context, address string) <-chan ScriptRedeemerResult
+	Pool(ctx context.Context, poolID string) (Pool, error)
 	Pools(ctx context.Context, query APIPagingParams) (Pools, error)
+	PoolsAll(ctx context.Context) <-chan PoolsResult
 	PoolsRetired(ctx context.Context, query APIPagingParams) ([]PoolRetired, error)
+	PoolsRetiredAll(ctx context.Context) <-chan PoolsRetiredResult
 	PoolsRetiring(ctx context.Context, query APIPagingParams) ([]PoolRetiring, error)
-	PoolSpecific(ctx context.Context, poolID string, query APIPagingParams) (PoolSpecific, error)
+	PoolsRetiringAll(ctx context.Context) <-chan PoolsRetiringResult
 	PoolHistory(ctx context.Context, poolID string, query APIPagingParams) ([]PoolHistory, error)
-	PoolMetadata(ctx context.Context, poolID string, query APIPagingParams) (PoolMetadata, error)
-	PoolRelays(ctx context.Context, poolID string, query APIPagingParams) ([]PoolRelay, error)
+	PoolHistoryAll(ctx context.Context, poolId string) <-chan PoolHistoryResult
+	PoolMetadata(ctx context.Context, poolID string) (PoolMetadata, error)
+	PoolRelays(ctx context.Context, poolID string) ([]PoolRelay, error)
 	PoolDelegators(ctx context.Context, poolID string, query APIPagingParams) ([]PoolDelegator, error)
+	PoolDelegatorsAll(ctx context.Context, poolId string) <-chan PoolDelegatorsResult
 	PoolBlocks(ctx context.Context, poolID string, query APIPagingParams) (PoolBlocks, error)
-	PoolUpdate(ctx context.Context, poolID string, query APIPagingParams) ([]PoolUpdate, error)
+	PoolBlocksAll(ctx context.Context, poolId string) <-chan PoolBlocksResult
+	PoolUpdates(ctx context.Context, poolID string, query APIPagingParams) ([]PoolUpdate, error)
+
 	Transaction(ctx context.Context, hash string) (TransactionContent, error)
 	TransactionUTXOs(ctx context.Context, hash string) (TransactionUTXOs, error)
 	TransactionStakeAddressCerts(ctx context.Context, hash string) ([]TransactionStakeAddressCert, error)
