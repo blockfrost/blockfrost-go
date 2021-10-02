@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 )
 
 const (
@@ -47,6 +48,16 @@ type AddressUTXO struct {
 	Amount      []AddressAmount `json:"amount,omitempty"`
 	Block       string          `json:"block,omitempty"`
 	DataHash    string          `json:"data_hash,omitempty"`
+}
+
+type AddressTxResult struct {
+	Res []AddressTransactions
+	Err error
+}
+
+type AddressUTXOResult struct {
+	Res []AddressUTXO
+	Err error
 }
 
 // Address ret
@@ -110,6 +121,46 @@ func (c *apiClient) AddressTransactions(ctx context.Context, address string, que
 	return txs, nil
 }
 
+func (c *apiClient) AddressTransactionsAll(ctx context.Context, address string) <-chan AddressTxResult {
+	ch := make(chan AddressTxResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AddressTxResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				atx, err := c.AddressTransactions(j.ctx, address, j.query)
+				if len(atx) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AddressTxResult{Res: atx, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 func (c *apiClient) AddressDetails(ctx context.Context, address string) (AddressDetails, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAddresses, address, resourceTotal))
 	if err != nil {
@@ -167,4 +218,44 @@ func (c *apiClient) AddressUTXOs(ctx context.Context, address string, query APIP
 		return utxos, err
 	}
 	return utxos, nil
+}
+
+func (c *apiClient) AddressUTXOsAll(ctx context.Context, address string) <-chan AddressUTXOResult {
+	ch := make(chan AddressUTXOResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AddressUTXOResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				autxo, err := c.AddressUTXOs(j.ctx, address, j.query)
+				if len(autxo) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AddressUTXOResult{Res: autxo, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }

@@ -11,6 +11,7 @@ type apiClient struct {
 	server    string
 	projectId string
 	client    HttpRequestDoer
+	routines  int
 }
 
 type HttpRequestDoer interface {
@@ -25,6 +26,8 @@ type APIClientOptions struct {
 	Server string
 	// Interface implementing Do method such *http.Client
 	Client HttpRequestDoer
+	// Number of goroutines to use for *All methods
+	Routines int
 }
 
 func NewAPIClient(options APIClientOptions) (APIClient, error) {
@@ -34,17 +37,22 @@ func NewAPIClient(options APIClientOptions) (APIClient, error) {
 
 	if options.Client == nil {
 		// TODO: Make configurable. Timeout, retries ...
-		options.Client = &http.Client{Timeout: time.Second * 5}
+		options.Client = &http.Client{Timeout: time.Second * 10}
 	}
 
 	if options.ProjectID == "" {
 		options.ProjectID = os.Getenv("BLOCKFROST_PROJECT_ID")
 	}
 
+	if options.Routines == 0 {
+		options.Routines = 10
+	}
+
 	client := &apiClient{
 		server:    options.Server,
 		client:    options.Client,
 		projectId: options.ProjectID,
+		routines:  options.Routines,
 	}
 
 	return client, nil
@@ -67,34 +75,56 @@ type APIClient interface {
 	Address(ctx context.Context, address string) (Address, error)
 	AddressDetails(ctx context.Context, address string) (AddressDetails, error)
 	AddressTransactions(ctx context.Context, address string, query APIPagingParams) ([]AddressTransactions, error)
+	AddressTransactionsAll(ctx context.Context, address string) <-chan AddressTxResult
 	AddressUTXOs(ctx context.Context, address string, query APIPagingParams) ([]AddressUTXO, error)
+	AddressUTXOsAll(ctx context.Context, address string) <-chan AddressUTXOResult
 	Account(ctx context.Context, stakeAddress string) (Account, error)
 	AccountHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountHistory, error)
+	AccountHistoryAll(ctx context.Context, address string) <-chan AccountHistoryResult
 	AccountRewardsHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountRewardsHistory, error)
+	AccountRewardsHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountRewardHisResult
 	AccountDelegationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountDelegationHistory, error)
+	AccountDelegationHistoryAll(ctx context.Context, stakeAddress string) <-chan AccDelegationHistoryResult
 	AccountRegistrationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountRegistrationHistory, error)
+	AccountRegistrationHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountRegistrationHistoryResult
 	AccountWithdrawalHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountWithdrawalHistory, error)
+	AccountWithdrawalHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountWithdrawalHistoryResult
 	AccountMIRHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountMIRHistory, error)
+	AccountMIRHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountMIRHistoryResult
 	AccountAssociatedAddresses(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAddress, error)
+	AccountAssociatedAddressesAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAddressesAll
 	AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAsset, error)
+	AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll
 	Genesis(ctx context.Context) (GenesisBlock, error)
 	MetadataTxLabels(ctx context.Context, query APIPagingParams) ([]MetadataTxLabel, error)
+	MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLabelResult
 	MetadataTxContentInJSON(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInJSON, error)
+	MetadataTxContentInJSONAll(ctx context.Context, label string) <-chan MetadataTxContentInJSONResult
 	MetadataTxContentInCBOR(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInCBOR, error)
+	MetadataTxContentInCBORAll(ctx context.Context, label string) <-chan MetadataTxContentInCBORResult
 	Network(ctx context.Context) (NetworkInfo, error)
 	Script(ctx context.Context, address string) (Script, error)
 	Scripts(ctx context.Context, query APIPagingParams) ([]Script, error)
+	ScriptsAll(ctx context.Context) <-chan ScriptAllResult
 	ScriptRedeemers(ctx context.Context, address string, query APIPagingParams) ([]ScriptRedeemer, error)
+	ScriptRedeemersAll(ctx context.Context, address string) <-chan ScriptRedeemerResult
+	Pool(ctx context.Context, poolID string) (Pool, error)
 	Pools(ctx context.Context, query APIPagingParams) (Pools, error)
+	PoolsAll(ctx context.Context) <-chan PoolsResult
 	PoolsRetired(ctx context.Context, query APIPagingParams) ([]PoolRetired, error)
+	PoolsRetiredAll(ctx context.Context) <-chan PoolsRetiredResult
 	PoolsRetiring(ctx context.Context, query APIPagingParams) ([]PoolRetiring, error)
-	PoolSpecific(ctx context.Context, poolID string, query APIPagingParams) (PoolSpecific, error)
+	PoolsRetiringAll(ctx context.Context) <-chan PoolsRetiringResult
 	PoolHistory(ctx context.Context, poolID string, query APIPagingParams) ([]PoolHistory, error)
-	PoolMetadata(ctx context.Context, poolID string, query APIPagingParams) (PoolMetadata, error)
-	PoolRelays(ctx context.Context, poolID string, query APIPagingParams) ([]PoolRelay, error)
+	PoolHistoryAll(ctx context.Context, poolId string) <-chan PoolHistoryResult
+	PoolMetadata(ctx context.Context, poolID string) (PoolMetadata, error)
+	PoolRelays(ctx context.Context, poolID string) ([]PoolRelay, error)
 	PoolDelegators(ctx context.Context, poolID string, query APIPagingParams) ([]PoolDelegator, error)
+	PoolDelegatorsAll(ctx context.Context, poolId string) <-chan PoolDelegatorsResult
 	PoolBlocks(ctx context.Context, poolID string, query APIPagingParams) (PoolBlocks, error)
-	PoolUpdate(ctx context.Context, poolID string, query APIPagingParams) ([]PoolUpdate, error)
+	PoolBlocksAll(ctx context.Context, poolId string) <-chan PoolBlocksResult
+	PoolUpdates(ctx context.Context, poolID string, query APIPagingParams) ([]PoolUpdate, error)
+	PoolUpdatesAll(ctx context.Context, poolId string) <-chan PoolUpdateResult
 	Transaction(ctx context.Context, hash string) (TransactionContent, error)
 	TransactionUTXOs(ctx context.Context, hash string) (TransactionUTXOs, error)
 	TransactionStakeAddressCerts(ctx context.Context, hash string) ([]TransactionStakeAddressCert, error)
