@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
 const (
@@ -25,6 +26,7 @@ type ipfsClient struct {
 	server    string
 	projectId string
 	client    HttpRequestDoer
+	routines  int
 }
 
 type IPFSClientOptions struct {
@@ -35,6 +37,8 @@ type IPFSClientOptions struct {
 	Server string
 	// Interface implementing Do method such *http.Client
 	Client HttpRequestDoer
+	// Max goroutines to use for *All Methods
+	MaxRoutines int
 }
 
 type IPFSObject struct {
@@ -64,10 +68,15 @@ func NewIPFSClient(options IPFSClientOptions) (IPFSClient, error) {
 		options.ProjectID = os.Getenv("BLOCKFROST_IPFS_PROJECT_ID")
 	}
 
+	if options.MaxRoutines == 0 {
+		options.MaxRoutines = 10
+	}
+
 	client := &ipfsClient{
 		server:    options.Server,
 		client:    options.Client,
 		projectId: options.ProjectID,
+		routines:  options.MaxRoutines,
 	}
 	return client, nil
 }
@@ -79,6 +88,12 @@ type IPFSClient interface {
 	PinnedObjects(ctx context.Context, query APIPagingParams) ([]IPFSPinnedObject, error)
 	Remove(ctx context.Context, path string) ([]IPFSObject, error)
 	Gateway(ctx context.Context, path string) ([]byte, error)
+	PinnedObjectsAll(ctx context.Context, label string) <-chan PinnedObjectResult
+}
+
+type PinnedObjectResult struct {
+	Res []IPFSPinnedObject
+	Err error
 }
 
 func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject, err error) {
@@ -126,6 +141,46 @@ func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject,
 	}
 
 	return ipo, nil
+}
+
+func (ip *ipfsClient) PinnedObjectsAll(ctx context.Context, label string) <-chan PinnedObjectResult {
+	ch := make(chan PinnedObjectResult, ip.routines)
+	jobs := make(chan methodOptions, ip.routines)
+	quit := make(chan bool, ip.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < ip.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan PinnedObjectResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				objs, err := ip.PinnedObjects(j.ctx, j.query)
+				if len(objs) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := PinnedObjectResult{Res: objs, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }
 
 func (ip *ipfsClient) Pin(ctx context.Context, IPFSPath string) (ipo IPFSPinnedObject, err error) {
