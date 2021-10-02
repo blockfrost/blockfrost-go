@@ -79,7 +79,7 @@ func (c *apiClient) Assets(ctx context.Context, query APIPagingParams) (a []Asse
 	req.URL.RawQuery = v.Encode()
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
@@ -145,7 +145,7 @@ func (c *apiClient) Asset(ctx context.Context, asset string) (a Asset, err error
 	}
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
@@ -172,7 +172,7 @@ func (c *apiClient) AssetHistory(ctx context.Context, asset string) (hist []Asse
 
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
@@ -199,7 +199,7 @@ func (c *apiClient) AssetTransactions(ctx context.Context, asset string) (trs []
 
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
@@ -226,7 +226,7 @@ func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []A
 
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
@@ -253,7 +253,7 @@ func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []As
 
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}

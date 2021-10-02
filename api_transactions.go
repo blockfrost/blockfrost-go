@@ -258,20 +258,6 @@ type TransactionRedeemer struct {
 	Fee       string `json:"fee"`
 }
 
-func (c *apiClient) handleRequest(req *http.Request) (res *http.Response, err error) {
-	req.Header.Add("project_id", c.projectId)
-	res, err = c.client.Do(req)
-	if err != nil {
-		return
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return res, handleAPIErrorResponse(res)
-	}
-
-	return res, nil
-}
-
 func (c *apiClient) Transaction(ctx context.Context, hash string) (tc TransactionContent, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceTxs, hash))
 	if err != nil {

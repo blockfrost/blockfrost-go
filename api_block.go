@@ -22,7 +22,7 @@ func (c *apiClient) BlockLatest(ctx context.Context) (Block, error) {
 	}
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return Block{}, err
 	}
@@ -52,7 +52,7 @@ func (c *apiClient) Block(ctx context.Context, hashOrNumber string) (Block, erro
 
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return Block{}, err
 	}
@@ -85,7 +85,7 @@ func (c *apiClient) BlocksNext(ctx context.Context, hashorNumber string) ([]Bloc
 		return blocks, err
 	}
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return blocks, err
 	}
@@ -116,7 +116,7 @@ func (c *apiClient) BlocksPrevious(ctx context.Context, hashorNumber string) ([]
 		return blocks, err
 	}
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return blocks, err
 	}
@@ -146,7 +146,7 @@ func (c *apiClient) BlockTransactions(ctx context.Context, hashOrNumber string) 
 	}
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return txs, err
 	}
@@ -176,7 +176,7 @@ func (c *apiClient) BlockLatestTransactions(ctx context.Context) ([]Transaction,
 	}
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return txs, err
 	}
@@ -206,7 +206,7 @@ func (c *apiClient) BlockBySlot(ctx context.Context, slotNumber int) (Block, err
 	}
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return Block{}, err
 	}
@@ -236,7 +236,7 @@ func (c *apiClient) BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, ep
 	}
 	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return Block{}, err
 	}

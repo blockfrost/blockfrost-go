@@ -61,7 +61,7 @@ type AddressUTXOResult struct {
 }
 
 // Address ret
-func (c *apiClient) Address(ctx context.Context, address string) (Address, error) {
+func (c *apiClient) Address(ctx context.Context, address string) (addr Address, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceAddresses, address))
 	if err != nil {
 		return Address{}, err
@@ -71,23 +71,17 @@ func (c *apiClient) Address(ctx context.Context, address string) (Address, error
 	if err != nil {
 		return Address{}, err
 	}
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return Address{}, nil
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return Address{}, handleAPIErrorResponse(res)
-	}
-
-	txs := Address{}
-	if err := json.NewDecoder(res.Body).Decode(&txs); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&addr); err != nil {
 		return Address{}, err
 	}
-	return txs, nil
+	return addr, nil
 }
 
 func (c *apiClient) AddressTransactions(ctx context.Context, address string, query APIPagingParams) ([]AddressTransactions, error) {
@@ -103,17 +97,11 @@ func (c *apiClient) AddressTransactions(ctx context.Context, address string, que
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return txs, err
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return txs, handleAPIErrorResponse(res)
-	}
 
 	if err := json.NewDecoder(res.Body).Decode(&txs); err != nil {
 		return txs, err
@@ -170,16 +158,11 @@ func (c *apiClient) AddressDetails(ctx context.Context, address string) (Address
 	if err != nil {
 		return AddressDetails{}, err
 	}
-	req.Header.Add("project_id", c.projectId)
-
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return AddressDetails{}, err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return AddressDetails{}, handleAPIErrorResponse(res)
-	}
 
 	det := AddressDetails{}
 	if err = json.NewDecoder(res.Body).Decode(&det); err != nil {
@@ -203,16 +186,12 @@ func (c *apiClient) AddressUTXOs(ctx context.Context, address string, query APIP
 	query.To = ""
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return utxos, err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return utxos, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&utxos); err != nil {
 		return utxos, err
