@@ -97,8 +97,11 @@ type APIClient interface {
 	AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll
 	Genesis(ctx context.Context) (GenesisBlock, error)
 	MetadataTxLabels(ctx context.Context, query APIPagingParams) ([]MetadataTxLabel, error)
+	MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLabelResult
 	MetadataTxContentInJSON(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInJSON, error)
+	MetadataTxContentInJSONAll(ctx context.Context, label string) <-chan MetadataTxContentInJSONResult
 	MetadataTxContentInCBOR(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInCBOR, error)
+	MetadataTxContentInCBORAll(ctx context.Context, label string) <-chan MetadataTxContentInCBORResult
 	Network(ctx context.Context) (NetworkInfo, error)
 	Script(ctx context.Context, address string) (Script, error)
 	Scripts(ctx context.Context, query APIPagingParams) ([]Script, error)
