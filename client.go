@@ -9,12 +9,6 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 )
 
-const (
-	defaultRetryWaitMin = 1 * time.Second
-	defaultRetryWaitMax = 10 * time.Second
-	defaultRetryMax     = 4
-)
-
 type apiClient struct {
 	server    string
 	projectId string
