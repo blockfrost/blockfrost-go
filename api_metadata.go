@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 )
 
 const (
@@ -39,124 +40,229 @@ type MetadataTxContentInCBOR struct {
 	CborMetadata string `json:"cbor_metadata,omitempty"`
 }
 
+type MetadataTxLabelResult struct {
+	Res []MetadataTxLabel
+	Err error
+}
+
+type MetadataTxContentInJSONResult struct {
+	Res []MetadataTxContentInJSON
+	Err error
+}
+
+type MetadataTxContentInCBORResult struct {
+	Res []MetadataTxContentInCBOR
+	Err error
+}
+
 // MetadataTxLabels returns the List of all used transaction metadata labels.
-func (c *apiClient) MetadataTxLabels(
-	ctx context.Context,
-	query APIPagingParams,
-) ([]MetadataTxLabel, error) {
+func (c *apiClient) MetadataTxLabels(ctx context.Context, query APIPagingParams) (mls []MetadataTxLabel, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/", c.server, resourceMetadataTxLabels))
 	if err != nil {
-		return []MetadataTxLabel{}, err
+		return
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return []MetadataTxLabel{}, err
+		return
 	}
 
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return []MetadataTxLabel{}, err
+		return
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return []MetadataTxLabel{}, handleAPIErrorResponse(res)
+		return mls, handleAPIErrorResponse(res)
 	}
-	metadataTxs := []MetadataTxLabel{}
-	err = json.NewDecoder(res.Body).Decode(&metadataTxs)
-	if err != nil {
-		return []MetadataTxLabel{}, err
+
+	if err = json.NewDecoder(res.Body).Decode(&mls); err != nil {
+		return
 	}
-	return metadataTxs, nil
+	return mls, nil
+}
+
+func (c *apiClient) MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLabelResult {
+	ch := make(chan MetadataTxLabelResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan MetadataTxLabelResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				as, err := c.MetadataTxLabels(j.ctx, j.query)
+				if len(as) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := MetadataTxLabelResult{Res: as, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }
 
 // MetadataTxContentInJSON returns the Transaction metadata content in JSON
 // Transaction metadata per label.
-func (c *apiClient) MetadataTxContentInJSON(
-	ctx context.Context,
-	label string,
-	query APIPagingParams,
-) ([]MetadataTxContentInJSON, error) {
-	requestUrl, err := url.Parse(
-		fmt.Sprintf("%s/%s/%s", c.server, resourceMetadataTxContentInJSON, label),
-	)
+func (c *apiClient) MetadataTxContentInJSON(ctx context.Context, label string, query APIPagingParams) (mt []MetadataTxContentInJSON, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceMetadataTxContentInJSON, label))
 	if err != nil {
-		return []MetadataTxContentInJSON{}, err
+		return
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return []MetadataTxContentInJSON{}, err
+		return
 	}
 
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return []MetadataTxContentInJSON{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return []MetadataTxContentInJSON{}, handleAPIErrorResponse(res)
-	}
-	metadataTxs := []MetadataTxContentInJSON{}
-	err = json.NewDecoder(res.Body).Decode(&metadataTxs)
+	err = json.NewDecoder(res.Body).Decode(&mt)
 	if err != nil {
-		return []MetadataTxContentInJSON{}, err
+		return
 	}
-	return metadataTxs, nil
+	return mt, nil
+}
+
+func (c *apiClient) MetadataTxContentInJSONAll(ctx context.Context, label string) <-chan MetadataTxContentInJSONResult {
+	ch := make(chan MetadataTxContentInJSONResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan MetadataTxContentInJSONResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				tc, err := c.MetadataTxContentInJSON(j.ctx, label, j.query)
+				if len(tc) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := MetadataTxContentInJSONResult{Res: tc, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }
 
 // MetadataTxContentInCBOR returns the Transaction metadata content in CBOR
 // Transaction metadata per label.
-func (c *apiClient) MetadataTxContentInCBOR(
-	ctx context.Context,
-	label string,
-	query APIPagingParams,
-) ([]MetadataTxContentInCBOR, error) {
-	requestUrl, err := url.Parse(
-		fmt.Sprintf("%s/%s/%s/%s", c.server, resourceMetadataTxContentInCBOR, label, "cbor"),
-	)
+func (c *apiClient) MetadataTxContentInCBOR(ctx context.Context, label string, query APIPagingParams) (mt []MetadataTxContentInCBOR, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceMetadataTxContentInCBOR, label, "cbor"))
 	if err != nil {
-		return []MetadataTxContentInCBOR{}, err
+		return
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return []MetadataTxContentInCBOR{}, err
+		return
 	}
 
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return []MetadataTxContentInCBOR{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return []MetadataTxContentInCBOR{}, handleAPIErrorResponse(res)
-	}
-	metadataTxs := []MetadataTxContentInCBOR{}
-	err = json.NewDecoder(res.Body).Decode(&metadataTxs)
+	err = json.NewDecoder(res.Body).Decode(&mt)
 	if err != nil {
-		return []MetadataTxContentInCBOR{}, err
+		return
 	}
-	return metadataTxs, nil
+	return mt, nil
+}
+
+func (c *apiClient) MetadataTxContentInCBORAll(ctx context.Context, label string) <-chan MetadataTxContentInCBORResult {
+	ch := make(chan MetadataTxContentInCBORResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan MetadataTxContentInCBORResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				tc, err := c.MetadataTxContentInCBOR(j.ctx, label, j.query)
+				if len(tc) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := MetadataTxContentInCBORResult{Res: tc, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }
