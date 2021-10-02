@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 )
 
 const (
@@ -59,6 +60,11 @@ type AssetAddress struct {
 	Quantity string `json:"quantity,omitempty"`
 }
 
+type AssetResult struct {
+	Res []Asset
+	Err error
+}
+
 func (c *apiClient) Assets(ctx context.Context, query APIPagingParams) (a []Asset, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceAssets))
 	if err != nil {
@@ -86,6 +92,46 @@ func (c *apiClient) Assets(ctx context.Context, query APIPagingParams) (a []Asse
 		return
 	}
 	return a, nil
+}
+
+func (c *apiClient) AssetsAll(ctx context.Context, poolId string) <-chan AssetResult {
+	ch := make(chan AssetResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AssetResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				assets, err := c.Assets(j.ctx, j.query)
+				if len(assets) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AssetResult{Res: assets, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }
 
 func (c *apiClient) Asset(ctx context.Context, asset string) (a Asset, err error) {

@@ -97,6 +97,7 @@ type APIClient interface {
 	AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll
 	Asset(ctx context.Context, asset string) (Asset, error)
 	Assets(ctx context.Context, query APIPagingParams) ([]Asset, error)
+	AssetsAll(ctx context.Context, poolId string) <-chan AssetResult
 	AssetHistory(ctx context.Context, asset string) ([]AssetHistory, error)
 	AssetTransactions(ctx context.Context, asset string) ([]AssetTransaction, error)
 	AssetAddresses(ctx context.Context, asset string) ([]AssetAddress, error)
