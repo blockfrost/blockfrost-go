@@ -124,7 +124,7 @@ type APIClient interface {
 	PoolBlocks(ctx context.Context, poolID string, query APIPagingParams) (PoolBlocks, error)
 	PoolBlocksAll(ctx context.Context, poolId string) <-chan PoolBlocksResult
 	PoolUpdates(ctx context.Context, poolID string, query APIPagingParams) ([]PoolUpdate, error)
-
+	PoolUpdatesAll(ctx context.Context, poolId string) <-chan PoolUpdateResult
 	Transaction(ctx context.Context, hash string) (TransactionContent, error)
 	TransactionUTXOs(ctx context.Context, hash string) (TransactionUTXOs, error)
 	TransactionStakeAddressCerts(ctx context.Context, hash string) ([]TransactionStakeAddressCert, error)
