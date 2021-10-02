@@ -35,17 +35,12 @@ func (c *apiClient) Genesis(ctx context.Context) (GenesisBlock, error) {
 	if err != nil {
 		return GenesisBlock{}, err
 	}
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return GenesisBlock{}, err
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return GenesisBlock{}, handleAPIErrorResponse(res)
-	}
 
 	gen := GenesisBlock{}
 	if err := json.NewDecoder(res.Body).Decode(&gen); err != nil {
