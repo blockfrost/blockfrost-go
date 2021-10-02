@@ -95,6 +95,13 @@ type APIClient interface {
 	AccountAssociatedAddressesAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAddressesAll
 	AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAsset, error)
 	AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll
+	Asset(ctx context.Context, asset string) (Asset, error)
+	Assets(ctx context.Context, query APIPagingParams) ([]Asset, error)
+	AssetsAll(ctx context.Context, poolId string) <-chan AssetResult
+	AssetHistory(ctx context.Context, asset string) ([]AssetHistory, error)
+	AssetTransactions(ctx context.Context, asset string) ([]AssetTransaction, error)
+	AssetAddresses(ctx context.Context, asset string) ([]AssetAddress, error)
+	AssetsByPolicy(ctx context.Context, policyId string) ([]Asset, error)
 	Genesis(ctx context.Context) (GenesisBlock, error)
 	MetadataTxLabels(ctx context.Context, query APIPagingParams) ([]MetadataTxLabel, error)
 	MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLabelResult
