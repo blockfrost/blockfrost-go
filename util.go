@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 func handleAPIErrorResponse(res *http.Response) error {
@@ -82,4 +84,22 @@ func formatParams(v url.Values, query APIPagingParams) url.Values {
 
 	v.Encode()
 	return v
+}
+
+func (c *apiClient) handleRequest(req *http.Request) (res *http.Response, err error) {
+	req.Header.Add("project_id", c.projectId)
+	rreq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return
+	}
+	res, err = c.client.Do(rreq)
+	if err != nil {
+		return
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return res, handleAPIErrorResponse(res)
+	}
+
+	return res, nil
 }

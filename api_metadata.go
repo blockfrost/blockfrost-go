@@ -56,41 +56,35 @@ type MetadataTxContentInCBORResult struct {
 }
 
 // MetadataTxLabels returns the List of all used transaction metadata labels.
-func (c *apiClient) MetadataTxLabels(
-	ctx context.Context,
-	query APIPagingParams,
-) ([]MetadataTxLabel, error) {
+func (c *apiClient) MetadataTxLabels(ctx context.Context, query APIPagingParams) (mls []MetadataTxLabel, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/", c.server, resourceMetadataTxLabels))
 	if err != nil {
-		return []MetadataTxLabel{}, err
+		return
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return []MetadataTxLabel{}, err
+		return
 	}
 
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return []MetadataTxLabel{}, err
+		return
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return []MetadataTxLabel{}, handleAPIErrorResponse(res)
+		return mls, handleAPIErrorResponse(res)
 	}
-	metadataTxs := []MetadataTxLabel{}
-	err = json.NewDecoder(res.Body).Decode(&metadataTxs)
-	if err != nil {
-		return []MetadataTxLabel{}, err
+
+	if err = json.NewDecoder(res.Body).Decode(&mls); err != nil {
+		return
 	}
-	return metadataTxs, nil
+	return mls, nil
 }
 
 func (c *apiClient) MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLabelResult {
@@ -135,44 +129,32 @@ func (c *apiClient) MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLa
 
 // MetadataTxContentInJSON returns the Transaction metadata content in JSON
 // Transaction metadata per label.
-func (c *apiClient) MetadataTxContentInJSON(
-	ctx context.Context,
-	label string,
-	query APIPagingParams,
-) ([]MetadataTxContentInJSON, error) {
-	requestUrl, err := url.Parse(
-		fmt.Sprintf("%s/%s/%s", c.server, resourceMetadataTxContentInJSON, label),
-	)
+func (c *apiClient) MetadataTxContentInJSON(ctx context.Context, label string, query APIPagingParams) (mt []MetadataTxContentInJSON, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceMetadataTxContentInJSON, label))
 	if err != nil {
-		return []MetadataTxContentInJSON{}, err
+		return
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return []MetadataTxContentInJSON{}, err
+		return
 	}
 
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return []MetadataTxContentInJSON{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return []MetadataTxContentInJSON{}, handleAPIErrorResponse(res)
-	}
-	metadataTxs := []MetadataTxContentInJSON{}
-	err = json.NewDecoder(res.Body).Decode(&metadataTxs)
+	err = json.NewDecoder(res.Body).Decode(&mt)
 	if err != nil {
-		return []MetadataTxContentInJSON{}, err
+		return
 	}
-	return metadataTxs, nil
+	return mt, nil
 }
 
 func (c *apiClient) MetadataTxContentInJSONAll(ctx context.Context, label string) <-chan MetadataTxContentInJSONResult {
@@ -217,40 +199,32 @@ func (c *apiClient) MetadataTxContentInJSONAll(ctx context.Context, label string
 
 // MetadataTxContentInCBOR returns the Transaction metadata content in CBOR
 // Transaction metadata per label.
-func (c *apiClient) MetadataTxContentInCBOR(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInCBOR, error) {
-	requestUrl, err := url.Parse(
-		fmt.Sprintf("%s/%s/%s/%s", c.server, resourceMetadataTxContentInCBOR, label, "cbor"),
-	)
+func (c *apiClient) MetadataTxContentInCBOR(ctx context.Context, label string, query APIPagingParams) (mt []MetadataTxContentInCBOR, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceMetadataTxContentInCBOR, label, "cbor"))
 	if err != nil {
-		return []MetadataTxContentInCBOR{}, err
+		return
 	}
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return []MetadataTxContentInCBOR{}, err
+		return
 	}
 
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return []MetadataTxContentInCBOR{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return []MetadataTxContentInCBOR{}, handleAPIErrorResponse(res)
-	}
-	metadataTxs := []MetadataTxContentInCBOR{}
-	err = json.NewDecoder(res.Body).Decode(&metadataTxs)
+	err = json.NewDecoder(res.Body).Decode(&mt)
 	if err != nil {
-		return []MetadataTxContentInCBOR{}, err
+		return
 	}
-	return metadataTxs, nil
+	return mt, nil
 }
 
 func (c *apiClient) MetadataTxContentInCBORAll(ctx context.Context, label string) <-chan MetadataTxContentInCBORResult {

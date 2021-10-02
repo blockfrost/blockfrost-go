@@ -5,12 +5,20 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
+)
+
+const (
+	defaultRetryWaitMin = 1 * time.Second
+	defaultRetryWaitMax = 10 * time.Second
+	defaultRetryMax     = 4
 )
 
 type apiClient struct {
 	server    string
 	projectId string
-	client    HttpRequestDoer
+	client    *retryablehttp.Client
 	routines  int
 }
 
@@ -22,12 +30,16 @@ type APIClientOptions struct {
 	// The project_id to use from blockfrost. If not set
 	// `BLOCKFROST_PROJECT_ID` is loaded from env
 	ProjectID string
-	// Configures server to use. Can be toggled for test servers
+
+	// Server url to use
 	Server string
-	// Interface implementing Do method such *http.Client
-	Client HttpRequestDoer
-	// Number of goroutines to use for *All methods
-	Routines int
+
+	// Max number of routines to use for *All methods
+	MaxRoutines int
+
+	RetryWaitMin time.Duration // Minimum time to wait
+	RetryWaitMax time.Duration // Maximum time to wait
+	RetryMax     int           // Maximum number of retries
 }
 
 func NewAPIClient(options APIClientOptions) (APIClient, error) {
@@ -35,24 +47,22 @@ func NewAPIClient(options APIClientOptions) (APIClient, error) {
 		options.Server = CardanoMainNet
 	}
 
-	if options.Client == nil {
-		// TODO: Make configurable. Timeout, retries ...
-		options.Client = &http.Client{Timeout: time.Second * 10}
-	}
+	retryclient := retryablehttp.NewClient()
+	retryclient.Logger = nil
 
 	if options.ProjectID == "" {
 		options.ProjectID = os.Getenv("BLOCKFROST_PROJECT_ID")
 	}
 
-	if options.Routines == 0 {
-		options.Routines = 10
+	if options.MaxRoutines == 0 {
+		options.MaxRoutines = 10
 	}
 
 	client := &apiClient{
 		server:    options.Server,
-		client:    options.Client,
+		client:    retryclient,
 		projectId: options.ProjectID,
-		routines:  options.Routines,
+		routines:  options.MaxRoutines,
 	}
 
 	return client, nil

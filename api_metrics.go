@@ -20,9 +20,7 @@ func (c *apiClient) Metrics(ctx context.Context) ([]Metric, error) {
 	if err != nil {
 		return metrics, err
 	}
-	req.Header.Add("project_id", c.projectId)
-
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return metrics, err
 	}
@@ -53,17 +51,11 @@ func (c *apiClient) MetricsEndpoints(ctx context.Context) ([]MetricsEndpoint, er
 		return metricsEndpoints, err
 	}
 
-	req.Header.Add("project_id", c.projectId)
-
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return metricsEndpoints, err
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return metricsEndpoints, handleAPIErrorResponse(res)
-	}
 
 	err = json.NewDecoder(res.Body).Decode(&metricsEndpoints)
 	if err != nil {
