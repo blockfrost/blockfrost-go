@@ -150,49 +150,32 @@ type PoolUpdateResult struct {
 
 // Pools returns the List of stake pools
 // List of registered stake pools.
-func (c *apiClient) Pools(ctx context.Context, query APIPagingParams) (Pools, error) {
+func (c *apiClient) Pools(ctx context.Context, query APIPagingParams) (ps Pools, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourcePool))
 	if err != nil {
 		return Pools{}, err
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return Pools{}, err
+		return
 	}
 
-	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return Pools{}, err
+		return
 	}
+
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return Pools{}, handleAPIErrorResponse(res)
+	if err = json.NewDecoder(res.Body).Decode(&ps); err != nil {
+		return
 	}
-	pools := Pools{}
-	err = json.NewDecoder(res.Body).Decode(&pools)
-	if err != nil {
-		return Pools{}, err
-	}
-	return pools, nil
+	return ps, nil
 }
 
 func (c *apiClient) PoolsAll(ctx context.Context) <-chan PoolsResult {
@@ -237,49 +220,31 @@ func (c *apiClient) PoolsAll(ctx context.Context) <-chan PoolsResult {
 
 // PoolsRetired returns the List of retired stake pools
 // List of already retired pools.
-func (c *apiClient) PoolsRetired(ctx context.Context, query APIPagingParams) ([]PoolRetired, error) {
+func (c *apiClient) PoolsRetired(ctx context.Context, query APIPagingParams) (prs []PoolRetired, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourcePoolRetired))
 	if err != nil {
-		return []PoolRetired{}, err
+		return
 	}
 
-	v := url.Values{}
-	if query.Count > 0 {
-		v.Set("count", fmt.Sprintf("%d", query.Count))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Page > 0 {
-		v.Set("page", fmt.Sprintf("%d", query.Page))
-		requestUrl.RawQuery = v.Encode()
-	}
-	if query.Order != "" {
-		v.Set("order", query.Order)
-		requestUrl.RawQuery = v.Encode()
-	}
-
-	req, err := http.NewRequest(http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return []PoolRetired{}, err
+		return
 	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 
-	req.Header.Add("project_id", c.projectId)
-	req = req.WithContext(ctx)
-
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return []PoolRetired{}, err
+		return
 	}
+
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return []PoolRetired{}, handleAPIErrorResponse(res)
+	if err = json.NewDecoder(res.Body).Decode(&prs); err != nil {
+		return
 	}
-	pools := []PoolRetired{}
-	err = json.NewDecoder(res.Body).Decode(&pools)
-	if err != nil {
-		return []PoolRetired{}, err
-	}
-	return pools, nil
+	return prs, nil
 }
 
 func (c *apiClient) PoolsRetiredAll(ctx context.Context) <-chan PoolsRetiredResult {
@@ -438,8 +403,8 @@ func (c *apiClient) PoolHistory(ctx context.Context, poolID string, query APIPag
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&ph); err != nil {
-		return []PoolHistory{}, err
+	if err = json.NewDecoder(res.Body).Decode(&ph); err != nil {
+		return
 	}
 	return ph, nil
 }
@@ -502,8 +467,7 @@ func (c *apiClient) PoolMetadata(ctx context.Context, poolID string) (pm PoolMet
 		return
 	}
 	defer res.Body.Close()
-	err = json.NewDecoder(res.Body).Decode(&pm)
-	if err != nil {
+	if err = json.NewDecoder(res.Body).Decode(&pm); err != nil {
 		return
 	}
 	return pm, nil
@@ -556,9 +520,6 @@ func (c *apiClient) PoolDelegators(ctx context.Context, poolID string, query API
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return pd, handleAPIErrorResponse(res)
-	}
 	if err = json.NewDecoder(res.Body).Decode(&pd); err != nil {
 		return pd, err
 	}
@@ -628,9 +589,6 @@ func (c *apiClient) PoolBlocks(ctx context.Context, poolID string, query APIPagi
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return pb, handleAPIErrorResponse(res)
-	}
 	if err = json.NewDecoder(res.Body).Decode(&pb); err != nil {
 		return pb, err
 	}
@@ -700,16 +658,13 @@ func (c *apiClient) PoolUpdates(ctx context.Context, poolID string, query APIPag
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return pu, handleAPIErrorResponse(res)
-	}
 	if err = json.NewDecoder(res.Body).Decode(&pu); err != nil {
 		return
 	}
 	return pu, nil
 }
 
-func (c *apiClient) PoolUpdateAll(ctx context.Context, poolId string) <-chan PoolUpdateResult {
+func (c *apiClient) PoolUpdatesAll(ctx context.Context, poolId string) <-chan PoolUpdateResult {
 	ch := make(chan PoolUpdateResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
 	quit := make(chan bool, c.routines)
