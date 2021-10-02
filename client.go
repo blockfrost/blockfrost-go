@@ -80,13 +80,21 @@ type APIClient interface {
 	AddressUTXOsAll(ctx context.Context, address string) <-chan AddressUTXOResult
 	Account(ctx context.Context, stakeAddress string) (Account, error)
 	AccountHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountHistory, error)
+	AccountHistoryAll(ctx context.Context, address string) <-chan AccountHistoryResult
 	AccountRewardsHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountRewardsHistory, error)
+	AccountRewardsHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountRewardHisResult
 	AccountDelegationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountDelegationHistory, error)
+	AccountDelegationHistoryAll(ctx context.Context, stakeAddress string) <-chan AccDelegationHistoryResult
 	AccountRegistrationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountRegistrationHistory, error)
+	AccountRegistrationHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountRegistrationHistoryResult
 	AccountWithdrawalHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountWithdrawalHistory, error)
+	AccountWithdrawalHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountWithdrawalHistoryResult
 	AccountMIRHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountMIRHistory, error)
+	AccountMIRHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountMIRHistoryResult
 	AccountAssociatedAddresses(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAddress, error)
+	AccountAssociatedAddressesAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAddressesAll
 	AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAsset, error)
+	AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll
 	Genesis(ctx context.Context) (GenesisBlock, error)
 	MetadataTxLabels(ctx context.Context, query APIPagingParams) ([]MetadataTxLabel, error)
 	MetadataTxContentInJSON(ctx context.Context, label string, query APIPagingParams) ([]MetadataTxContentInJSON, error)

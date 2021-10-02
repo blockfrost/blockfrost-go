@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 )
 
 const (
@@ -95,6 +96,46 @@ type AccountAssociatedAsset struct {
 	Quantity string `json:"quantity,omitempty"`
 }
 
+type AccountHistoryResult struct {
+	Res []AccountHistory
+	Err error
+}
+
+type AccountRewardHisResult struct {
+	Res []AccountRewardsHistory
+	Err error
+}
+
+type AccDelegationHistoryResult struct {
+	Res []AccountDelegationHistory
+	Err error
+}
+
+type AccountRegistrationHistoryResult struct {
+	Res []AccountRegistrationHistory
+	Err error
+}
+
+type AccountMIRHistoryResult struct {
+	Res []AccountMIRHistory
+	Err error
+}
+
+type AccountWithdrawalHistoryResult struct {
+	Res []AccountWithdrawalHistory
+	Err error
+}
+
+type AccountAssociatedAddressesAll struct {
+	Res []AccountAssociatedAddress
+	Err error
+}
+
+type AccountAssociatedAssetsAll struct {
+	Res []AccountAssociatedAsset
+	Err error
+}
+
 // Account returns the content of a requested Account by the specific stake account.
 func (c *apiClient) Account(ctx context.Context, stakeAddress string) (Account, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceAccount, stakeAddress))
@@ -166,13 +207,49 @@ func (c *apiClient) AccountRewardsHistory(
 	return accounts, nil
 }
 
+func (c *apiClient) AccountRewardsHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountRewardHisResult {
+	ch := make(chan AccountRewardHisResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AccountRewardHisResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				his, err := c.AccountRewardsHistory(j.ctx, stakeAddress, j.query)
+				if len(his) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AccountRewardHisResult{Res: his, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 // AccountHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the history.
-func (c *apiClient) AccountHistory(
-	ctx context.Context,
-	stakeAddress string,
-	query APIPagingParams,
-) ([]AccountHistory, error) {
+func (c *apiClient) AccountHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountHistory, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountHistory))
 	if err != nil {
 		return []AccountHistory{}, err
@@ -206,13 +283,49 @@ func (c *apiClient) AccountHistory(
 	return accounts, nil
 }
 
+func (c *apiClient) AccountHistoryAll(ctx context.Context, address string) <-chan AccountHistoryResult {
+	ch := make(chan AccountHistoryResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AccountHistoryResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				his, err := c.AccountHistory(j.ctx, address, j.query)
+				if len(his) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AccountHistoryResult{Res: his, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 // AccountDelegationHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the delegations.
-func (c *apiClient) AccountDelegationHistory(
-	ctx context.Context,
-	stakeAddress string,
-	query APIPagingParams,
-) ([]AccountDelegationHistory, error) {
+func (c *apiClient) AccountDelegationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountDelegationHistory, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountDelegationHistory))
 	if err != nil {
 		return []AccountDelegationHistory{}, err
@@ -244,6 +357,46 @@ func (c *apiClient) AccountDelegationHistory(
 		return []AccountDelegationHistory{}, err
 	}
 	return accounts, nil
+}
+
+func (c *apiClient) AccountDelegationHistoryAll(ctx context.Context, stakeAddress string) <-chan AccDelegationHistoryResult {
+	ch := make(chan AccDelegationHistoryResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AccDelegationHistoryResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				his, err := c.AccountDelegationHistory(j.ctx, stakeAddress, j.query)
+				if len(his) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AccDelegationHistoryResult{Res: his, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }
 
 // AccountRegistrationHistory returns the content of a requested Account by the specific stake account.
@@ -286,13 +439,49 @@ func (c *apiClient) AccountRegistrationHistory(
 	return accounts, nil
 }
 
+func (c *apiClient) AccountRegistrationHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountRegistrationHistoryResult {
+	ch := make(chan AccountRegistrationHistoryResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AccountRegistrationHistoryResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				his, err := c.AccountRegistrationHistory(j.ctx, stakeAddress, j.query)
+				if len(his) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AccountRegistrationHistoryResult{Res: his, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 // AccountWithdrawalHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the Withdrawals.
-func (c *apiClient) AccountWithdrawalHistory(
-	ctx context.Context,
-	stakeAddress string,
-	query APIPagingParams,
-) ([]AccountWithdrawalHistory, error) {
+func (c *apiClient) AccountWithdrawalHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountWithdrawalHistory, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountWithdrawalHistory))
 	if err != nil {
 		return []AccountWithdrawalHistory{}, err
@@ -326,13 +515,49 @@ func (c *apiClient) AccountWithdrawalHistory(
 	return accounts, nil
 }
 
+func (c *apiClient) AccountWithdrawalHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountWithdrawalHistoryResult {
+	ch := make(chan AccountWithdrawalHistoryResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AccountWithdrawalHistoryResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				his, err := c.AccountWithdrawalHistory(j.ctx, stakeAddress, j.query)
+				if len(his) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AccountWithdrawalHistoryResult{Res: his, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 // AccountMIRHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the MIRs.
-func (c *apiClient) AccountMIRHistory(
-	ctx context.Context,
-	stakeAddress string,
-	query APIPagingParams,
-) ([]AccountMIRHistory, error) {
+func (c *apiClient) AccountMIRHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountMIRHistory, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountMIRHistory))
 	if err != nil {
 		return []AccountMIRHistory{}, err
@@ -366,13 +591,49 @@ func (c *apiClient) AccountMIRHistory(
 	return accounts, nil
 }
 
+func (c *apiClient) AccountMIRHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountMIRHistoryResult {
+	ch := make(chan AccountMIRHistoryResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AccountMIRHistoryResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				his, err := c.AccountMIRHistory(j.ctx, stakeAddress, j.query)
+				if len(his) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AccountMIRHistoryResult{Res: his, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 // AccountAssociatedAddresses returns the content of a requested Account by the specific stake account.
 // Obtain information about the addresses of a specific account.
-func (c *apiClient) AccountAssociatedAddresses(
-	ctx context.Context,
-	stakeAddress string,
-	query APIPagingParams,
-) ([]AccountAssociatedAddress, error) {
+func (c *apiClient) AccountAssociatedAddresses(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAddress, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountAssociatedAddress))
 	if err != nil {
 		return []AccountAssociatedAddress{}, err
@@ -405,13 +666,49 @@ func (c *apiClient) AccountAssociatedAddresses(
 	return accounts, nil
 }
 
+func (c *apiClient) AccountAssociatedAddressesAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAddressesAll {
+	ch := make(chan AccountAssociatedAddressesAll, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AccountAssociatedAddressesAll, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				addrs, err := c.AccountAssociatedAddresses(j.ctx, stakeAddress, j.query)
+				if len(addrs) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AccountAssociatedAddressesAll{Res: addrs, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 // AccountAssociatedAssets returns the content of a requested Account by the specific stake account.
 // Obtain information about the addresses of a specific account.
-func (c *apiClient) AccountAssociatedAssets(
-	ctx context.Context,
-	stakeAddress string,
-	query APIPagingParams,
-) ([]AccountAssociatedAsset, error) {
+func (c *apiClient) AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountAssociatedAsset, error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountAddressWithAssetsAssociated))
 	if err != nil {
 		return []AccountAssociatedAsset{}, err
@@ -442,4 +739,44 @@ func (c *apiClient) AccountAssociatedAssets(
 		return []AccountAssociatedAsset{}, err
 	}
 	return accounts, nil
+}
+
+func (c *apiClient) AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll {
+	ch := make(chan AccountAssociatedAssetsAll, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AccountAssociatedAssetsAll, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				as, err := c.AccountAssociatedAssets(j.ctx, stakeAddress, j.query)
+				if len(as) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := AccountAssociatedAssetsAll{Res: as, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }
