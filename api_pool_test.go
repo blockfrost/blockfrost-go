@@ -2,6 +2,7 @@ package blockfrost_test
 
 import (
 	"context"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -33,12 +34,12 @@ func TestResourcePools(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	q := blockfrost.APIPagingParams{}
 	pools, err := api.Pools(context.TODO(), q)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	assert.Equal(t, inputPoolID, pools[0])
 }
@@ -65,12 +66,12 @@ func TestResourcePoolsRetired(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	q := blockfrost.APIPagingParams{}
 	pools, err := api.PoolsRetired(context.TODO(), q)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	assert.Equal(t, expectedElement, pools[0])
 }
@@ -97,12 +98,12 @@ func TestResourcePoolsRetiring(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	q := blockfrost.APIPagingParams{}
 	pools, err := api.PoolsRetiring(context.TODO(), q)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	assert.Equal(t, expectedElement, pools[0])
 }
@@ -110,7 +111,7 @@ func TestResourcePoolsRetiring(t *testing.T) {
 func TestResourcePoolSpecific(t *testing.T) {
 	t.Parallel()
 	inputPoolID := "pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy"
-	expectedElement := blockfrost.PoolSpecific{
+	expectedElement := blockfrost.Pool{
 		PoolID:         inputPoolID,
 		Hex:            "0f292fcaa02b8b2f9b3c8f9fd8e0bb21abedb692a6d5058df3ef2735",
 		VrfKey:         "0b5245f9934ec2151116fb8ec00f35fd00e0aa3b075c4ed12cce440f999d8233",
@@ -150,12 +151,11 @@ func TestResourcePoolSpecific(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
-	pool, err := api.PoolSpecific(context.TODO(), inputPoolID, q)
+	pool, err := api.Pool(context.TODO(), inputPoolID)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	assert.Equal(t, expectedElement, pool)
 }
@@ -188,14 +188,14 @@ func TestResourcePoolHistory(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	q := blockfrost.APIPagingParams{}
-	pool, err := api.PoolHistory(context.TODO(), inputPoolID, q)
+	got, err := api.PoolHistory(context.TODO(), inputPoolID, q)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
-	assert.Equal(t, expectedElement, pool[0])
+	assert.Equal(t, expectedElement, got[0])
 }
 
 func TestResourcePoolMetadata(t *testing.T) {
@@ -227,34 +227,27 @@ func TestResourcePoolMetadata(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
-	pool, err := api.PoolMetadata(context.TODO(), inputPoolID, q)
+	pool, err := api.PoolMetadata(context.TODO(), inputPoolID)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	assert.Equal(t, expectedElement, pool)
 }
 func TestResourcePoolRelays(t *testing.T) {
 	t.Parallel()
-	inputPoolID := "pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy"
-	expectedElement := blockfrost.PoolRelay{
+	want := []blockfrost.PoolRelay{{
 		Ipv4:   "4.4.4.4",
 		Ipv6:   "https://stakenuts.com/mainnet.json",
 		DNS:    "relay1.stakenuts.com",
 		DNSSrv: "_relays._tcp.relays.stakenuts.com",
 		Port:   3001,
+	},
 	}
 	s := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			time.Sleep(20 * time.Millisecond)
-			fp := filepath.Join(testdata, "json", "pool", "pools_relays.json")
-			file, err := ioutil.ReadFile(fp)
-			if err != nil {
-				t.Fatalf("an error ocurred while trying to read json test file %s", fp)
-			}
-			w.Write(file)
+			json.NewEncoder(w).Encode(want)
 		}),
 	)
 	defer s.Close()
@@ -262,14 +255,13 @@ func TestResourcePoolRelays(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
-	pool, err := api.PoolRelays(context.TODO(), inputPoolID, q)
+	got, err := api.PoolRelays(context.TODO(), "")
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
-	assert.Equal(t, expectedElement, pool[0])
+	assert.Equal(t, want, got)
 }
 func TestResourcePoolDelegators(t *testing.T) {
 	t.Parallel()
@@ -294,12 +286,12 @@ func TestResourcePoolDelegators(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	q := blockfrost.APIPagingParams{}
 	pool, err := api.PoolDelegators(context.TODO(), inputPoolID, q)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	assert.Equal(t, expectedElement, pool[0])
 }
@@ -329,12 +321,12 @@ func TestResourcePoolBlocks(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	q := blockfrost.APIPagingParams{}
 	pool, err := api.PoolBlocks(context.TODO(), inputPoolID, q)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	assert.Equal(t, expectedElement, pool)
 }
@@ -363,12 +355,12 @@ func TestResourcePoolUpdate(t *testing.T) {
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	q := blockfrost.APIPagingParams{}
-	pool, err := api.PoolUpdate(context.TODO(), inputPoolID, q)
+	pool, err := api.PoolUpdates(context.TODO(), inputPoolID, q)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err)
 	}
 	assert.Equal(t, expectedElement, pool[0])
 }
