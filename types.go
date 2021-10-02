@@ -5,7 +5,7 @@ import "fmt"
 const (
 	CardanoMainNet = "https://cardano-mainnet.blockfrost.io/api/v0"
 	CardanoTestNet = "https://cardano-testnet.blockfrost.io/api/v0"
-	IPFS           = "https://ipfs.blockfrost.io/api/v0"
+	IPFSNet        = "https://ipfs.blockfrost.io/api/v0"
 )
 
 // resource paths
