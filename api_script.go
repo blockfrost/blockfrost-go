@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 )
 
 const (
@@ -28,6 +29,21 @@ type ScriptRedeemer struct {
 	Fee       string `json:"fee,omitempty"`
 }
 
+type methodOptions struct {
+	ctx   context.Context
+	query APIPagingParams
+}
+
+type ScriptAllResult struct {
+	Scripts []Script
+	Err     error
+}
+
+type ScriptRedeemerResult struct {
+	ScriptRedeemers []ScriptRedeemer
+	Err             error
+}
+
 func (c *apiClient) Scripts(ctx context.Context, query APIPagingParams) (scripts []Script, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceScripts))
 	if err != nil {
@@ -40,9 +56,8 @@ func (c *apiClient) Scripts(ctx context.Context, query APIPagingParams) (scripts
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
@@ -59,6 +74,46 @@ func (c *apiClient) Scripts(ctx context.Context, query APIPagingParams) (scripts
 
 }
 
+func (c *apiClient) ScriptsAll(ctx context.Context) <-chan ScriptAllResult {
+	ch := make(chan ScriptAllResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan ScriptAllResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				sc, err := c.Scripts(j.ctx, j.query)
+				if len(sc) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := ScriptAllResult{Scripts: sc, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 func (c *apiClient) Script(ctx context.Context, address string) (script Script, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceScripts, address))
 	if err != nil {
@@ -69,19 +124,16 @@ func (c *apiClient) Script(ctx context.Context, address string) (script Script, 
 		return
 	}
 
-	req.Header.Add("project_id", c.projectId)
-
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
 	if res.StatusCode != http.StatusOK {
 		return script, handleAPIErrorResponse(res)
 	}
 
-	if err := json.NewDecoder(res.Body).Decode(&script); err != nil {
+	if err = json.NewDecoder(res.Body).Decode(&script); err != nil {
 		return script, err
 	}
 	return script, nil
@@ -97,8 +149,7 @@ func (c *apiClient) ScriptRedeemers(ctx context.Context, address string, query A
 		return
 	}
 
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
@@ -112,4 +163,44 @@ func (c *apiClient) ScriptRedeemers(ctx context.Context, address string, query A
 		return sr, err
 	}
 	return sr, nil
+}
+
+func (c *apiClient) ScriptRedeemersAll(ctx context.Context, address string) <-chan ScriptRedeemerResult {
+	ch := make(chan ScriptRedeemerResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan ScriptRedeemerResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				sr, err := c.ScriptRedeemers(j.ctx, address, j.query)
+				if len(sr) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := ScriptRedeemerResult{ScriptRedeemers: sr, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }
