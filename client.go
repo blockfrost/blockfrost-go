@@ -75,7 +75,9 @@ type APIClient interface {
 	Address(ctx context.Context, address string) (Address, error)
 	AddressDetails(ctx context.Context, address string) (AddressDetails, error)
 	AddressTransactions(ctx context.Context, address string, query APIPagingParams) ([]AddressTransactions, error)
+	AddressTransactionsAll(ctx context.Context, address string) <-chan AddressTxResult
 	AddressUTXOs(ctx context.Context, address string, query APIPagingParams) ([]AddressUTXO, error)
+	AddressUTXOsAll(ctx context.Context, address string) <-chan AddressUTXOResult
 	Account(ctx context.Context, stakeAddress string) (Account, error)
 	AccountHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountHistory, error)
 	AccountRewardsHistory(ctx context.Context, stakeAddress string, query APIPagingParams) ([]AccountRewardsHistory, error)
