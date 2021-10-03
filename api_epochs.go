@@ -127,16 +127,11 @@ func (c *apiClient) EpochLatest(ctx context.Context) (ep Epoch, err error) {
 	if err != nil {
 		return
 	}
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return ep, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&ep); err != nil {
 		return
@@ -153,16 +148,12 @@ func (c *apiClient) LatestEpochParameters(ctx context.Context) (epr EpochParamet
 	if err != nil {
 		return
 	}
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return epr, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&epr); err != nil {
 		return
@@ -179,16 +170,12 @@ func (c *apiClient) Epoch(ctx context.Context, epochNumber int) (ep Epoch, err e
 	if err != nil {
 		return
 	}
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return ep, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&ep); err != nil {
 		return
@@ -208,16 +195,11 @@ func (c *apiClient) EpochsNext(ctx context.Context, epochNumber int, query APIPa
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return eps, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
 		return
@@ -237,16 +219,12 @@ func (c *apiClient) EpochsPrevious(ctx context.Context, epochNumber int, query A
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return eps, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
 		return
@@ -266,16 +244,12 @@ func (c *apiClient) EpochStakeDistribution(ctx context.Context, epochNumber int,
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return eps, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
 		return
@@ -295,16 +269,12 @@ func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumbe
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return eps, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
 		return
@@ -324,16 +294,12 @@ func (c *apiClient) EpochBlockDistribution(ctx context.Context, epochNumber int,
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return bd, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&bd); err != nil {
 		return
@@ -353,16 +319,12 @@ func (c *apiClient) EpochBlockDistributionByPool(ctx context.Context, epochNumbe
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return bd, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&bd); err != nil {
 		return
@@ -380,16 +342,11 @@ func (c *apiClient) EpochParameters(ctx context.Context, epochNumber int) (eps E
 		return
 	}
 
-	req.Header.Add("project_id", c.projectId)
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return eps, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&eps); err != nil {
 		return
