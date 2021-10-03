@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
+	q := blockfrost.APIQueryParams{}
 
 	pool, err := api.PoolHistory(context.TODO(), poolID, q)
 	if err != nil {

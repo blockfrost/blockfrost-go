@@ -69,7 +69,7 @@ func TestResourceAccountRewardsHistory(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.AccountRewardsHistory(context.TODO(), inputStakeAddr, q)
@@ -107,7 +107,7 @@ func TestResourceAccountHistory(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.AccountHistory(context.TODO(), inputStakeAddr, q)
@@ -146,7 +146,7 @@ func TestResourceAccountDelegationHistory(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.AccountDelegationHistory(context.TODO(), inputStakeAddr, q)
@@ -183,7 +183,7 @@ func TestResourceAccountRegistrationHistory(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.AccountRegistrationHistory(context.TODO(), inputStakeAddr, q)
@@ -220,7 +220,7 @@ func TestResourceAccountWithdrawalHistory(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.AccountWithdrawalHistory(context.TODO(), inputStakeAddr, q)
@@ -257,7 +257,7 @@ func TestResourceAccountMIRHistory(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.AccountMIRHistory(context.TODO(), inputStakeAddr, q)
@@ -293,7 +293,7 @@ func TestResourceAccountAssociatedAddresses(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.AccountAssociatedAddresses(context.TODO(), inputStakeAddr, q)
@@ -330,7 +330,7 @@ func TestResourceAccountAssociatedAssets(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.AccountAssociatedAssets(context.TODO(), inputStakeAddr, q)

@@ -199,7 +199,7 @@ func (c *apiClient) Epoch(ctx context.Context, epochNumber int) (ep Epoch, err e
 	return ep, nil
 }
 
-func (c *apiClient) EpochsNext(ctx context.Context, epochNumber int, query APIPagingParams) (eps []Epoch, err error) {
+func (c *apiClient) EpochsNext(ctx context.Context, epochNumber int, query APIQueryParams) (eps []Epoch, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsNext))
 	if err != nil {
 		return
@@ -254,7 +254,7 @@ func (c *apiClient) EpochNextAll(ctx context.Context, epochNumber int) <-chan Ep
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -263,7 +263,7 @@ func (c *apiClient) EpochNextAll(ctx context.Context, epochNumber int) <-chan Ep
 	return ch
 }
 
-func (c *apiClient) EpochsPrevious(ctx context.Context, epochNumber int, query APIPagingParams) (eps []Epoch, err error) {
+func (c *apiClient) EpochsPrevious(ctx context.Context, epochNumber int, query APIQueryParams) (eps []Epoch, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsPrevious))
 	if err != nil {
 		return
@@ -319,7 +319,7 @@ func (c *apiClient) EpochPreviousAll(ctx context.Context, epochNumber int) <-cha
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -328,7 +328,7 @@ func (c *apiClient) EpochPreviousAll(ctx context.Context, epochNumber int) <-cha
 	return ch
 }
 
-func (c *apiClient) EpochStakeDistribution(ctx context.Context, epochNumber int, query APIPagingParams) (eps []EpochStake, err error) {
+func (c *apiClient) EpochStakeDistribution(ctx context.Context, epochNumber int, query APIQueryParams) (eps []EpochStake, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
 	if err != nil {
 		return
@@ -384,7 +384,7 @@ func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber i
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -393,7 +393,7 @@ func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber i
 	return ch
 }
 
-func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIPagingParams) (eps []EpochStake, err error) {
+func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) (eps []EpochStake, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes, poolId))
 	if err != nil {
 		return
@@ -449,7 +449,7 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -458,7 +458,7 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 	return ch
 }
 
-func (c *apiClient) EpochBlockDistribution(ctx context.Context, epochNumber int, query APIPagingParams) (bd []string, err error) {
+func (c *apiClient) EpochBlockDistribution(ctx context.Context, epochNumber int, query APIQueryParams) (bd []string, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
 	if err != nil {
 		return
@@ -514,7 +514,7 @@ func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber i
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -523,7 +523,7 @@ func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber i
 	return ch
 }
 
-func (c *apiClient) EpochBlockDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIPagingParams) (bd []string, err error) {
+func (c *apiClient) EpochBlockDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) (bd []string, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
 	if err != nil {
 		return
@@ -579,7 +579,7 @@ func (c *apiClient) EpochBlockDistributionByPoolAll(ctx context.Context, epochNu
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 

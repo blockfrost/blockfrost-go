@@ -161,7 +161,7 @@ func (c *apiClient) Account(ctx context.Context, stakeAddress string) (acc Accou
 
 // AccountRewardsHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the reward history.
-func (c *apiClient) AccountRewardsHistory(ctx context.Context, stakeAddress string, query APIPagingParams) (ah []AccountRewardsHistory, err error) {
+func (c *apiClient) AccountRewardsHistory(ctx context.Context, stakeAddress string, query APIQueryParams) (ah []AccountRewardsHistory, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountRewardsHistory))
 	if err != nil {
 		return
@@ -220,7 +220,7 @@ func (c *apiClient) AccountRewardsHistoryAll(ctx context.Context, stakeAddress s
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -231,7 +231,7 @@ func (c *apiClient) AccountRewardsHistoryAll(ctx context.Context, stakeAddress s
 
 // AccountHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the history.
-func (c *apiClient) AccountHistory(ctx context.Context, stakeAddress string, query APIPagingParams) (ah []AccountHistory, err error) {
+func (c *apiClient) AccountHistory(ctx context.Context, stakeAddress string, query APIQueryParams) (ah []AccountHistory, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountHistory))
 	if err != nil {
 		return
@@ -289,7 +289,7 @@ func (c *apiClient) AccountHistoryAll(ctx context.Context, address string) <-cha
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -300,7 +300,7 @@ func (c *apiClient) AccountHistoryAll(ctx context.Context, address string) <-cha
 
 // AccountDelegationHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the delegations.
-func (c *apiClient) AccountDelegationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) (adh []AccountDelegationHistory, err error) {
+func (c *apiClient) AccountDelegationHistory(ctx context.Context, stakeAddress string, query APIQueryParams) (adh []AccountDelegationHistory, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountDelegationHistory))
 	if err != nil {
 		return
@@ -358,7 +358,7 @@ func (c *apiClient) AccountDelegationHistoryAll(ctx context.Context, stakeAddres
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -369,7 +369,7 @@ func (c *apiClient) AccountDelegationHistoryAll(ctx context.Context, stakeAddres
 
 // AccountRegistrationHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the Registrations.
-func (c *apiClient) AccountRegistrationHistory(ctx context.Context, stakeAddress string, query APIPagingParams) (arh []AccountRegistrationHistory, err error) {
+func (c *apiClient) AccountRegistrationHistory(ctx context.Context, stakeAddress string, query APIQueryParams) (arh []AccountRegistrationHistory, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountRegistrationHistory))
 	if err != nil {
 		return
@@ -427,7 +427,7 @@ func (c *apiClient) AccountRegistrationHistoryAll(ctx context.Context, stakeAddr
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -438,7 +438,7 @@ func (c *apiClient) AccountRegistrationHistoryAll(ctx context.Context, stakeAddr
 
 // AccountWithdrawalHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the Withdrawals.
-func (c *apiClient) AccountWithdrawalHistory(ctx context.Context, stakeAddress string, query APIPagingParams) (awh []AccountWithdrawalHistory, err error) {
+func (c *apiClient) AccountWithdrawalHistory(ctx context.Context, stakeAddress string, query APIQueryParams) (awh []AccountWithdrawalHistory, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountWithdrawalHistory))
 	if err != nil {
 		return
@@ -497,7 +497,7 @@ func (c *apiClient) AccountWithdrawalHistoryAll(ctx context.Context, stakeAddres
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -508,7 +508,7 @@ func (c *apiClient) AccountWithdrawalHistoryAll(ctx context.Context, stakeAddres
 
 // AccountMIRHistory returns the content of a requested Account by the specific stake account.
 // Obtain information about the MIRs.
-func (c *apiClient) AccountMIRHistory(ctx context.Context, stakeAddress string, query APIPagingParams) (amh []AccountMIRHistory, err error) {
+func (c *apiClient) AccountMIRHistory(ctx context.Context, stakeAddress string, query APIQueryParams) (amh []AccountMIRHistory, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountMIRHistory))
 	if err != nil {
 		return
@@ -566,7 +566,7 @@ func (c *apiClient) AccountMIRHistoryAll(ctx context.Context, stakeAddress strin
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -577,7 +577,7 @@ func (c *apiClient) AccountMIRHistoryAll(ctx context.Context, stakeAddress strin
 
 // AccountAssociatedAddresses returns the content of a requested Account by the specific stake account.
 // Obtain information about the addresses of a specific account.
-func (c *apiClient) AccountAssociatedAddresses(ctx context.Context, stakeAddress string, query APIPagingParams) (aas []AccountAssociatedAddress, err error) {
+func (c *apiClient) AccountAssociatedAddresses(ctx context.Context, stakeAddress string, query APIQueryParams) (aas []AccountAssociatedAddress, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountAssociatedAddress))
 	if err != nil {
 		return
@@ -634,7 +634,7 @@ func (c *apiClient) AccountAssociatedAddressesAll(ctx context.Context, stakeAddr
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -645,7 +645,7 @@ func (c *apiClient) AccountAssociatedAddressesAll(ctx context.Context, stakeAddr
 
 // AccountAssociatedAssets returns the content of a requested Account by the specific stake account.
 // Obtain information about the addresses of a specific account.
-func (c *apiClient) AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIPagingParams) (aaa []AccountAssociatedAsset, err error) {
+func (c *apiClient) AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIQueryParams) (aaa []AccountAssociatedAsset, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountAddressWithAssetsAssociated))
 	if err != nil {
 		return
@@ -703,7 +703,7 @@ func (c *apiClient) AccountAssociatedAssetsAll(ctx context.Context, stakeAddress
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
