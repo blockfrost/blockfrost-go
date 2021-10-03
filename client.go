@@ -76,6 +76,22 @@ type APIClient interface {
 	BlocksPrevious(ctx context.Context, hashOrNumber string) ([]Block, error)
 	BlockBySlot(ctx context.Context, slotNumber int) (Block, error)
 	BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (Block, error)
+	EpochLatest(ctx context.Context) (Epoch, error)
+	LatestEpochParameters(ctx context.Context) (EpochParameters, error)
+	Epoch(ctx context.Context, epochNumber int) (Epoch, error)
+	EpochsNext(ctx context.Context, epochNumber int, query APIPagingParams) ([]Epoch, error)
+	EpochNextAll(ctx context.Context, epochNumber int) <-chan EpochResult
+	EpochsPrevious(ctx context.Context, epochNumber int, query APIPagingParams) ([]Epoch, error)
+	EpochPreviousAll(ctx context.Context, epochNumber int) <-chan EpochResult
+	EpochStakeDistribution(ctx context.Context, epochNumber int, query APIPagingParams) ([]EpochStake, error)
+	EpochStakeDistributionAll(ctx context.Context, epochNumber int) <-chan EpochStakeResult
+	EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIPagingParams) ([]EpochStake, error)
+	EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeResult
+	EpochBlockDistribution(ctx context.Context, epochNumber int, query APIPagingParams) ([]string, error)
+	EpochBlockDistributionAll(ctx context.Context, epochNumber int) <-chan BlockDistributionResult
+	EpochBlockDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIPagingParams) ([]string, error)
+	EpochBlockDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan BlockDistributionResult
+	EpochParameters(ctx context.Context, epochNumber int) (EpochParameters, error)
 	Address(ctx context.Context, address string) (Address, error)
 	AddressDetails(ctx context.Context, address string) (AddressDetails, error)
 	AddressTransactions(ctx context.Context, address string, query APIPagingParams) ([]AddressTransactions, error)
