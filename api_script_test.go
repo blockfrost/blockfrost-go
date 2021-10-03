@@ -81,7 +81,7 @@ func TestIntegrationResourceRedeemers(t *testing.T) {
 	}
 
 	addr := "e1457a0c47dfb7a2f6b8fbb059bdceab163c05d34f195b87b9f2b30e"
-	got, err := api.ScriptRedeemers(context.TODO(), addr, blockfrost.APIPagingParams{})
+	got, err := api.ScriptRedeemers(context.TODO(), addr, blockfrost.APIQueryParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +109,7 @@ func TestIntegrationResourceScripts(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := api.Scripts(context.TODO(), blockfrost.APIPagingParams{})
+	got, err := api.Scripts(context.TODO(), blockfrost.APIQueryParams{})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -85,7 +85,7 @@ type IPFSClient interface {
 	Add(ctx context.Context, filePath string) (IPFSObject, error)
 	Pin(ctx context.Context, path string) (IPFSPinnedObject, error)
 	PinnedObject(ctx context.Context, path string) (IPFSPinnedObject, error)
-	PinnedObjects(ctx context.Context, query APIPagingParams) ([]IPFSPinnedObject, error)
+	PinnedObjects(ctx context.Context, query APIQueryParams) ([]IPFSPinnedObject, error)
 	Remove(ctx context.Context, path string) ([]IPFSObject, error)
 	Gateway(ctx context.Context, path string) ([]byte, error)
 	PinnedObjectsAll(ctx context.Context, label string) <-chan PinnedObjectResult
@@ -174,7 +174,7 @@ func (ip *ipfsClient) PinnedObjectsAll(ctx context.Context, label string) <-chan
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -234,7 +234,7 @@ func (ip *ipfsClient) PinnedObject(ctx context.Context, IPFSPath string) (ipo IP
 	return ipo, nil
 }
 
-func (ip *ipfsClient) PinnedObjects(ctx context.Context, query APIPagingParams) (ipos []IPFSPinnedObject, err error) {
+func (ip *ipfsClient) PinnedObjects(ctx context.Context, query APIQueryParams) (ipos []IPFSPinnedObject, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", ip.server, resourceIPFSPinList))
 	if err != nil {
 		return

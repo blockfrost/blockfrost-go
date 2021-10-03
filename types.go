@@ -131,12 +131,11 @@ type Block struct {
 
 type Transaction string
 
-type APIPagingParams struct {
+//APIQueryParams ...
+type APIQueryParams struct {
 	Count int
 	Page  int
 	Order string
 	From  string
 	To    string
 }
-
-type APIQueryParams APIPagingParams

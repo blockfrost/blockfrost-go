@@ -36,7 +36,7 @@ func TestResourcePools(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
+	q := blockfrost.APIQueryParams{}
 	pools, err := api.Pools(context.TODO(), q)
 	if err != nil {
 		t.Fatal(err)
@@ -68,7 +68,7 @@ func TestResourcePoolsRetired(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
+	q := blockfrost.APIQueryParams{}
 	pools, err := api.PoolsRetired(context.TODO(), q)
 	if err != nil {
 		t.Fatal(err)
@@ -100,7 +100,7 @@ func TestResourcePoolsRetiring(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
+	q := blockfrost.APIQueryParams{}
 	pools, err := api.PoolsRetiring(context.TODO(), q)
 	if err != nil {
 		t.Fatal(err)
@@ -190,7 +190,7 @@ func TestResourcePoolHistory(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
+	q := blockfrost.APIQueryParams{}
 	got, err := api.PoolHistory(context.TODO(), inputPoolID, q)
 	if err != nil {
 		t.Fatal(err)
@@ -288,7 +288,7 @@ func TestResourcePoolDelegators(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
+	q := blockfrost.APIQueryParams{}
 	pool, err := api.PoolDelegators(context.TODO(), inputPoolID, q)
 	if err != nil {
 		t.Fatal(err)
@@ -323,7 +323,7 @@ func TestResourcePoolBlocks(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
+	q := blockfrost.APIQueryParams{}
 	pool, err := api.PoolBlocks(context.TODO(), inputPoolID, q)
 	if err != nil {
 		t.Fatal(err)
@@ -357,7 +357,7 @@ func TestResourcePoolUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
+	q := blockfrost.APIQueryParams{}
 	pool, err := api.PoolUpdates(context.TODO(), inputPoolID, q)
 	if err != nil {
 		t.Fatal(err)

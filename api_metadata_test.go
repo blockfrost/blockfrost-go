@@ -43,7 +43,7 @@ func TestResourceMetadataTxLabels(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.MetadataTxLabels(context.TODO(), q)
@@ -89,7 +89,7 @@ func TestResourceMetadataTxContentInJSON(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.MetadataTxContentInJSON(context.TODO(), inputLabel, q)
@@ -127,7 +127,7 @@ func TestResourceMetadataTxContentInCBOR(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	q := blockfrost.APIPagingParams{
+	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
 	accountArray, err := api.MetadataTxContentInCBOR(context.TODO(), inputLabel, q)

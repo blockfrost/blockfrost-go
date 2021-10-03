@@ -31,7 +31,7 @@ type ScriptRedeemer struct {
 
 type methodOptions struct {
 	ctx   context.Context
-	query APIPagingParams
+	query APIQueryParams
 }
 
 type ScriptAllResult struct {
@@ -44,7 +44,7 @@ type ScriptRedeemerResult struct {
 	Err             error
 }
 
-func (c *apiClient) Scripts(ctx context.Context, query APIPagingParams) (scripts []Script, err error) {
+func (c *apiClient) Scripts(ctx context.Context, query APIQueryParams) (scripts []Script, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceScripts))
 	if err != nil {
 		return
@@ -105,7 +105,7 @@ func (c *apiClient) ScriptsAll(ctx context.Context) <-chan ScriptAllResult {
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -139,7 +139,7 @@ func (c *apiClient) Script(ctx context.Context, address string) (script Script, 
 	return script, nil
 }
 
-func (c *apiClient) ScriptRedeemers(ctx context.Context, address string, query APIPagingParams) (sr []ScriptRedeemer, err error) {
+func (c *apiClient) ScriptRedeemers(ctx context.Context, address string, query APIQueryParams) (sr []ScriptRedeemer, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceScripts, address, resourceRedeemers))
 	if err != nil {
 		return
@@ -196,7 +196,7 @@ func (c *apiClient) ScriptRedeemersAll(ctx context.Context, address string) <-ch
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 

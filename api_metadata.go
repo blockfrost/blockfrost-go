@@ -56,7 +56,7 @@ type MetadataTxContentInCBORResult struct {
 }
 
 // MetadataTxLabels returns the List of all used transaction metadata labels.
-func (c *apiClient) MetadataTxLabels(ctx context.Context, query APIPagingParams) (mls []MetadataTxLabel, err error) {
+func (c *apiClient) MetadataTxLabels(ctx context.Context, query APIQueryParams) (mls []MetadataTxLabel, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/", c.server, resourceMetadataTxLabels))
 	if err != nil {
 		return
@@ -118,7 +118,7 @@ func (c *apiClient) MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLa
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -129,7 +129,7 @@ func (c *apiClient) MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLa
 
 // MetadataTxContentInJSON returns the Transaction metadata content in JSON
 // Transaction metadata per label.
-func (c *apiClient) MetadataTxContentInJSON(ctx context.Context, label string, query APIPagingParams) (mt []MetadataTxContentInJSON, err error) {
+func (c *apiClient) MetadataTxContentInJSON(ctx context.Context, label string, query APIQueryParams) (mt []MetadataTxContentInJSON, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceMetadataTxContentInJSON, label))
 	if err != nil {
 		return
@@ -188,7 +188,7 @@ func (c *apiClient) MetadataTxContentInJSONAll(ctx context.Context, label string
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -199,7 +199,7 @@ func (c *apiClient) MetadataTxContentInJSONAll(ctx context.Context, label string
 
 // MetadataTxContentInCBOR returns the Transaction metadata content in CBOR
 // Transaction metadata per label.
-func (c *apiClient) MetadataTxContentInCBOR(ctx context.Context, label string, query APIPagingParams) (mt []MetadataTxContentInCBOR, err error) {
+func (c *apiClient) MetadataTxContentInCBOR(ctx context.Context, label string, query APIQueryParams) (mt []MetadataTxContentInCBOR, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceMetadataTxContentInCBOR, label, "cbor"))
 	if err != nil {
 		return
@@ -258,7 +258,7 @@ func (c *apiClient) MetadataTxContentInCBORAll(ctx context.Context, label string
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
