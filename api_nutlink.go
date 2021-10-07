@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 )
 
 const (
@@ -38,6 +39,16 @@ type TickerRecord struct {
 	TxHash      string `json:"tx_hash,omitempty"`
 	BlockHeight int    `json:"block_height,omitempty"`
 	TxIndex     int    `json:"tx_index,omitempty"`
+}
+
+type TickerResult struct {
+	Res []Ticker
+	Err error
+}
+
+type TickerRecordResult struct {
+	Res []TickerRecord
+	Err error
 }
 
 func (c *apiClient) Nutlink(ctx context.Context, address string) (nu NutlinkAddress, err error) {
@@ -90,6 +101,46 @@ func (c *apiClient) Tickers(ctx context.Context, address string, query APIQueryP
 	return ti, nil
 }
 
+func (c *apiClient) TickersAll(ctx context.Context, address string) <-chan TickerResult {
+	ch := make(chan TickerResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan TickerResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				as, err := c.Tickers(j.ctx, address, j.query)
+				if len(as) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := TickerResult{Res: as, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 func (c *apiClient) TickerRecords(ctx context.Context, ticker string, query APIQueryParams) (trs []TickerRecord, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceNutLink, resourceTickers, ticker))
 	if err != nil {
@@ -117,6 +168,46 @@ func (c *apiClient) TickerRecords(ctx context.Context, ticker string, query APIQ
 	return trs, nil
 }
 
+func (c *apiClient) TickerRecordsAll(ctx context.Context, ticker string) <-chan TickerRecordResult {
+	ch := make(chan TickerRecordResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan TickerRecordResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				as, err := c.TickerRecords(j.ctx, ticker, j.query)
+				if len(as) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := TickerRecordResult{Res: as, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
+}
+
 func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ticker string, query APIQueryParams) (trs []TickerRecord, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceNutLink, address, resourceTickers, ticker))
 	if err != nil {
@@ -141,4 +232,44 @@ func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ti
 		return
 	}
 	return trs, nil
+}
+
+func (c *apiClient) AddressTickerRecordsAll(ctx context.Context, address string, ticker string) <-chan TickerRecordResult {
+	ch := make(chan TickerRecordResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, c.routines)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan TickerRecordResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				as, err := c.AddressTickerRecords(j.ctx, address, ticker, j.query)
+				if len(as) != j.query.Count || err != nil {
+					quit <- true
+				}
+				res := TickerRecordResult{Res: as, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				return
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		wg.Wait()
+	}()
+	return ch
 }
