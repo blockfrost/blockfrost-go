@@ -9,6 +9,7 @@
 
 [![Build status](https://github.com/blockfrost/blockfrost-go/actions/workflows/test.yml/badge.svg?branch=staging)](https://github.com/blockfrost/blockfrost-go/actions/workflows/test.yml)
 [![Go report card](https://goreportcard.com/badge/github.com/blockfrost/blockfrost-go)](https://goreportcard.com/report/github.com/blockfrost/blockfrost-go)
+[![GoDoc](https://godoc.org/github.com/blockfrost/blockfrost-go?status.svg)](https://godoc.org/github.com/blockfrost/blockfrost-go)
 
 
 # Installation
