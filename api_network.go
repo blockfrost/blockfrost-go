@@ -38,17 +38,12 @@ func (c *apiClient) Network(ctx context.Context) (ni NetworkInfo, err error) {
 	if err != nil {
 		return ni, err
 	}
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return ni, err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return ni, handleAPIErrorResponse(res)
-	}
-
 	if err = json.NewDecoder(res.Body).Decode(&ni); err != nil {
 		return ni, err
 	}

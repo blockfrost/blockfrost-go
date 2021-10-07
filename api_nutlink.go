@@ -50,17 +50,12 @@ func (c *apiClient) Nutlink(ctx context.Context, address string) (nu NutlinkAddr
 	if err != nil {
 		return
 	}
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return nu, err
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return nu, handleAPIErrorResponse(res)
-	}
 
 	if err := json.NewDecoder(res.Body).Decode(&nu); err != nil {
 		return nu, err
@@ -68,7 +63,7 @@ func (c *apiClient) Nutlink(ctx context.Context, address string) (nu NutlinkAddr
 	return nu, nil
 }
 
-func (c *apiClient) Tickers(ctx context.Context, address string, query APIPagingParams) (ti []Ticker, err error) {
+func (c *apiClient) Tickers(ctx context.Context, address string, query APIQueryParams) (ti []Ticker, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceNutLink, address, resourceTickers))
 	if err != nil {
 		return
@@ -82,17 +77,12 @@ func (c *apiClient) Tickers(ctx context.Context, address string, query APIPaging
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return ti, handleAPIErrorResponse(res)
-	}
 
 	if err := json.NewDecoder(res.Body).Decode(&ti); err != nil {
 		return ti, err
@@ -100,7 +90,7 @@ func (c *apiClient) Tickers(ctx context.Context, address string, query APIPaging
 	return ti, nil
 }
 
-func (c *apiClient) TickerRecords(ctx context.Context, ticker string) (trs []TickerRecord, err error) {
+func (c *apiClient) TickerRecords(ctx context.Context, ticker string, query APIQueryParams) (trs []TickerRecord, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceNutLink, resourceTickers, ticker))
 	if err != nil {
 		return
@@ -110,17 +100,16 @@ func (c *apiClient) TickerRecords(ctx context.Context, ticker string) (trs []Tic
 	if err != nil {
 		return
 	}
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return trs, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&trs); err != nil {
 		return
@@ -128,7 +117,7 @@ func (c *apiClient) TickerRecords(ctx context.Context, ticker string) (trs []Tic
 	return trs, nil
 }
 
-func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ticker string) (trs []TickerRecord, err error) {
+func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ticker string, query APIQueryParams) (trs []TickerRecord, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceNutLink, address, resourceTickers, ticker))
 	if err != nil {
 		return
@@ -138,17 +127,15 @@ func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ti
 	if err != nil {
 		return
 	}
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return trs, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&trs); err != nil {
 		return

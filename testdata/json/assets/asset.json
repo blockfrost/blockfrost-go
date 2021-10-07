@@ -1,0 +1,21 @@
+{
+    "asset": "b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e",
+    "policy_id": "b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7",
+    "asset_name": "6e7574636f696e",
+    "fingerprint": "asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w",
+    "quantity": "12000",
+    "initial_mint_tx_hash": "6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad",
+    "mint_or_burn_count": 1,
+    "onchain_metadata": {
+      "name": "My NFT token",
+      "image": "ipfs://ipfs/QmfKyJ4tuvHowwKQCbCHj4L5T3fSj8cjs7Aau8V7BWv226"
+    },
+    "metadata": {
+      "name": "nutcoin",
+      "description": "The Nut Coin",
+      "ticker": "nutc",
+      "url": "https://www.stakenuts.com/",
+      "logo": "42",
+      "decimals": 6
+    }
+}

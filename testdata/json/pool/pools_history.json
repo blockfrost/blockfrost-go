@@ -1,0 +1,11 @@
+[
+    {
+        "epoch": 233,
+        "blocks": 22,
+        "active_stake": "20485965693569",
+        "active_size": 1.2345,
+        "delegators_count": 115,
+        "rewards": "206936253674159",
+        "fees": "1290968354"
+    }
+]
