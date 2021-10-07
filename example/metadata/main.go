@@ -15,7 +15,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	q := blockfrost.APIPagingParams{}
+	q := blockfrost.APIQueryParams{}
 	m, err := api.MetadataTxLabels(context.TODO(), q)
 	if err != nil {
 		log.Fatal(err)

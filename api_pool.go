@@ -150,7 +150,7 @@ type PoolUpdateResult struct {
 
 // Pools returns the List of stake pools
 // List of registered stake pools.
-func (c *apiClient) Pools(ctx context.Context, query APIPagingParams) (ps Pools, err error) {
+func (c *apiClient) Pools(ctx context.Context, query APIQueryParams) (ps Pools, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourcePool))
 	if err != nil {
 		return Pools{}, err
@@ -209,7 +209,7 @@ func (c *apiClient) PoolsAll(ctx context.Context) <-chan PoolsResult {
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -220,7 +220,7 @@ func (c *apiClient) PoolsAll(ctx context.Context) <-chan PoolsResult {
 
 // PoolsRetired returns the List of retired stake pools
 // List of already retired pools.
-func (c *apiClient) PoolsRetired(ctx context.Context, query APIPagingParams) (prs []PoolRetired, err error) {
+func (c *apiClient) PoolsRetired(ctx context.Context, query APIQueryParams) (prs []PoolRetired, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourcePoolRetired))
 	if err != nil {
 		return
@@ -278,7 +278,7 @@ func (c *apiClient) PoolsRetiredAll(ctx context.Context) <-chan PoolsRetiredResu
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -289,7 +289,7 @@ func (c *apiClient) PoolsRetiredAll(ctx context.Context) <-chan PoolsRetiredResu
 
 // PoolsRetiring returns the List of retiring stake pools
 // List of stake pools retiring in the upcoming epochs
-func (c *apiClient) PoolsRetiring(ctx context.Context, query APIPagingParams) (pr []PoolRetiring, err error) {
+func (c *apiClient) PoolsRetiring(ctx context.Context, query APIQueryParams) (pr []PoolRetiring, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourcePoolRetiring))
 	if err != nil {
 		return
@@ -348,7 +348,7 @@ func (c *apiClient) PoolsRetiringAll(ctx context.Context) <-chan PoolsRetiringRe
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -382,7 +382,7 @@ func (c *apiClient) Pool(ctx context.Context, poolID string) (pool Pool, err err
 
 // PoolHistory returns the Stake pool history
 // History of stake pool parameters over epochs.
-func (c *apiClient) PoolHistory(ctx context.Context, poolID string, query APIPagingParams) (ph []PoolHistory, err error) {
+func (c *apiClient) PoolHistory(ctx context.Context, poolID string, query APIQueryParams) (ph []PoolHistory, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourcePool, poolID, resourcePoolHistory))
 	if err != nil {
 		return
@@ -440,7 +440,7 @@ func (c *apiClient) PoolHistoryAll(ctx context.Context, poolId string) <-chan Po
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -500,7 +500,7 @@ func (c *apiClient) PoolRelays(ctx context.Context, poolID string) (prs []PoolRe
 
 // PoolDelegator returns the Stake pool delegators
 // List of current stake pools delegators.
-func (c *apiClient) PoolDelegators(ctx context.Context, poolID string, query APIPagingParams) (pd []PoolDelegator, err error) {
+func (c *apiClient) PoolDelegators(ctx context.Context, poolID string, query APIQueryParams) (pd []PoolDelegator, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourcePool, poolID, resourcePoolDelegator))
 	if err != nil {
 		return
@@ -557,7 +557,7 @@ func (c *apiClient) PoolDelegatorsAll(ctx context.Context, poolId string) <-chan
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -568,7 +568,7 @@ func (c *apiClient) PoolDelegatorsAll(ctx context.Context, poolId string) <-chan
 
 // PoolBlocks returns the Stake pool blocks
 // List of stake pools blocks.
-func (c *apiClient) PoolBlocks(ctx context.Context, poolID string, query APIPagingParams) (pb PoolBlocks, err error) {
+func (c *apiClient) PoolBlocks(ctx context.Context, poolID string, query APIQueryParams) (pb PoolBlocks, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourcePool, poolID, resourcePoolBlocks))
 	if err != nil {
 		return
@@ -626,7 +626,7 @@ func (c *apiClient) PoolBlocksAll(ctx context.Context, poolId string) <-chan Poo
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -637,7 +637,7 @@ func (c *apiClient) PoolBlocksAll(ctx context.Context, poolId string) <-chan Poo
 
 // PoolUpdate returns the Stake pool updates
 // List of certificate updates to the stake pool.
-func (c *apiClient) PoolUpdates(ctx context.Context, poolID string, query APIPagingParams) (pu []PoolUpdate, err error) {
+func (c *apiClient) PoolUpdates(ctx context.Context, poolID string, query APIQueryParams) (pu []PoolUpdate, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourcePool, poolID, resourcePoolUpdate))
 	if err != nil {
 		return
@@ -695,7 +695,7 @@ func (c *apiClient) PoolUpdatesAll(ctx context.Context, poolId string) <-chan Po
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 

@@ -65,7 +65,7 @@ type AssetResult struct {
 	Err error
 }
 
-func (c *apiClient) Assets(ctx context.Context, query APIPagingParams) (a []Asset, err error) {
+func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceAssets))
 	if err != nil {
 		return
@@ -125,7 +125,7 @@ func (c *apiClient) AssetsAll(ctx context.Context, poolId string) <-chan AssetRe
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 

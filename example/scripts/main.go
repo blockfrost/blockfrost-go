@@ -14,7 +14,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	scripts, err := api.Scripts(context.TODO(), blockfrost.APIPagingParams{})
+	scripts, err := api.Scripts(context.TODO(), blockfrost.APIQueryParams{})
 	if err != nil {
 		log.Fatal(err)
 	}

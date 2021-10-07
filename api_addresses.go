@@ -84,7 +84,7 @@ func (c *apiClient) Address(ctx context.Context, address string) (addr Address, 
 	return addr, nil
 }
 
-func (c *apiClient) AddressTransactions(ctx context.Context, address string, query APIPagingParams) ([]AddressTransactions, error) {
+func (c *apiClient) AddressTransactions(ctx context.Context, address string, query APIQueryParams) ([]AddressTransactions, error) {
 	var txs []AddressTransactions
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAddresses, address, resourceTransactions))
 	if err != nil {
@@ -140,7 +140,7 @@ func (c *apiClient) AddressTransactionsAll(ctx context.Context, address string) 
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
@@ -171,7 +171,7 @@ func (c *apiClient) AddressDetails(ctx context.Context, address string) (Address
 	return det, nil
 }
 
-func (c *apiClient) AddressUTXOs(ctx context.Context, address string, query APIPagingParams) ([]AddressUTXO, error) {
+func (c *apiClient) AddressUTXOs(ctx context.Context, address string, query APIQueryParams) ([]AddressUTXO, error) {
 	var utxos []AddressUTXO
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAddresses, address, resourceUTXOs))
 	if err != nil {
@@ -230,7 +230,7 @@ func (c *apiClient) AddressUTXOsAll(ctx context.Context, address string) <-chan 
 				fetchScripts = false
 				return
 			default:
-				jobs <- methodOptions{ctx: ctx, query: APIPagingParams{Count: 100, Page: i}}
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
