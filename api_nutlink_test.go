@@ -19,3 +19,11 @@ func TestNutlinkAddressUnMarshall(t *testing.T) {
 	got := blockfrost.NutlinkAddress{}
 	testStructGotWant(t, fp, &got, &want)
 }
+
+func TestTickerUnmarshal(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "nutlink", "ticker.json")
+	want := blockfrost.Ticker{Name: "ADAUSD", Count: 1980038, LatestBlock: 2657092}
+
+	got := blockfrost.Ticker{}
+	testStructGotWant(t, fp, &got, &want)
+}
