@@ -20,7 +20,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	tickers, err := api.Tickers(context.TODO(), addr, blockfrost.APIPagingParams{})
+	tickers, err := api.Tickers(context.TODO(), addr, blockfrost.APIQueryParams{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,7 +31,9 @@ func main() {
 	}
 	fmt.Printf("\nTickers(%d): \n\t%+v\n\t...", len(tickers), tickers[0])
 
-	adtickers, err := api.AddressTickerRecords(context.TODO(), addr, tickers[0].Name)
+	adtickers, err := api.AddressTickerRecords(
+		context.TODO(), addr, tickers[0].Name, blockfrost.APIQueryParams{},
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
