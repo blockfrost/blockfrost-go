@@ -130,6 +130,13 @@ type APIClient interface {
 	MetadataTxContentInCBOR(ctx context.Context, label string, query APIQueryParams) ([]MetadataTxContentInCBOR, error)
 	MetadataTxContentInCBORAll(ctx context.Context, label string) <-chan MetadataTxContentInCBORResult
 	Network(ctx context.Context) (NetworkInfo, error)
+	Nutlink(ctx context.Context, address string) (NutlinkAddress, error)
+	Tickers(ctx context.Context, address string, query APIQueryParams) ([]Ticker, error)
+	TickersAll(ctx context.Context, address string) <-chan TickerResult
+	TickerRecords(ctx context.Context, ticker string, query APIQueryParams) ([]TickerRecord, error)
+	TickerRecordsAll(ctx context.Context, ticker string) <-chan TickerRecordResult
+	AddressTickerRecords(ctx context.Context, address string, ticker string, query APIQueryParams) ([]TickerRecord, error)
+	AddressTickerRecordsAll(ctx context.Context, address string, ticker string) <-chan TickerRecordResult
 	Script(ctx context.Context, address string) (Script, error)
 	Scripts(ctx context.Context, query APIQueryParams) ([]Script, error)
 	ScriptsAll(ctx context.Context) <-chan ScriptAllResult
