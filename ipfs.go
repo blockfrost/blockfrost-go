@@ -42,7 +42,7 @@ type IPFSClientOptions struct {
 }
 
 type IPFSObject struct {
-	Name     string `json:"string,omitempty"`
+	Name     string `json:"name,omitempty"`
 	IPFSHash string `json:"ipfs_hash,omitempty"`
 	Size     string `json:"size,omitempty"`
 }
