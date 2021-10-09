@@ -63,12 +63,8 @@ func (c *apiClient) Scripts(ctx context.Context, query APIQueryParams) (scripts 
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return scripts, handleAPIErrorResponse(res)
-	}
-
-	if err := json.NewDecoder(res.Body).Decode(&scripts); err != nil {
-		return scripts, err
+	if err = json.NewDecoder(res.Body).Decode(&scripts); err != nil {
+		return
 	}
 	return scripts, nil
 
@@ -129,12 +125,9 @@ func (c *apiClient) Script(ctx context.Context, address string) (script Script, 
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return script, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&script); err != nil {
-		return script, err
+		return
 	}
 	return script, nil
 }
@@ -155,12 +148,8 @@ func (c *apiClient) ScriptRedeemers(ctx context.Context, address string, query A
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return sr, handleAPIErrorResponse(res)
-	}
-
-	if err := json.NewDecoder(res.Body).Decode(&sr); err != nil {
-		return sr, err
+	if err = json.NewDecoder(res.Body).Decode(&sr); err != nil {
+		return
 	}
 	return sr, nil
 }

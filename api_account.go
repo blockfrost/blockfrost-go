@@ -459,8 +459,7 @@ func (c *apiClient) AccountWithdrawalHistory(ctx context.Context, stakeAddress s
 	}
 	defer res.Body.Close()
 
-	err = json.NewDecoder(res.Body).Decode(&awh)
-	if err != nil {
+	if err = json.NewDecoder(res.Body).Decode(&awh); err != nil {
 		return
 	}
 	return awh, nil

@@ -153,7 +153,7 @@ type PoolUpdateResult struct {
 func (c *apiClient) Pools(ctx context.Context, query APIQueryParams) (ps Pools, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourcePool))
 	if err != nil {
-		return Pools{}, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
@@ -493,7 +493,7 @@ func (c *apiClient) PoolRelays(ctx context.Context, poolID string) (prs []PoolRe
 	defer res.Body.Close()
 
 	if err = json.NewDecoder(res.Body).Decode(&prs); err != nil {
-		return prs, err
+		return
 	}
 	return prs, nil
 }
@@ -521,7 +521,7 @@ func (c *apiClient) PoolDelegators(ctx context.Context, poolID string, query API
 	defer res.Body.Close()
 
 	if err = json.NewDecoder(res.Body).Decode(&pd); err != nil {
-		return pd, err
+		return
 	}
 	return pd, nil
 }
@@ -590,7 +590,7 @@ func (c *apiClient) PoolBlocks(ctx context.Context, poolID string, query APIQuer
 	defer res.Body.Close()
 
 	if err = json.NewDecoder(res.Body).Decode(&pb); err != nil {
-		return pb, err
+		return
 	}
 	return pb, nil
 }
