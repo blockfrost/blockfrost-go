@@ -25,24 +25,23 @@ type GenesisBlock struct {
 	SecurityParam          int     `json:"security_param,omitempty"`
 }
 
-func (c *apiClient) Genesis(ctx context.Context) (GenesisBlock, error) {
+func (c *apiClient) Genesis(ctx context.Context) (gen GenesisBlock, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceGenesis))
 	if err != nil {
-		return GenesisBlock{}, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return GenesisBlock{}, err
+		return
 	}
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return GenesisBlock{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	gen := GenesisBlock{}
 	if err := json.NewDecoder(res.Body).Decode(&gen); err != nil {
 		return gen, err
 	}
