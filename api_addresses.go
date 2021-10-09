@@ -64,47 +64,47 @@ type AddressUTXOResult struct {
 func (c *apiClient) Address(ctx context.Context, address string) (addr Address, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceAddresses, address))
 	if err != nil {
-		return Address{}, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return Address{}, err
+		return
 	}
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return Address{}, nil
+		return
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&addr); err != nil {
-		return Address{}, err
+	if err = json.NewDecoder(res.Body).Decode(&addr); err != nil {
+		return
 	}
 	return addr, nil
 }
 
-func (c *apiClient) AddressTransactions(ctx context.Context, address string, query APIQueryParams) ([]AddressTransactions, error) {
-	var txs []AddressTransactions
+func (c *apiClient) AddressTransactions(ctx context.Context, address string, query APIQueryParams) (txs []AddressTransactions, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAddresses, address, resourceTransactions))
 	if err != nil {
-		return txs, err
+		return
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return txs, err
+		return
 	}
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
+
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return txs, err
+		return
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&txs); err != nil {
-		return txs, err
+	if err = json.NewDecoder(res.Body).Decode(&txs); err != nil {
+		return
 	}
 	return txs, nil
 }
@@ -149,37 +149,35 @@ func (c *apiClient) AddressTransactionsAll(ctx context.Context, address string) 
 	return ch
 }
 
-func (c *apiClient) AddressDetails(ctx context.Context, address string) (AddressDetails, error) {
+func (c *apiClient) AddressDetails(ctx context.Context, address string) (ad AddressDetails, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAddresses, address, resourceTotal))
 	if err != nil {
-		return AddressDetails{}, err
+		return
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return AddressDetails{}, err
+		return
 	}
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return AddressDetails{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	det := AddressDetails{}
-	if err = json.NewDecoder(res.Body).Decode(&det); err != nil {
-		return det, err
+	if err = json.NewDecoder(res.Body).Decode(&ad); err != nil {
+		return
 	}
-	return det, nil
+	return ad, nil
 }
 
-func (c *apiClient) AddressUTXOs(ctx context.Context, address string, query APIQueryParams) ([]AddressUTXO, error) {
-	var utxos []AddressUTXO
+func (c *apiClient) AddressUTXOs(ctx context.Context, address string, query APIQueryParams) (utxos []AddressUTXO, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAddresses, address, resourceUTXOs))
 	if err != nil {
-		return utxos, err
+		return
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return utxos, err
+		return
 	}
 	v := req.URL.Query()
 	query.From = ""
@@ -189,12 +187,12 @@ func (c *apiClient) AddressUTXOs(ctx context.Context, address string, query APIQ
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return utxos, err
+		return
 	}
 	defer res.Body.Close()
 
 	if err = json.NewDecoder(res.Body).Decode(&utxos); err != nil {
-		return utxos, err
+		return
 	}
 	return utxos, nil
 }
