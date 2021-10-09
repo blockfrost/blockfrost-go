@@ -27,3 +27,16 @@ func TestTickerUnmarshal(t *testing.T) {
 	got := blockfrost.Ticker{}
 	testStructGotWant(t, fp, &got, &want)
 }
+
+func TestTickerRecordUnmarshal(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "nutlink", "ticker_records.json")
+	want := []blockfrost.TickerRecord{
+		{
+			TxHash:      "e8073fd5318ff43eca18a852527166aa8008bee9ee9e891f585612b7e4ba700b",
+			BlockHeight: 2657092,
+			TxIndex:     8,
+		},
+	}
+	got := []blockfrost.TickerRecord{}
+	testStructGotWant(t, fp, &got, &want)
+}
