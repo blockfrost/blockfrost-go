@@ -1,7 +1,11 @@
 package blockfrost_test
 
 import (
+	"context"
+	"encoding/json"
 	"path/filepath"
+	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
@@ -32,4 +36,112 @@ func TestAssetUnmarshal(t *testing.T) {
 	}
 	got := blockfrost.Asset{}
 	testStructGotWant(t, fp, &got, &want)
+}
+
+func TestResourceAssetsIntegration(t *testing.T) {
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.Assets(context.TODO(), blockfrost.APIQueryParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	want := []blockfrost.Asset{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestResourceAssetIntegration(t *testing.T) {
+	asset := "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e4669727374636f696e"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.Asset(context.TODO(), asset)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	want := blockfrost.Asset{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestResourceAssetHistoryIntegration(t *testing.T) {
+	asset := "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e4669727374636f696e"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.AssetHistory(context.TODO(), asset)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	want := []blockfrost.AssetHistory{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestResourceAssetTransactionIntegration(t *testing.T) {
+	asset := "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e4669727374636f696e"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.AssetTransactions(context.TODO(), asset)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	want := []blockfrost.AssetTransaction{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestResourceAssetddressesIntegration(t *testing.T) {
+	asset := "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e4669727374636f696e"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.AssetAddresses(context.TODO(), asset)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	want := []blockfrost.AssetAddress{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestResourceAssetsByPolicyIntegration(t *testing.T) {
+	policy := "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.AssetsByPolicy(context.TODO(), policy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+
+	want := []blockfrost.Asset{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func testIntUtil(t *testing.T, fp string, got interface{}, want interface{}) {
+	if *update {
+		data, err := json.Marshal(got)
+		if err != nil {
+			t.Fatal(err)
+		}
+		WriteGoldenFile(t, fp, data)
+	}
+	bytes := ReadOrGenerateGoldenFile(t, fp, got)
+	if err := json.Unmarshal(bytes, want); err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("expected %v got %v", want, got)
+	}
 }
