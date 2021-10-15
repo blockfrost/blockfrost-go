@@ -1,7 +1,9 @@
 package blockfrost_test
 
 import (
+	"context"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
@@ -96,4 +98,186 @@ func TestTransactionMetadataCborUnmarshal(t *testing.T) {
 	}
 	got := []blockfrost.TransactionMetadataCbor{}
 	testStructGotWant(t, fp, &got, &want)
+}
+
+func TestTransactionIntegration(t *testing.T) {
+	hash := "6e5f825c82c1c6d6b77f2a14092f3b78c8f1b66db6f4cf8caec1555b6f967b3b"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := api.Transaction(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := blockfrost.TransactionContent{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionUTXOs(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := api.TransactionUTXOs(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := blockfrost.TransactionUTXOs{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionStakeAddressCertsIntegration(t *testing.T) {
+	hash := "6e5f825c82c1c6d6b77f2a14092f3b78c8f1b66db6f4cf8caec1555b6f967b3b"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionStakeAddressCerts(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionStakeAddressCert{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionWithdrawlsIntegration(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionWithdrawals(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionWidthrawal{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionMIRsIntegration(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionMIRs(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionMIR{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionMetadata(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionMetadata(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionMetadata{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionMetadataInCBORsIntegration(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionMetadataInCBORs(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionMetadataCbor{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionRedeemersIntegration(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionRedeemers(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionRedeemer{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionDelegationCertsIntegration(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionDelegationCerts(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionDelegation{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionPoolUpdatesIntegration(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionPoolUpdates(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionPoolCert{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionPoolUpdateCertsIntegration(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionPoolUpdateCerts(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionPoolCert{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionPoolRetirementsIntegration(t *testing.T) {
+	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := api.TransactionPoolRetirementCerts(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionPoolCert{}
+	testIntUtil(t, fp, &got, &want)
 }
