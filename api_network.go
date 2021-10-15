@@ -31,22 +31,22 @@ type NetworkInfo struct {
 func (c *apiClient) Network(ctx context.Context) (ni NetworkInfo, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceNetwork))
 	if err != nil {
-		return ni, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return ni, err
+		return
 	}
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return ni, err
+		return
 	}
 	defer res.Body.Close()
 	if err = json.NewDecoder(res.Body).Decode(&ni); err != nil {
-		return ni, err
+		return
 	}
 
-	return
+	return ni, nil
 }

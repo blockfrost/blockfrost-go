@@ -10,6 +10,7 @@ import (
 
 const (
 	resourceTxs           = "txs"
+	resourceTxStakes      = "stakes"
 	resourceTxUTXOs       = "utxos"
 	resourceTxWithdrawals = "withdrawals"
 	resourceTxMetadata    = "metadata"
@@ -106,8 +107,8 @@ type TransactionUTXOs struct {
 	} `json:"inputs"`
 	Outputs []struct {
 		// Output address
-		Address string   `json:"address"`
-		Amount  TxAmount `json:"amount"`
+		Address string     `json:"address"`
+		Amount  []TxAmount `json:"amount"`
 	} `json:"outputs"`
 }
 
@@ -299,7 +300,7 @@ func (c *apiClient) TransactionUTXOs(ctx context.Context, hash string) (tu Trans
 }
 
 func (c *apiClient) TransactionStakeAddressCerts(ctx context.Context, hash string) (tc []TransactionStakeAddressCert, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxUTXOs))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxStakes))
 	if err != nil {
 		return
 	}
@@ -398,7 +399,7 @@ func (c *apiClient) TransactionMetadataInCBORs(ctx context.Context, hash string)
 	return tmc, nil
 }
 
-func (c *apiClient) TransactionRedeemers(ctx context.Context, hash string) (tm []TransactionMetadata, err error) {
+func (c *apiClient) TransactionRedeemers(ctx context.Context, hash string) (tm []TransactionRedeemer, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata, resourceCbor))
 	if err != nil {
 		return

@@ -77,16 +77,12 @@ func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	req.Header.Add("project_id", c.projectId)
 
 	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return a, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&a); err != nil {
 		return
@@ -143,17 +139,11 @@ func (c *apiClient) Asset(ctx context.Context, asset string) (a Asset, err error
 	if err != nil {
 		return
 	}
-	req.Header.Add("project_id", c.projectId)
-
 	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return a, handleAPIErrorResponse(res)
-	}
-
 	if err = json.NewDecoder(res.Body).Decode(&a); err != nil {
 		return
 	}
@@ -170,16 +160,11 @@ func (c *apiClient) AssetHistory(ctx context.Context, asset string) (hist []Asse
 		return
 	}
 
-	req.Header.Add("project_id", c.projectId)
-
 	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return hist, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&hist); err != nil {
 		return
@@ -197,16 +182,11 @@ func (c *apiClient) AssetTransactions(ctx context.Context, asset string) (trs []
 		return
 	}
 
-	req.Header.Add("project_id", c.projectId)
-
 	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return trs, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&trs); err != nil {
 		return
@@ -224,16 +204,11 @@ func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []A
 		return
 	}
 
-	req.Header.Add("project_id", c.projectId)
-
 	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return addrs, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&addrs); err != nil {
 		return
@@ -242,7 +217,7 @@ func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []A
 }
 
 func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []Asset, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, resourceAssets, policyId))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourcePolicyAssets, policyId))
 	if err != nil {
 		return
 	}
@@ -251,16 +226,11 @@ func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []As
 		return
 	}
 
-	req.Header.Add("project_id", c.projectId)
-
 	res, err := c.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return a, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&a); err != nil {
 		return

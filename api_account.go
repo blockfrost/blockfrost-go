@@ -184,7 +184,7 @@ func (c *apiClient) AccountRewardsHistory(ctx context.Context, stakeAddress stri
 
 	err = json.NewDecoder(res.Body).Decode(&ah)
 	if err != nil {
-		return ah, err
+		return
 	}
 	return ah, nil
 }
@@ -253,7 +253,7 @@ func (c *apiClient) AccountHistory(ctx context.Context, stakeAddress string, que
 	defer res.Body.Close()
 
 	if err = json.NewDecoder(res.Body).Decode(&ah); err != nil {
-		return []AccountHistory{}, err
+		return
 	}
 	return ah, nil
 }
@@ -322,7 +322,7 @@ func (c *apiClient) AccountDelegationHistory(ctx context.Context, stakeAddress s
 	defer res.Body.Close()
 
 	if err = json.NewDecoder(res.Body).Decode(&adh); err != nil {
-		return []AccountDelegationHistory{}, err
+		return
 	}
 	return adh, nil
 }
@@ -459,9 +459,8 @@ func (c *apiClient) AccountWithdrawalHistory(ctx context.Context, stakeAddress s
 	}
 	defer res.Body.Close()
 
-	err = json.NewDecoder(res.Body).Decode(&awh)
-	if err != nil {
-		return awh, err
+	if err = json.NewDecoder(res.Body).Decode(&awh); err != nil {
+		return
 	}
 	return awh, nil
 }
@@ -530,7 +529,7 @@ func (c *apiClient) AccountMIRHistory(ctx context.Context, stakeAddress string, 
 	defer res.Body.Close()
 
 	if err = json.NewDecoder(res.Body).Decode(&amh); err != nil {
-		return amh, err
+		return
 	}
 	return amh, nil
 }
@@ -598,7 +597,7 @@ func (c *apiClient) AccountAssociatedAddresses(ctx context.Context, stakeAddress
 	defer res.Body.Close()
 
 	if err = json.NewDecoder(res.Body).Decode(&aas); err != nil {
-		return []AccountAssociatedAddress{}, err
+		return
 	}
 	return aas, nil
 }
@@ -667,7 +666,7 @@ func (c *apiClient) AccountAssociatedAssets(ctx context.Context, stakeAddress st
 
 	err = json.NewDecoder(res.Body).Decode(&aaa)
 	if err != nil {
-		return aaa, err
+		return
 	}
 	return aaa, nil
 }
