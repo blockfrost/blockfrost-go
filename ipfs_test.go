@@ -103,28 +103,6 @@ func testIPFSResourcePinIntegration(t *testing.T, ipfs blockfrost.IPFSClient, ip
 	testErrorHelper(t, err)
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(testNames[len(testNames)-1], "Test"))+".golden")
 	want := blockfrost.IPFSPinnedObject{}
-
-	// if *update {
-	// 	data, err := json.Marshal(got)
-	// 	if err != nil {
-	// 		t.Fatal(err)
-	// 	}
-	// 	WriteGoldenFile(t, fp, data)
-	// }
-	// bytes := ReadOrGenerateGoldenFile(t, fp, got)
-	// if err := json.Unmarshal(bytes, &want); err != nil {
-	// 	t.Fatal(err)
-	// }
-
-	// want.TimeCreated = 0
-	// want.TimePinned = 0
-
-	// got.TimeCreated = 0
-	// got.TimePinned = 0
-
-	// if !reflect.DeepEqual(got, want) {
-	// 	t.Fatalf("expected %v got %v", want, got)
-	// }
 	testIntUtil(t, fp, &got, &want)
 
 }

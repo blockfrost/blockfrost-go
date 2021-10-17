@@ -128,7 +128,7 @@ func TestResourceAssetsByPolicyIntegration(t *testing.T) {
 	testIntUtil(t, fp, &got, &want)
 }
 
-type withCustomTest func(got interface{}, want interface{})
+type withCustomTest func() func(got interface{}, want interface{})
 
 func testIntUtil(t *testing.T, fp string, got interface{}, want interface{}, opts ...withCustomTest) {
 	if *update {
@@ -144,7 +144,7 @@ func testIntUtil(t *testing.T, fp string, got interface{}, want interface{}, opt
 	}
 
 	for _, opt := range opts {
-		opt(&got, &want)
+		opt()(&got, &want)
 	}
 
 	if !reflect.DeepEqual(got, want) {
