@@ -131,11 +131,7 @@ func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject,
 	if err != nil {
 		return
 	}
-	ipo = IPFSObject{}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return ipo, handleAPIErrorResponse(res)
-	}
 	if err = json.NewDecoder(res.Body).Decode(&ipo); err != nil {
 		return
 	}
