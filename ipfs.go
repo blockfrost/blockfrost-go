@@ -13,6 +13,8 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 const (
@@ -20,12 +22,13 @@ const (
 	resourceIPFSPin       = "ipfs/pin/add"
 	resourceIPFSPinList   = "ipfs/pin/list"
 	resourceIPFSPinRemove = "ipfs/pin/remove"
+	resourceIPFSGateway   = "ipfs/gateway"
 )
 
 type ipfsClient struct {
 	server    string
 	projectId string
-	client    HttpRequestDoer
+	client    *retryablehttp.Client
 	routines  int
 }
 
@@ -36,7 +39,7 @@ type IPFSClientOptions struct {
 	// Configures server to use. Can be toggled for test servers
 	Server string
 	// Interface implementing Do method such *http.Client
-	Client HttpRequestDoer
+	Client *retryablehttp.Client
 	// Max goroutines to use for *All Methods
 	MaxRoutines int
 }
@@ -59,10 +62,8 @@ func NewIPFSClient(options IPFSClientOptions) (IPFSClient, error) {
 	if options.Server == "" {
 		options.Server = IPFSNet
 	}
-
-	if options.Client == nil {
-		options.Client = &http.Client{}
-	}
+	retryclient := retryablehttp.NewClient()
+	retryclient.Logger = nil
 
 	if options.ProjectID == "" {
 		options.ProjectID = os.Getenv("BLOCKFROST_IPFS_PROJECT_ID")
@@ -74,7 +75,7 @@ func NewIPFSClient(options IPFSClientOptions) (IPFSClient, error) {
 
 	client := &ipfsClient{
 		server:    options.Server,
-		client:    options.Client,
+		client:    retryclient,
 		projectId: options.ProjectID,
 		routines:  options.MaxRoutines,
 	}
@@ -86,7 +87,7 @@ type IPFSClient interface {
 	Pin(ctx context.Context, path string) (IPFSPinnedObject, error)
 	PinnedObject(ctx context.Context, path string) (IPFSPinnedObject, error)
 	PinnedObjects(ctx context.Context, query APIQueryParams) ([]IPFSPinnedObject, error)
-	Remove(ctx context.Context, path string) ([]IPFSObject, error)
+	Remove(ctx context.Context, path string) (IPFSObject, error)
 	Gateway(ctx context.Context, path string) ([]byte, error)
 	PinnedObjectsAll(ctx context.Context, label string) <-chan PinnedObjectResult
 }
@@ -124,10 +125,9 @@ func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject,
 		return
 	}
 
-	req.Header.Add("project_id", ip.projectId)
 	req.Header.Add("Content-Type", wr.FormDataContentType())
 
-	res, err := ip.client.Do(req)
+	res, err := ip.handleRequest(req)
 	if err != nil {
 		return
 	}
@@ -192,16 +192,11 @@ func (ip *ipfsClient) Pin(ctx context.Context, IPFSPath string) (ipo IPFSPinnedO
 	if err != nil {
 		return
 	}
-	req.Header.Add("project_id", ip.projectId)
-	res, err := ip.client.Do(req)
+	res, err := ip.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&ipo); err != nil {
 		return
@@ -219,14 +214,11 @@ func (ip *ipfsClient) PinnedObject(ctx context.Context, IPFSPath string) (ipo IP
 	if err != nil {
 		return
 	}
-	res, err := ip.client.Do(req)
+	res, err := ip.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return ipo, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&ipo); err != nil {
 		return
@@ -247,14 +239,11 @@ func (ip *ipfsClient) PinnedObjects(ctx context.Context, query APIQueryParams) (
 	v := req.URL.Query()
 	v = formatParams(v, query)
 	req.URL.RawQuery = v.Encode()
-	res, err := ip.client.Do(req)
+	res, err := ip.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return ipos, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&ipos); err != nil {
 		return
@@ -262,24 +251,21 @@ func (ip *ipfsClient) PinnedObjects(ctx context.Context, query APIQueryParams) (
 	return ipos, nil
 }
 
-func (ip *ipfsClient) Remove(ctx context.Context, IPFSPath string) (ipo []IPFSObject, err error) {
+func (ip *ipfsClient) Remove(ctx context.Context, IPFSPath string) (ipo IPFSObject, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", ip.server, resourceIPFSPinRemove, IPFSPath))
 	if err != nil {
 		return
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl.String(), nil)
 	if err != nil {
 		return
 	}
-	res, err := ip.client.Do(req)
+	res, err := ip.handleRequest(req)
 	if err != nil {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return ipo, handleAPIErrorResponse(res)
-	}
 
 	if err = json.NewDecoder(res.Body).Decode(&ipo); err != nil {
 		return
@@ -288,7 +274,7 @@ func (ip *ipfsClient) Remove(ctx context.Context, IPFSPath string) (ipo []IPFSOb
 }
 
 func (ip *ipfsClient) Gateway(ctx context.Context, IPFSPath string) (ipo []byte, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", ip.server, resourceIPFSPinRemove, IPFSPath))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", ip.server, resourceIPFSGateway, IPFSPath))
 	if err != nil {
 		return
 	}
@@ -297,7 +283,7 @@ func (ip *ipfsClient) Gateway(ctx context.Context, IPFSPath string) (ipo []byte,
 	if err != nil {
 		return
 	}
-	res, err := ip.client.Do(req)
+	res, err := ip.handleRequest(req)
 	if err != nil {
 		return
 	}
