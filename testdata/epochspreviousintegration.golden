@@ -1,0 +1,62 @@
+[
+  {
+    "active_stake": "15859988643309526",
+    "block_count": 21627,
+    "end_time": 1601675091,
+    "epoch": 220,
+    "fees": "5135934788",
+    "first_block_time": 1601243091,
+    "last_block_time": 1601675059,
+    "output": "12708523642248889",
+    "start_time": 1601243091,
+    "tx_count": 19534
+  },
+  {
+    "active_stake": "16064098678859669",
+    "block_count": 21547,
+    "end_time": 1602107091,
+    "epoch": 221,
+    "fees": "3913521858",
+    "first_block_time": 1601675091,
+    "last_block_time": 1602107062,
+    "output": "14661316268620606",
+    "start_time": 1601675091,
+    "tx_count": 16365
+  },
+  {
+    "active_stake": "16371244779824020",
+    "block_count": 21466,
+    "end_time": 1602539091,
+    "epoch": 222,
+    "fees": "4499540105",
+    "first_block_time": 1602107091,
+    "last_block_time": 1602539065,
+    "output": "16854292321003503",
+    "start_time": 1602107091,
+    "tx_count": 19298
+  },
+  {
+    "active_stake": "16743231852830277",
+    "block_count": 21374,
+    "end_time": 1602971091,
+    "epoch": 223,
+    "fees": "4423831286",
+    "first_block_time": 1602539091,
+    "last_block_time": 1602971056,
+    "output": "15617686728839956",
+    "start_time": 1602539091,
+    "tx_count": 18098
+  },
+  {
+    "active_stake": "16980957495734679",
+    "block_count": 21324,
+    "end_time": 1603403091,
+    "epoch": 224,
+    "fees": "4124509016",
+    "first_block_time": 1602971091,
+    "last_block_time": 1603403068,
+    "output": "13228947318478116",
+    "start_time": 1602971091,
+    "tx_count": 17527
+  }
+]

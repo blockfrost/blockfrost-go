@@ -1,0 +1,27 @@
+[
+  {
+    "stake_address": "stake1uyqqr23f3gvakvuneaxgc2009zvztuattzkuufq2qnzvw9snvmd03",
+    "pool_id": "pool1myvgx4ef424e6nw2strqq7dxcepav52plyyhxrk0avaw7y098l2",
+    "amount": "48205931990"
+  },
+  {
+    "stake_address": "stake1uyqq9fy0vpypzh7vsu0xutnh3t9rt887vxy7mcg7v3faz6qethxnh",
+    "pool_id": "pool1sj0plznq9nnduxp82aa8crchfety7kzcryqdmn6860xvwwzzc4w",
+    "amount": "3187202043"
+  },
+  {
+    "stake_address": "stake1uyqqxflgdzwsf3tdunxktg7vzp9lpnm2hltv4jfz4p9l96gw7sf3k",
+    "pool_id": "pool1arsqn9w87wpqlm0sre66gs79dcs0jmwulytgke3vut7u62lttu7",
+    "amount": "210415349"
+  },
+  {
+    "stake_address": "stake1uyqqx5v0f49c8rgymszw9gdgrea9yanhrk5fcg9ymgs2jnctyyj94",
+    "pool_id": "pool1a2nh3ktswllhwf07fjahpdg5mpqyq7j950pyftq9765r6t4cefl",
+    "amount": "59519451196"
+  },
+  {
+    "stake_address": "stake1uyqq2a22arunrft3k9ehqc7yjpxtxjmvgndae80xw89mwyge9skyp",
+    "pool_id": "pool1ell3xjtspzzz4vtsatscan6rheltf7j3hh2s8qsam2h3jvcxzm9",
+    "amount": "151262378560"
+  }
+]
