@@ -23,10 +23,7 @@ var (
 
 func main() {
 	flag.Parse()
-	ipfs, err := blockfrost.NewIPFSClient(blockfrost.IPFSClientOptions{})
-	if err != nil {
-		log.Fatal(err)
-	}
+	ipfs := blockfrost.NewIPFSClient(blockfrost.IPFSClientOptions{})
 
 	ipo, err := ipfs.Add(context.TODO(), *fp)
 	if err != nil {
