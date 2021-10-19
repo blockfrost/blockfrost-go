@@ -76,6 +76,7 @@ func TestIPFSResourceAddIntegration(t *testing.T) {
 	fp_up := filepath.Join(testdata, "json", "ipfs", "ipfs_object.json")
 	got, err := ipfs.Add(context.TODO(), fp_up)
 	testErrorHelper(t, err)
+	*update = true
 
 	// want := blockfrost.IPFSObject{}
 	// fp_golden := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
@@ -95,6 +96,7 @@ func TestIPFSResourceAddIntegration(t *testing.T) {
 	t.Run("TestIPFSResourceRemoveIntegration", func(ti *testing.T) {
 		testIPFSResourceRemoveIntegration(ti, ipfs, got.IPFSHash)
 	})
+	*update = false
 }
 
 func testIPFSResourcePinIntegration(t *testing.T, ipfs blockfrost.IPFSClient, ipfsPath string) {
