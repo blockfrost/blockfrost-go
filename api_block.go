@@ -181,7 +181,7 @@ func (c *apiClient) BlockBySlot(ctx context.Context, slotNumber int) (bl Block, 
 
 // BlocksBySlotAndEpoch returns a Block for a specific slot and epoch
 func (c *apiClient) BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (bl Block, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%d/%s/%d", c.server, epochNumber, "slot", slotNumber))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%d/%s/%d", c.server, "blocks", "epoch", epochNumber, "slot", slotNumber))
 	if err != nil {
 		return
 	}
