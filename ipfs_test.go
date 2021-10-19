@@ -77,9 +77,9 @@ func TestIPFSResourceAddIntegration(t *testing.T) {
 	got, err := ipfs.Add(context.TODO(), fp_up)
 	testErrorHelper(t, err)
 
-	want := blockfrost.IPFSObject{}
-	fp_golden := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
-	testIntUtil(t, fp_golden, &got, &want)
+	// want := blockfrost.IPFSObject{}
+	// fp_golden := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	// testIntUtil(t, fp_golden, &got, &want)
 	t.Run("TestIPFSResourcePinIntegration", func(ti *testing.T) {
 		testIPFSResourcePinIntegration(ti, ipfs, got.IPFSHash)
 	})
