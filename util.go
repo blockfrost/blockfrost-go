@@ -110,3 +110,21 @@ func (c *apiClient) handleRequest(req *http.Request) (res *http.Response, err er
 
 	return res, nil
 }
+
+func (ip *ipfsClient) handleRequest(req *http.Request) (res *http.Response, err error) {
+	req.Header.Add("project_id", ip.projectId)
+	rreq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return
+	}
+	res, err = ip.client.Do(rreq)
+	if err != nil {
+		return
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return res, handleAPIErrorResponse(res)
+	}
+
+	return res, nil
+}

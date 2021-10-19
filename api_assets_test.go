@@ -128,7 +128,9 @@ func TestResourceAssetsByPolicyIntegration(t *testing.T) {
 	testIntUtil(t, fp, &got, &want)
 }
 
-func testIntUtil(t *testing.T, fp string, got interface{}, want interface{}) {
+type withCustomTest func() func(got interface{}, want interface{})
+
+func testIntUtil(t *testing.T, fp string, got interface{}, want interface{}, opts ...withCustomTest) {
 	if *update {
 		data, err := json.Marshal(got)
 		if err != nil {
@@ -139,6 +141,10 @@ func testIntUtil(t *testing.T, fp string, got interface{}, want interface{}) {
 	bytes := ReadOrGenerateGoldenFile(t, fp, got)
 	if err := json.Unmarshal(bytes, want); err != nil {
 		t.Fatal(err)
+	}
+
+	for _, opt := range opts {
+		opt()(&got, &want)
 	}
 
 	if !reflect.DeepEqual(got, want) {
