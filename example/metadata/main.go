@@ -1,3 +1,10 @@
+// Example script introducing usage of query params for pagination
+// Run using:
+// 		go run main.go
+//
+// You'll need a valid project_id from blockfrost.io
+// This example fetches project_id from env:BLOCKFROST_IPFS_PROJECT_ID
+
 package main
 
 import (

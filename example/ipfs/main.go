@@ -1,3 +1,11 @@
+// Add and Pin file using the IPFS client
+// Run it using
+//
+// 		go run main.go -file blockfrost.txt
+//
+// You'll need a valid project_id from blockfrost.io
+// This example fetches project_id from env:BLOCKFROST_IPFS_PROJECT_ID
+
 package main
 
 import (

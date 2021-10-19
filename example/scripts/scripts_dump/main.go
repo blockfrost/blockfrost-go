@@ -1,3 +1,11 @@
+// This example gets and dumps scripts to csv file utilising ScriptsAll Method
+// Run it using
+//
+// 		go run main.go -file scripts.csv
+//
+// You'll need a valid project_id from blockfrost.io
+// This example fetches project_id from env:BLOCKFROST_IPFS_PROJECT_ID
+
 package main
 
 import (
@@ -37,7 +45,7 @@ func main() {
 	handleError(err)
 
 	for r := range api.ScriptsAll(context.TODO()) {
-		for k, v := range r.Scripts {
+		for k, v := range r.Res {
 			arr := []string{fmt.Sprintf("%d", k), v.ScriptHash}
 			err := wr.Write(arr)
 			handleError(err)
