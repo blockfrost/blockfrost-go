@@ -3,6 +3,7 @@ package blockfrost
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -61,7 +62,13 @@ func handleAPIErrorResponse(res *http.Response) error {
 			Response: ise,
 		}
 	default:
-		return &APIError{}
+		data, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+		return &APIError{
+			Response: string(data),
+		}
 	}
 }
 
@@ -78,8 +85,8 @@ func formatParams(v url.Values, query APIQueryParams) url.Values {
 	if query.From != "" {
 		v.Add("from", query.From)
 	}
-	if query.From != "" {
-		v.Add("to", query.From)
+	if query.To != "" {
+		v.Add("to", query.To)
 	}
 
 	v.Encode()

@@ -16,6 +16,8 @@ func TestFormatParams(t *testing.T) {
 		{APIQueryParams{Order: "asc"}, "order=asc"},
 		{APIQueryParams{Count: 5, Page: 10}, "count=5&page=10"},
 		{APIQueryParams{Count: 5, Page: 10, Order: "desc"}, "count=5&order=desc&page=10"},
+		{APIQueryParams{From: "8929261"}, "from=8929261"},
+		{APIQueryParams{To: "9999269:10"}, "to=9999269%3A10"},
 	}
 	req, err := http.NewRequest(http.MethodGet, "/go", nil)
 	if err != nil {
