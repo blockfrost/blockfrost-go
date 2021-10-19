@@ -35,13 +35,13 @@ type methodOptions struct {
 }
 
 type ScriptAllResult struct {
-	Scripts []Script
-	Err     error
+	Res []Script
+	Err error
 }
 
 type ScriptRedeemerResult struct {
-	ScriptRedeemers []ScriptRedeemer
-	Err             error
+	Res []ScriptRedeemer
+	Err error
 }
 
 func (c *apiClient) Scripts(ctx context.Context, query APIQueryParams) (scripts []Script, err error) {
@@ -86,7 +86,7 @@ func (c *apiClient) ScriptsAll(ctx context.Context) <-chan ScriptAllResult {
 				if len(sc) != j.query.Count || err != nil {
 					quit <- true
 				}
-				res := ScriptAllResult{Scripts: sc, Err: err}
+				res := ScriptAllResult{Res: sc, Err: err}
 				ch <- res
 			}
 
@@ -170,7 +170,7 @@ func (c *apiClient) ScriptRedeemersAll(ctx context.Context, address string) <-ch
 				if len(sr) != j.query.Count || err != nil {
 					quit <- true
 				}
-				res := ScriptRedeemerResult{ScriptRedeemers: sr, Err: err}
+				res := ScriptRedeemerResult{Res: sr, Err: err}
 				ch <- res
 			}
 
