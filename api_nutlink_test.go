@@ -1,7 +1,9 @@
 package blockfrost_test
 
 import (
+	"context"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
@@ -39,4 +41,68 @@ func TestTickerRecordUnmarshal(t *testing.T) {
 	}
 	got := []blockfrost.TickerRecord{}
 	testStructGotWant(t, fp, &got, &want)
+}
+
+func TestNutlinkIntegration(t *testing.T) {
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr := "addr1qygvjldfxxhp7q96w729c6gvq7hy6pfc937jqlvpms2833rah0c4wey5zfgnuar9eyf6q7pzjzv56c542q7zctpkz9wqay69js"
+	got, err := api.Nutlink(context.TODO(), addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := blockfrost.NutlinkAddress{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTickersIntegration(t *testing.T) {
+	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr := "addr1qygvjldfxxhp7q96w729c6gvq7hy6pfc937jqlvpms2833rah0c4wey5zfgnuar9eyf6q7pzjzv56c542q7zctpkz9wqay69js"
+	got, err := api.Tickers(context.TODO(), addr, blockfrost.APIQueryParams{Count: 5})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.Ticker{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTickerRecordsIntegration(t *testing.T) {
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := api.TickerRecords(context.TODO(), "ADAUSD", blockfrost.APIQueryParams{Count: 5})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TickerRecord{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestAddressTickerRecordsIntegration(t *testing.T) {
+	api, err := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr := "addr1qygvjldfxxhp7q96w729c6gvq7hy6pfc937jqlvpms2833rah0c4wey5zfgnuar9eyf6q7pzjzv56c542q7zctpkz9wqay69js"
+	got, err := api.AddressTickerRecords(context.TODO(), addr, "ADAUSD", blockfrost.APIQueryParams{Count: 5})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TickerRecord{}
+	testIntUtil(t, fp, &got, &want)
 }
