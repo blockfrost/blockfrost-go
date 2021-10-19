@@ -13,19 +13,18 @@ import (
 func (c *apiClient) Info(ctx context.Context) (info Info, err error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.server, nil)
 	if err != nil {
-		return Info{}, err
+		return
 	}
 
 	res, err := c.handleRequest(req)
 
 	if err != nil {
-		return Info{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	err = json.NewDecoder(res.Body).Decode(&info)
-	if err != nil {
-		return Info{}, err
+	if err = json.NewDecoder(res.Body).Decode(&info); err != nil {
+		return
 	}
 	return info, nil
 

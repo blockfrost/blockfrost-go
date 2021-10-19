@@ -9,57 +9,50 @@ import (
 )
 
 // Metrics returns the history of your Blockfrost usage metrics in the past 30 days.
-func (c *apiClient) Metrics(ctx context.Context) ([]Metric, error) {
-	var metrics []Metric
+func (c *apiClient) Metrics(ctx context.Context) (mes []Metric, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceMetrics))
 	if err != nil {
-		return metrics, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return metrics, err
+		return
 	}
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return metrics, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != 200 {
-		return metrics, handleAPIErrorResponse(res)
+	if err = json.NewDecoder(res.Body).Decode(&mes); err != nil {
+		return
 	}
-
-	err = json.NewDecoder(res.Body).Decode(&metrics)
-	if err != nil {
-		return []Metric{}, err
-	}
-	return metrics, nil
+	return mes, nil
 }
 
 // MetricsEndpoints returns history of your blockfrost usage metrics
 // History of your Blockfrost usage metrics per endpoint in the past 30 days.
-func (c *apiClient) MetricsEndpoints(ctx context.Context) ([]MetricsEndpoint, error) {
-	var metricsEndpoints []MetricsEndpoint
+func (c *apiClient) MetricsEndpoints(ctx context.Context) (mes []MetricsEndpoint, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceMetricsEndpoint))
 	if err != nil {
-		return metricsEndpoints, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return metricsEndpoints, err
+		return
 	}
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return metricsEndpoints, err
+		return
 	}
 	defer res.Body.Close()
 
-	err = json.NewDecoder(res.Body).Decode(&metricsEndpoints)
+	err = json.NewDecoder(res.Body).Decode(&mes)
 	if err != nil {
-		return []MetricsEndpoint{}, err
+		return
 	}
-	return metricsEndpoints, nil
+	return mes, nil
 }

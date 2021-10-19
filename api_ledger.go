@@ -42,8 +42,8 @@ func (c *apiClient) Genesis(ctx context.Context) (gen GenesisBlock, err error) {
 	}
 	defer res.Body.Close()
 
-	if err := json.NewDecoder(res.Body).Decode(&gen); err != nil {
-		return gen, err
+	if err = json.NewDecoder(res.Body).Decode(&gen); err != nil {
+		return
 	}
 	return gen, nil
 }

@@ -10,246 +10,195 @@ import (
 
 // BlocksLatest Return the latest block available to the backends, also known as the
 // tip of the blockchain.
-func (c *apiClient) BlockLatest(ctx context.Context) (Block, error) {
+func (c *apiClient) BlockLatest(ctx context.Context) (b Block, err error) {
 	requestUrl, err := url.Parse((fmt.Sprintf("%s/%s", c.server, resourceBlocksLatest)))
 	if err != nil {
-		return Block{}, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return Block{}, err
+		return
 	}
-	req.Header.Add("project_id", c.projectId)
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return Block{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return Block{}, handleAPIErrorResponse(res)
-	}
-	block := Block{}
-	err = json.NewDecoder(res.Body).Decode(&block)
+	err = json.NewDecoder(res.Body).Decode(&b)
 	if err != nil {
-		return Block{}, err
+		return
 	}
-	return block, nil
+	return b, nil
 }
 
 // Block returns the content of a requested block by the hash or block number
-func (c *apiClient) Block(ctx context.Context, hashOrNumber string) (Block, error) {
+func (c *apiClient) Block(ctx context.Context, hashOrNumber string) (bl Block, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceBlock, hashOrNumber))
 	if err != nil {
-		return Block{}, err
+		return
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return Block{}, err
+		return
 	}
-
-	req.Header.Add("project_id", c.projectId)
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return Block{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return Block{}, handleAPIErrorResponse(res)
+	if err = json.NewDecoder(res.Body).Decode(&bl); err != nil {
+		return
 	}
-	block := Block{}
-	err = json.NewDecoder(res.Body).Decode(&block)
-	if err != nil {
-		return Block{}, err
-	}
-	return block, nil
+	return bl, nil
 }
 
 // BlocksNext returns the list of blocks following a specific block
 // denoted by the hash or block number
-func (c *apiClient) BlocksNext(ctx context.Context, hashorNumber string) ([]Block, error) {
-	var blocks []Block
+func (c *apiClient) BlocksNext(ctx context.Context, hashorNumber string) (bls []Block, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceBlock, hashorNumber, "next"))
 	if err != nil {
-		return blocks, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
-	req.Header.Add("project_id", c.projectId)
-
 	if err != nil {
-		return blocks, err
+		return
 	}
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return blocks, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return blocks, handleAPIErrorResponse(res)
+	if err = json.NewDecoder(res.Body).Decode(&bls); err != nil {
+		return
 	}
-	err = json.NewDecoder(res.Body).Decode(&blocks)
-	if err != nil {
-		return []Block{}, err
-	}
-	return blocks, nil
+	return bls, nil
 }
 
 // BlocksPrevious returns the list of blocks preceding a specific block
 // specified by a hash or block number
-func (c *apiClient) BlocksPrevious(ctx context.Context, hashorNumber string) ([]Block, error) {
-	var blocks []Block
+func (c *apiClient) BlocksPrevious(ctx context.Context, hashorNumber string) (bls []Block, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceBlock, hashorNumber, "previous"))
 	if err != nil {
-		return blocks, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
-	req.Header.Add("project_id", c.projectId)
 	if err != nil {
-		return blocks, err
+		return
 	}
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return blocks, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return blocks, handleAPIErrorResponse(res)
+	if err = json.NewDecoder(res.Body).Decode(&bls); err != nil {
+		return
 	}
-	err = json.NewDecoder(res.Body).Decode(&blocks)
-	if err != nil {
-		return []Block{}, err
-	}
-	return blocks, nil
+	return bls, nil
 }
 
 // BlocksTransactions returns slice of Transaction within the block specified
 // by a hash or block number
-func (c *apiClient) BlockTransactions(ctx context.Context, hashOrNumber string) ([]Transaction, error) {
-	var txs []Transaction
+func (c *apiClient) BlockTransactions(ctx context.Context, hashOrNumber string) (txs []Transaction, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceBlock, hashOrNumber, "txs"))
 	if err != nil {
-		return txs, err
+		return
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return txs, err
+		return
 	}
-	req.Header.Add("project_id", c.projectId)
-
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return txs, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return txs, handleAPIErrorResponse(res)
-	}
-
 	err = json.NewDecoder(res.Body).Decode(&txs)
 	if err != nil {
-		return []Transaction{}, err
+		return
 	}
 	return txs, nil
 }
 
 // BlockLatestTransactions returns the transactions within the latest block.
-func (c *apiClient) BlockLatestTransactions(ctx context.Context) ([]Transaction, error) {
-	var txs []Transaction
+func (c *apiClient) BlockLatestTransactions(ctx context.Context) (txs []Transaction, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceBlocksLatestTransactions))
 	if err != nil {
-		return txs, err
+		return
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return txs, err
+		return
 	}
-	req.Header.Add("project_id", c.projectId)
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return txs, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return txs, handleAPIErrorResponse(res)
-	}
-
-	err = json.NewDecoder(res.Body).Decode(&txs)
-	if err != nil {
-		return []Transaction{}, err
+	if err = json.NewDecoder(res.Body).Decode(&txs); err != nil {
+		return
 	}
 	return txs, nil
 }
 
 // BlocksBySlot returns the content of a requested block for a specific slot.
-func (c *apiClient) BlockBySlot(ctx context.Context, slotNumber int) (Block, error) {
+func (c *apiClient) BlockBySlot(ctx context.Context, slotNumber int) (bl Block, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d", c.server, resourceBlocksSlot, slotNumber))
 	if err != nil {
-		return Block{}, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return Block{}, err
+		return
 	}
-	req.Header.Add("project_id", c.projectId)
-
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return Block{}, err
+		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return Block{}, handleAPIErrorResponse(res)
-	}
 
-	block := Block{}
-	err = json.NewDecoder(res.Body).Decode(&block)
+	err = json.NewDecoder(res.Body).Decode(&bl)
 	if err != nil {
-		return Block{}, err
+		return
 	}
-	return block, nil
+	return bl, nil
 
 }
 
 // BlocksBySlotAndEpoch returns a Block for a specific slot and epoch
-func (c *apiClient) BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (Block, error) {
+func (c *apiClient) BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (bl Block, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%d/%s/%d", c.server, epochNumber, "slot", slotNumber))
 	if err != nil {
-		return Block{}, err
+		return
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return Block{}, err
+		return
 	}
-	req.Header.Add("project_id", c.projectId)
 
 	res, err := c.handleRequest(req)
 	if err != nil {
-		return Block{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return Block{}, handleAPIErrorResponse(res)
-	}
-
-	block := Block{}
-	err = json.NewDecoder(res.Body).Decode(&block)
+	err = json.NewDecoder(res.Body).Decode(&bl)
 	if err != nil {
-		return Block{}, err
+		return
 	}
-	return block, nil
+	return bl, nil
 }
