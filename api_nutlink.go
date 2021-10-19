@@ -61,7 +61,6 @@ func (c *apiClient) Nutlink(ctx context.Context, address string) (nu NutlinkAddr
 	if err != nil {
 		return
 	}
-
 	res, err := c.handleRequest(req)
 	if err != nil {
 		return nu, err
@@ -213,7 +212,6 @@ func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ti
 	if err != nil {
 		return
 	}
-
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return
