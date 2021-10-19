@@ -12,6 +12,7 @@ const (
 	resourceNetwork = "network"
 )
 
+// NetworkSupply contains information on network supply
 type NetworkSupply struct {
 	Max         string `json:"max,omitempty"`
 	Total       string `json:"total,omitempty"`
@@ -19,15 +20,19 @@ type NetworkSupply struct {
 	Locked      string `json:"locked,omitempty"`
 }
 
+// NetworkStake contains information on the cardano network stake
 type NetworkStake struct {
 	Live   string `json:"live,omitempty"`
 	Active string `json:"active,omitempty"`
 }
+
+// NetworkInfo contains network stake and supply information on the network
 type NetworkInfo struct {
-	Supply NetworkSupply `json:"supply,omitempty"`
-	Stake  NetworkStake  `json:"stake,omitempty"`
+	Supply NetworkSupply `json:"supply"`
+	Stake  NetworkStake  `json:"stake"`
 }
 
+// Network returns detailed network information.
 func (c *apiClient) Network(ctx context.Context) (ni NetworkInfo, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceNetwork))
 	if err != nil {
