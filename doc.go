@@ -12,6 +12,7 @@
 			api, err := blockfrost.NewAPIClient(
 				blockfrost.APIClientOptions{},
 			)
+			...
 		}
 
 	Examples can be found at

@@ -50,7 +50,7 @@ func TestIPFSClientInit(t *testing.T) {
 				}),
 			)
 			tt.option.Server = s.URL
-			c, _ := blockfrost.NewIPFSClient(
+			c := blockfrost.NewIPFSClient(
 				tt.option,
 			)
 			_, _ = c.Add(context.TODO(), "")
@@ -70,8 +70,7 @@ func TestIPFSObjectUnmarshal(t *testing.T) {
 }
 
 func TestIPFSResourceAddIntegration(t *testing.T) {
-	ipfs, err := blockfrost.NewIPFSClient(blockfrost.IPFSClientOptions{})
-	testErrorHelper(t, err)
+	ipfs := blockfrost.NewIPFSClient(blockfrost.IPFSClientOptions{})
 
 	fp_up := filepath.Join(testdata, "json", "ipfs", "ipfs_object.json")
 	got, err := ipfs.Add(context.TODO(), fp_up)

@@ -44,12 +44,14 @@ type IPFSClientOptions struct {
 	MaxRoutines int
 }
 
+// IPFSObject contains information on an IPFS object
 type IPFSObject struct {
 	Name     string `json:"name,omitempty"`
 	IPFSHash string `json:"ipfs_hash,omitempty"`
 	Size     string `json:"size,omitempty"`
 }
 
+// IPFSPinnedObject contains information on a pinned object
 type IPFSPinnedObject struct {
 	TimeCreated int    `json:"time_created,omitempty"`
 	TimePinned  int    `json:"time_pinned,omitempty"`
@@ -58,7 +60,10 @@ type IPFSPinnedObject struct {
 	Size        string `json:"size,omitempty"`
 }
 
-func NewIPFSClient(options IPFSClientOptions) (IPFSClient, error) {
+// NewIPFSClient creates and returns an IPFS client configured using
+// IPFSClientOptions. It will initialize the client with default options
+// if provided with empty options
+func NewIPFSClient(options IPFSClientOptions) IPFSClient {
 	if options.Server == "" {
 		options.Server = IPFSNet
 	}
@@ -79,7 +84,7 @@ func NewIPFSClient(options IPFSClientOptions) (IPFSClient, error) {
 		projectId: options.ProjectID,
 		routines:  options.MaxRoutines,
 	}
-	return client, nil
+	return client
 }
 
 type IPFSClient interface {
@@ -89,14 +94,17 @@ type IPFSClient interface {
 	PinnedObjects(ctx context.Context, query APIQueryParams) ([]IPFSPinnedObject, error)
 	Remove(ctx context.Context, path string) (IPFSObject, error)
 	Gateway(ctx context.Context, path string) ([]byte, error)
-	PinnedObjectsAll(ctx context.Context, label string) <-chan PinnedObjectResult
+	PinnedObjectsAll(ctx context.Context) <-chan PinnedObjectResult
 }
 
+// PinnedObjectResult contains response and error from an All method
 type PinnedObjectResult struct {
 	Res []IPFSPinnedObject
 	Err error
 }
 
+// Add a file to IPFS storage
+// You need to Pin an object to avoid it being garbage collected.
 func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", ip.server, resourceIPFSAdd))
 	if err != nil {
@@ -139,7 +147,8 @@ func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject,
 	return ipo, nil
 }
 
-func (ip *ipfsClient) PinnedObjectsAll(ctx context.Context, label string) <-chan PinnedObjectResult {
+// PinnedObjectsAll gets all pinned objects. Returns a channel that can be used with range
+func (ip *ipfsClient) PinnedObjectsAll(ctx context.Context) <-chan PinnedObjectResult {
 	ch := make(chan PinnedObjectResult, ip.routines)
 	jobs := make(chan methodOptions, ip.routines)
 	quit := make(chan bool, ip.routines)
@@ -179,6 +188,7 @@ func (ip *ipfsClient) PinnedObjectsAll(ctx context.Context, label string) <-chan
 	return ch
 }
 
+// Pin an object to avoid it being garbage collected
 func (ip *ipfsClient) Pin(ctx context.Context, IPFSPath string) (ipo IPFSPinnedObject, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", ip.server, resourceIPFSPin, IPFSPath))
 	if err != nil {
@@ -200,6 +210,7 @@ func (ip *ipfsClient) Pin(ctx context.Context, IPFSPath string) (ipo IPFSPinnedO
 	return ipo, nil
 }
 
+// PinnedObject returns information about locally pinned IPFS object
 func (ip *ipfsClient) PinnedObject(ctx context.Context, IPFSPath string) (ipo IPFSPinnedObject, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", ip.server, resourceIPFSPinList, IPFSPath))
 	if err != nil {
@@ -222,6 +233,9 @@ func (ip *ipfsClient) PinnedObject(ctx context.Context, IPFSPath string) (ipo IP
 	return ipo, nil
 }
 
+// PinnedObjects returns information about locally pinned IPFS objects. Returns
+// a slice of IPFSPinnedObject(s) whose quantity and offset is controlled by
+// query parameters
 func (ip *ipfsClient) PinnedObjects(ctx context.Context, query APIQueryParams) (ipos []IPFSPinnedObject, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", ip.server, resourceIPFSPinList))
 	if err != nil {
@@ -247,6 +261,8 @@ func (ip *ipfsClient) PinnedObjects(ctx context.Context, query APIQueryParams) (
 	return ipos, nil
 }
 
+// Remove - removes pinned objects from local storage. Returns and IPFSObject
+// containing removed object information
 func (ip *ipfsClient) Remove(ctx context.Context, IPFSPath string) (ipo IPFSObject, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", ip.server, resourceIPFSPinRemove, IPFSPath))
 	if err != nil {
@@ -269,6 +285,8 @@ func (ip *ipfsClient) Remove(ctx context.Context, IPFSPath string) (ipo IPFSObje
 	return ipo, nil
 }
 
+// Gateway retrieves an object from the IFPS gateway and returns a byte
+// (useful if you do not want to rely on a public gateway, such as `ipfs.blockfrost.dev`).
 func (ip *ipfsClient) Gateway(ctx context.Context, IPFSPath string) (ipo []byte, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", ip.server, resourceIPFSGateway, IPFSPath))
 	if err != nil {
