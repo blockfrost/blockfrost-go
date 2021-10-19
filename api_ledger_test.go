@@ -3,7 +3,6 @@ package blockfrost_test
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -12,7 +11,8 @@ import (
 	"github.com/blockfrost/blockfrost-go"
 )
 
-func TestGenesisMarshall(t *testing.T) {
+func TestGenesisUnmarshall(t *testing.T) {
+	fp := filepath.Join(testdata, "json", "genesis", "genesis.json")
 	want := blockfrost.GenesisBlock{
 		ActiveSlotsCoefficient: 0.05,
 		UpdateQuorum:           5,
@@ -25,21 +25,8 @@ func TestGenesisMarshall(t *testing.T) {
 		MaxKesEvolutions:       62,
 		SecurityParam:          2160,
 	}
-
-	fp := filepath.Join(testdata, "json", "genesis", "genesis.json")
-	bytes, err := ioutil.ReadFile(fp)
-	if err != nil {
-		t.Fatalf("an error ocurred while trying to read json test file %s", fp)
-	}
-
 	got := blockfrost.GenesisBlock{}
-	if err = json.Unmarshal(bytes, &got); err != nil {
-		t.Fatalf("failed to unmarshal %s with err %v", fp, err)
-	}
-
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
-	}
+	testStructGotWant(t, fp, &got, &want)
 }
 
 func TestGenesisIntegration(t *testing.T) {

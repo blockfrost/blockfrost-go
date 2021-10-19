@@ -135,7 +135,7 @@ type BlockDistributionResult struct {
 }
 
 func (c *apiClient) EpochLatest(ctx context.Context) (ep Epoch, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceEpochs, resourceEpochsLatest, resourceEpochParameters))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceEpochs, resourceEpochsLatest))
 	if err != nil {
 		return
 	}
@@ -156,7 +156,7 @@ func (c *apiClient) EpochLatest(ctx context.Context) (ep Epoch, err error) {
 }
 
 func (c *apiClient) LatestEpochParameters(ctx context.Context) (epr EpochParameters, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceEpochs, resourceEpochsLatest))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceEpochs, resourceEpochsLatest, resourceEpochParameters))
 	if err != nil {
 		return
 	}
@@ -459,7 +459,7 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 }
 
 func (c *apiClient) EpochBlockDistribution(ctx context.Context, epochNumber int, query APIQueryParams) (bd []string, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsBlocks))
 	if err != nil {
 		return
 	}
@@ -524,7 +524,7 @@ func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber i
 }
 
 func (c *apiClient) EpochBlockDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) (bd []string, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s/%s", c.server, resourceEpochs, epochNumber, resourceEpochsBlocks, poolId))
 	if err != nil {
 		return
 	}
@@ -589,7 +589,7 @@ func (c *apiClient) EpochBlockDistributionByPoolAll(ctx context.Context, epochNu
 }
 
 func (c *apiClient) EpochParameters(ctx context.Context, epochNumber int) (eps EpochParameters, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochParameters))
 	if err != nil {
 		return
 	}

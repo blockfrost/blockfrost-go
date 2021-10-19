@@ -1,0 +1,27 @@
+[
+  {
+    "name": "ADABTC",
+    "count": 1471,
+    "latest_block": 5553156
+  },
+  {
+    "name": "ADACAD",
+    "count": 1471,
+    "latest_block": 5553156
+  },
+  {
+    "name": "ADAEUR",
+    "count": 1471,
+    "latest_block": 5553156
+  },
+  {
+    "name": "ADAJPY",
+    "count": 1471,
+    "latest_block": 5553156
+  },
+  {
+    "name": "ADAUSD",
+    "count": 1471,
+    "latest_block": 5553156
+  }
+]

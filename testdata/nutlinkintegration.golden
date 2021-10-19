@@ -1,0 +1,12 @@
+{
+  "address": "addr1qygvjldfxxhp7q96w729c6gvq7hy6pfc937jqlvpms2833rah0c4wey5zfgnuar9eyf6q7pzjzv56c542q7zctpkz9wqay69js",
+  "metadata_url": "https://cardanocanucks.com/oracle-metadata.canuk.json",
+  "metadata_hash": "55d588f267e1e6d46391e01d737c44a3efd2d4eb7042d07f99164953de2af58a",
+  "metadata": {
+    "ticker": "CANUK",
+    "name": "Cardano Canucks Oracles",
+    "description": "A Canadian oracle provider operated by Cardano Canucks Stake Pool",
+    "homepage": "https://cardanocanucks.com",
+    "address": "addr1qygvjldfxxhp7q96w729c6gvq7hy6pfc937jqlvpms2833rah0c4wey5zfgnuar9eyf6q7pzjzv56c542q7zctpkz9wqay69js"
+  }
+}
