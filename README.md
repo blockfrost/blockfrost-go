@@ -11,8 +11,15 @@
 [![Go report card](https://goreportcard.com/badge/github.com/blockfrost/blockfrost-go)](https://goreportcard.com/report/github.com/blockfrost/blockfrost-go)
 [![GoDoc](https://godoc.org/github.com/blockfrost/blockfrost-go?status.svg)](https://godoc.org/github.com/blockfrost/blockfrost-go)
 
+## Getting started
 
-# Installation
+To use this SDK, you first need to log in to [blockfrost.io](https://blockfrost.io), create your project and retrieve the API token.
+
+<img src="https://i.imgur.com/smY12ro.png">
+
+<br/>
+
+## Installation
 
 `blockfrost-go` can be installed through go get
 
@@ -52,6 +59,47 @@ func main() {
 	fmt.Printf("API Info:\n\tUrl: %s\n\tVersion: %s", info.Url, info.Version)
 }
 ```
+
+### IPFS
+
+```go
+package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"log"
+
+	"github.com/blockfrost/blockfrost-go"
+)
+
+var (
+	fp = flag.String("file", "", "Path to file")
+)
+
+func main() {
+	flag.Parse()
+	// Load project_id from env:BLOCKFROST_IPFS_PROJECT_ID
+	ipfs := blockfrost.NewIPFSClient(blockfrost.IPFSClientOptions{})
+
+	ipo, err := ipfs.Add(context.TODO(), *fp)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("IPFS Object: %+v\n", ipo)
+
+	// Pin item to avoid being garbage collected.
+	pin, err := ipfs.Pin(context.TODO(), ipo.IPFSHash)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Pin: %+v", pin)
+}
+```
+
+More examples of usage can be found in [`example`](https://github.com/blockfrost/blockfrost-go/tree/master/example) folder.
 
 ## License
 
