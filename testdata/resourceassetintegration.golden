@@ -1,0 +1,11 @@
+{
+  "asset": "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e4669727374636f696e",
+  "policy_id": "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e",
+  "asset_name": "4669727374636f696e",
+  "fingerprint": "asset1aq460y056c3mm4jmuv9vg39n7w8y5gykywjwge",
+  "quantity": "1",
+  "initial_mint_tx_hash": "0b28244fade854bb15f0358de44872cfb2216744b95dc0855704dac34619f382",
+  "mint_or_burn_count": 1,
+  "onchain_metadata": {},
+  "metadata": {}
+}

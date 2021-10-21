@@ -10,28 +10,21 @@ import (
 
 // Info returns the root endpoint `/`. Root endpoint has
 // no other function than to point end users to documentation.
-func (c *apiClient) Info(ctx context.Context) (Info, error) {
+func (c *apiClient) Info(ctx context.Context) (info Info, err error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.server, nil)
 	if err != nil {
-		return Info{}, err
+		return
 	}
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 
 	if err != nil {
-		return Info{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != 200 {
-		return Info{}, handleAPIErrorResponse(res)
-	}
-
-	info := Info{}
-	err = json.NewDecoder(res.Body).Decode(&info)
-	if err != nil {
-		return Info{}, err
+	if err = json.NewDecoder(res.Body).Decode(&info); err != nil {
+		return
 	}
 	return info, nil
 
@@ -40,64 +33,49 @@ func (c *apiClient) Info(ctx context.Context) (Info, error) {
 // Health returns the backend health status
 // Return backend status as a boolean. Your application
 // should handle situations when backend for the given chain is unavailable.
-func (c *apiClient) Health(ctx context.Context) (Health, error) {
+func (c *apiClient) Health(ctx context.Context) (h Health, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceHealth))
 	if err != nil {
-		return Health{}, err
+		return
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return Health{}, err
+		return
 	}
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return Health{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != 200 {
-		return Health{}, handleAPIErrorResponse(res)
+	if err = json.NewDecoder(res.Body).Decode(&h); err != nil {
+		return
 	}
-
-	health := Health{}
-	err = json.NewDecoder(res.Body).Decode(&health)
-	if err != nil {
-		return Health{}, err
-	}
-	return health, nil
+	return h, nil
 }
 
 // HealthClock returns the current UNIX time. Your application might
 // use this to verify if the client clock is not out of sync.
-func (c *apiClient) HealthClock(ctx context.Context) (HealthClock, error) {
+func (c *apiClient) HealthClock(ctx context.Context) (hc HealthClock, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceHealthClock))
 	if err != nil {
-		return HealthClock{}, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return HealthClock{}, err
+		return
 	}
-	req.Header.Add("project_id", c.projectId)
-
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 
 	if err != nil {
-		return HealthClock{}, err
+		return
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != 200 {
-		return HealthClock{}, handleAPIErrorResponse(res)
-	}
-
-	healthClock := HealthClock{}
-	err = json.NewDecoder(res.Body).Decode(&healthClock)
-	if err != nil {
+	if err = json.NewDecoder(res.Body).Decode(&hc); err != nil {
 		return HealthClock{}, err
 	}
-	return healthClock, nil
+	return hc, nil
 }

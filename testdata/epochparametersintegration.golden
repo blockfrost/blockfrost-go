@@ -1,0 +1,22 @@
+{
+  "a0": 0.3,
+  "decentralisation_param": 0.54,
+  "e_max": 18,
+  "epoch": 225,
+  "extra_entropy": null,
+  "key_deposit": "2000000",
+  "max_block_header_size": 1100,
+  "max_block_size": 65536,
+  "max_tx_size": 16384,
+  "min_fee_a": 44,
+  "min_fee_b": 155381,
+  "min_pool_cost": "340000000",
+  "min_utxo": "1000000",
+  "n_opt": 150,
+  "nonce": "edb2d417956becb8ae5c6e29028459ab1230c1c8620778b9a801cd99feae8fb9",
+  "pool_deposit": "500000000",
+  "protocol_major_ver": 2,
+  "protocol_minor_ver": 0,
+  "rho": 0.003,
+  "tau": 0.2
+}

@@ -3,8 +3,11 @@ package blockfrost
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 func handleAPIErrorResponse(res *http.Response) error {
@@ -59,11 +62,17 @@ func handleAPIErrorResponse(res *http.Response) error {
 			Response: ise,
 		}
 	default:
-		return &APIError{}
+		data, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+		return &APIError{
+			Response: string(data),
+		}
 	}
 }
 
-func formatParams(v url.Values, query APIPagingParams) url.Values {
+func formatParams(v url.Values, query APIQueryParams) url.Values {
 	if query.Count > 0 && query.Count <= 100 {
 		v.Add("count", fmt.Sprintf("%d", query.Count))
 	}
@@ -76,10 +85,46 @@ func formatParams(v url.Values, query APIPagingParams) url.Values {
 	if query.From != "" {
 		v.Add("from", query.From)
 	}
-	if query.From != "" {
-		v.Add("to", query.From)
+	if query.To != "" {
+		v.Add("to", query.To)
 	}
 
 	v.Encode()
 	return v
+}
+
+func (c *apiClient) handleRequest(req *http.Request) (res *http.Response, err error) {
+	req.Header.Add("project_id", c.projectId)
+	rreq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return
+	}
+	res, err = c.client.Do(rreq)
+	if err != nil {
+		return
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return res, handleAPIErrorResponse(res)
+	}
+
+	return res, nil
+}
+
+func (ip *ipfsClient) handleRequest(req *http.Request) (res *http.Response, err error) {
+	req.Header.Add("project_id", ip.projectId)
+	rreq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return
+	}
+	res, err = ip.client.Do(rreq)
+	if err != nil {
+		return
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return res, handleAPIErrorResponse(res)
+	}
+
+	return res, nil
 }

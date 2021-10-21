@@ -7,15 +7,17 @@ import (
 
 func TestFormatParams(t *testing.T) {
 	tests := []struct {
-		query APIPagingParams
+		query APIQueryParams
 		want  string
 	}{
-		{APIPagingParams{Count: 5}, "count=5"},
-		{APIPagingParams{Page: 10}, "page=10"},
-		{APIPagingParams{}, ""},
-		{APIPagingParams{Order: "asc"}, "order=asc"},
-		{APIPagingParams{Count: 5, Page: 10}, "count=5&page=10"},
-		{APIPagingParams{Count: 5, Page: 10, Order: "desc"}, "count=5&order=desc&page=10"},
+		{APIQueryParams{Count: 5}, "count=5"},
+		{APIQueryParams{Page: 10}, "page=10"},
+		{APIQueryParams{}, ""},
+		{APIQueryParams{Order: "asc"}, "order=asc"},
+		{APIQueryParams{Count: 5, Page: 10}, "count=5&page=10"},
+		{APIQueryParams{Count: 5, Page: 10, Order: "desc"}, "count=5&order=desc&page=10"},
+		{APIQueryParams{From: "8929261"}, "from=8929261"},
+		{APIQueryParams{To: "9999269:10"}, "to=9999269%3A10"},
 	}
 	req, err := http.NewRequest(http.MethodGet, "/go", nil)
 	if err != nil {

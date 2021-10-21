@@ -178,7 +178,7 @@ func TestResourceAddressTransactions(t *testing.T) {
 	got, err := api.AddressTransactions(
 		context.TODO(),
 		addr,
-		blockfrost.APIPagingParams{},
+		blockfrost.APIQueryParams{},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -214,7 +214,7 @@ func TestAddressUTXOs(t *testing.T) {
 	got, err := api.AddressUTXOs(
 		context.TODO(),
 		addr,
-		blockfrost.APIPagingParams{},
+		blockfrost.APIQueryParams{},
 	)
 	if err != nil {
 		t.Fatal(err)

@@ -12,6 +12,7 @@ const (
 	resourceNetwork = "network"
 )
 
+// NetworkSupply contains information on network supply
 type NetworkSupply struct {
 	Max         string `json:"max,omitempty"`
 	Total       string `json:"total,omitempty"`
@@ -19,39 +20,38 @@ type NetworkSupply struct {
 	Locked      string `json:"locked,omitempty"`
 }
 
+// NetworkStake contains information on the cardano network stake
 type NetworkStake struct {
 	Live   string `json:"live,omitempty"`
 	Active string `json:"active,omitempty"`
 }
+
+// NetworkInfo contains network stake and supply information on the network
 type NetworkInfo struct {
-	Supply NetworkSupply `json:"supply,omitempty"`
-	Stake  NetworkStake  `json:"stake,omitempty"`
+	Supply NetworkSupply `json:"supply"`
+	Stake  NetworkStake  `json:"stake"`
 }
 
+// Network returns detailed network information.
 func (c *apiClient) Network(ctx context.Context) (ni NetworkInfo, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceNetwork))
 	if err != nil {
-		return ni, err
+		return
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
-		return ni, err
+		return
 	}
-	req.Header.Add("project_id", c.projectId)
 
-	res, err := c.client.Do(req)
+	res, err := c.handleRequest(req)
 	if err != nil {
-		return ni, err
+		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return ni, handleAPIErrorResponse(res)
-	}
-
 	if err = json.NewDecoder(res.Body).Decode(&ni); err != nil {
-		return ni, err
+		return
 	}
 
-	return
+	return ni, nil
 }

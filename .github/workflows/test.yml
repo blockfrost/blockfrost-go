@@ -4,7 +4,10 @@ on:
   push:
     branches: 
       - master
-      - feat/**
+      - feat**
+      - test**
+      - docs**
+      - ref**
   pull_request:
     branches: [ master ]
 
@@ -13,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BLOCKFROST_PROJECT_ID: ${{ secrets.BLOCKFROST_PROJECT_ID }}
+      BLOCKFROST_IPFS_PROJECT_ID: ${{ secrets.BLOCKFROST_IPFS_PROJECT_ID }}
     steps:
     - uses: actions/checkout@v2
 
