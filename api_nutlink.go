@@ -51,6 +51,7 @@ type TickerRecordResult struct {
 	Err error
 }
 
+// Nutlink returns list metadata about specific address.
 func (c *apiClient) Nutlink(ctx context.Context, address string) (nu NutlinkAddress, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceNutLink, address))
 	if err != nil {
@@ -73,6 +74,7 @@ func (c *apiClient) Nutlink(ctx context.Context, address string) (nu NutlinkAddr
 	return nu, nil
 }
 
+// Tickers returns paginated list tickers for a specific metadata oracle.
 func (c *apiClient) Tickers(ctx context.Context, address string, query APIQueryParams) (ti []Ticker, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceNutLink, address, resourceTickers))
 	if err != nil {
@@ -100,6 +102,7 @@ func (c *apiClient) Tickers(ctx context.Context, address string, query APIQueryP
 	return ti, nil
 }
 
+// TickersAll returns all tickers for a specific metadata oracle.
 func (c *apiClient) TickersAll(ctx context.Context, address string) <-chan TickerResult {
 	ch := make(chan TickerResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
@@ -140,6 +143,7 @@ func (c *apiClient) TickersAll(ctx context.Context, address string) <-chan Ticke
 	return ch
 }
 
+// TickerRecords returns list of records of a specific ticker.
 func (c *apiClient) TickerRecords(ctx context.Context, ticker string, query APIQueryParams) (trs []TickerRecord, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceNutLink, resourceTickers, ticker))
 	if err != nil {
@@ -167,6 +171,7 @@ func (c *apiClient) TickerRecords(ctx context.Context, ticker string, query APIQ
 	return trs, nil
 }
 
+// TickerRecordsAll returns list of all records of a specific ticker.
 func (c *apiClient) TickerRecordsAll(ctx context.Context, ticker string) <-chan TickerRecordResult {
 	ch := make(chan TickerRecordResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
@@ -207,6 +212,7 @@ func (c *apiClient) TickerRecordsAll(ctx context.Context, ticker string) <-chan 
 	return ch
 }
 
+// AddressTickeRecords returns list of records of a specific ticker by address.
 func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ticker string, query APIQueryParams) (trs []TickerRecord, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceNutLink, address, resourceTickers, ticker))
 	if err != nil {
@@ -232,6 +238,7 @@ func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ti
 	return trs, nil
 }
 
+// AddressTickerRecordsAll returns list of all records of a specific ticker by address.
 func (c *apiClient) AddressTickerRecordsAll(ctx context.Context, address string, ticker string) <-chan TickerRecordResult {
 	ch := make(chan TickerRecordResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
