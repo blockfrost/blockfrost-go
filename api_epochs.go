@@ -25,6 +25,7 @@ type EpochStake struct {
 	Amount       string `json:"amount,omitempty"`
 }
 
+// Epoch contains information on an epoch.
 type Epoch struct {
 	// Sum of all the active stakes within the epoch in Lovelaces
 	ActiveStake string `json:"active_stake"`
@@ -134,6 +135,7 @@ type BlockDistributionResult struct {
 	Err error
 }
 
+// EpochLatest returns the information about the latest, therefore current, epoch.
 func (c *apiClient) EpochLatest(ctx context.Context) (ep Epoch, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceEpochs, resourceEpochsLatest))
 	if err != nil {
@@ -155,6 +157,7 @@ func (c *apiClient) EpochLatest(ctx context.Context) (ep Epoch, err error) {
 	return ep, nil
 }
 
+// LatestEpochParameters returns the protocol parameters for the latest epoch.
 func (c *apiClient) LatestEpochParameters(ctx context.Context) (epr EpochParameters, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceEpochs, resourceEpochsLatest, resourceEpochParameters))
 	if err != nil {
@@ -177,6 +180,7 @@ func (c *apiClient) LatestEpochParameters(ctx context.Context) (epr EpochParamet
 	return epr, nil
 }
 
+// Epoch returns the content of the requested epoch given by the epochNumber.
 func (c *apiClient) Epoch(ctx context.Context, epochNumber int) (ep Epoch, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d", c.server, resourceEpochs, epochNumber))
 	if err != nil {
@@ -199,6 +203,7 @@ func (c *apiClient) Epoch(ctx context.Context, epochNumber int) (ep Epoch, err e
 	return ep, nil
 }
 
+// EpochsNext returns the list of epochs following a specific epoch given by the epochNumber.
 func (c *apiClient) EpochsNext(ctx context.Context, epochNumber int, query APIQueryParams) (eps []Epoch, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsNext))
 	if err != nil {
@@ -223,6 +228,8 @@ func (c *apiClient) EpochsNext(ctx context.Context, epochNumber int, query APIQu
 	return eps, nil
 }
 
+// EpochsNextAll fetches all epochs after a specific epoch specified by an epochNumber.
+// Returns a channel of type EpochResult.
 func (c *apiClient) EpochNextAll(ctx context.Context, epochNumber int) <-chan EpochResult {
 	ch := make(chan EpochResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
@@ -263,6 +270,7 @@ func (c *apiClient) EpochNextAll(ctx context.Context, epochNumber int) <-chan Ep
 	return ch
 }
 
+// EpochsPrevious returns the list of epochs preceding a specific epoch.
 func (c *apiClient) EpochsPrevious(ctx context.Context, epochNumber int, query APIQueryParams) (eps []Epoch, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsPrevious))
 	if err != nil {
@@ -288,6 +296,8 @@ func (c *apiClient) EpochsPrevious(ctx context.Context, epochNumber int, query A
 	return eps, nil
 }
 
+// EpochsPreviousAll fetches all epochs before a specific epoch specified by an epochNumber.
+// Returns a channel of type EpochResult.
 func (c *apiClient) EpochPreviousAll(ctx context.Context, epochNumber int) <-chan EpochResult {
 	ch := make(chan EpochResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
@@ -328,6 +338,7 @@ func (c *apiClient) EpochPreviousAll(ctx context.Context, epochNumber int) <-cha
 	return ch
 }
 
+// EpochStakeDistribution returns the active stake distribution for the specified epoch.
 func (c *apiClient) EpochStakeDistribution(ctx context.Context, epochNumber int, query APIQueryParams) (eps []EpochStake, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes))
 	if err != nil {
@@ -353,6 +364,8 @@ func (c *apiClient) EpochStakeDistribution(ctx context.Context, epochNumber int,
 	return eps, nil
 }
 
+// EpochStakeDistributionAll fetches all active stake distribution for the specified epoch..
+// Returns a channel of type EpochStakeResult.
 func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber int) <-chan EpochStakeResult {
 	ch := make(chan EpochStakeResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
@@ -393,6 +406,7 @@ func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber i
 	return ch
 }
 
+// EpochStakeDistributionByPool returns the active stake distribution for the epoch specified by stake pool.
 func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) (eps []EpochStake, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes, poolId))
 	if err != nil {
@@ -418,6 +432,8 @@ func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumbe
 	return eps, nil
 }
 
+// EpochStakeDistributionByPoolAll fetches all active stake distribution for the epoch specified by stake pool.
+// Returns a channel of type EpochStakeResult
 func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeResult {
 	ch := make(chan EpochStakeResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
@@ -458,6 +474,7 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 	return ch
 }
 
+// EpochBlockDistribution returns the blocks minted for the epoch specified.
 func (c *apiClient) EpochBlockDistribution(ctx context.Context, epochNumber int, query APIQueryParams) (bd []string, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochsBlocks))
 	if err != nil {
@@ -483,6 +500,8 @@ func (c *apiClient) EpochBlockDistribution(ctx context.Context, epochNumber int,
 	return bd, nil
 }
 
+// EpochBlockDstributionAll fetches all blocks minted for the epoch specified.
+// Returns a channel of type BlockDistributionResult.
 func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber int) <-chan BlockDistributionResult {
 	ch := make(chan BlockDistributionResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
@@ -523,6 +542,7 @@ func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber i
 	return ch
 }
 
+// EpochBlockDistributionByPool returns the block minted for the epoch specified by stake pool.
 func (c *apiClient) EpochBlockDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) (bd []string, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s/%s", c.server, resourceEpochs, epochNumber, resourceEpochsBlocks, poolId))
 	if err != nil {
@@ -548,6 +568,8 @@ func (c *apiClient) EpochBlockDistributionByPool(ctx context.Context, epochNumbe
 	return bd, nil
 }
 
+// EpochBlockDistributionByPoolAll fetches all block minted for the epoch specified by stake pool.
+// Returns a channel of type BlockDistributionResult.
 func (c *apiClient) EpochBlockDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan BlockDistributionResult {
 	ch := make(chan BlockDistributionResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
@@ -588,6 +610,7 @@ func (c *apiClient) EpochBlockDistributionByPoolAll(ctx context.Context, epochNu
 	return ch
 }
 
+// EpochParameters returns the protocol parameters for the epoch specified.
 func (c *apiClient) EpochParameters(ctx context.Context, epochNumber int) (eps EpochParameters, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s", c.server, resourceEpochs, epochNumber, resourceEpochParameters))
 	if err != nil {
