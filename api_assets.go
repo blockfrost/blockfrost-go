@@ -22,6 +22,7 @@ type AssetOnchainMetadata struct {
 	Image string `json:"image,omitempty"`
 }
 
+// Contains metadata information about an asset.
 type AssetMetadata struct {
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
@@ -31,6 +32,7 @@ type AssetMetadata struct {
 	Decimals    int    `json:"decimals,omitempty"`
 }
 
+// Assets contains information on an asset.
 type Asset struct {
 	Asset             string               `json:"asset,omitempty"`
 	PolicyId          string               `json:"policy_id,omitempty"`
@@ -43,12 +45,15 @@ type Asset struct {
 	Metadata          AssetMetadata        `json:"metadata,omitempty"`
 }
 
+// AssetHistory contains history of an asset.
 type AssetHistory struct {
 	TxHash string `json:"tx_hash,omitempty"`
 	Action string `json:"action,omitempty"`
 	Amount string `json:"amount,omitempty"`
 }
 
+// AssetTransaction contains information on transactions belonging
+// to an asset.
 type AssetTransaction struct {
 	TxHash      string `json:"tx_hash,omitempty"`
 	TxIndex     int    `json:"tx_index,omitempty"`
@@ -65,6 +70,7 @@ type AssetResult struct {
 	Err error
 }
 
+// Assets returns a paginated list of assets.
 func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceAssets))
 	if err != nil {
@@ -90,7 +96,8 @@ func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset
 	return a, nil
 }
 
-func (c *apiClient) AssetsAll(ctx context.Context, poolId string) <-chan AssetResult {
+// AssetsAll returns all assets.
+func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
 	ch := make(chan AssetResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
 	quit := make(chan bool, c.routines)
@@ -130,6 +137,7 @@ func (c *apiClient) AssetsAll(ctx context.Context, poolId string) <-chan AssetRe
 	return ch
 }
 
+// Asset returns information about a specific asset.
 func (c *apiClient) Asset(ctx context.Context, asset string) (a Asset, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceAssets, asset))
 	if err != nil {
@@ -150,6 +158,7 @@ func (c *apiClient) Asset(ctx context.Context, asset string) (a Asset, err error
 	return a, nil
 }
 
+// AssetHistory returns history of a specific asset.
 func (c *apiClient) AssetHistory(ctx context.Context, asset string) (hist []AssetHistory, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetHistory))
 	if err != nil {
@@ -172,6 +181,7 @@ func (c *apiClient) AssetHistory(ctx context.Context, asset string) (hist []Asse
 	return hist, nil
 }
 
+// AssetTransactions returns list of a specific asset transactions.
 func (c *apiClient) AssetTransactions(ctx context.Context, asset string) (trs []AssetTransaction, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetTransactions))
 	if err != nil {
@@ -194,6 +204,7 @@ func (c *apiClient) AssetTransactions(ctx context.Context, asset string) (trs []
 	return trs, nil
 }
 
+// AssetAddresses returns list of a addresses containing a specific asset.
 func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []AssetAddress, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetHistory))
 	if err != nil {
@@ -216,6 +227,7 @@ func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []A
 	return addrs, nil
 }
 
+// AssetsByPolicy returns list of assets minted under a specific policy.
 func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []Asset, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourcePolicyAssets, policyId))
 	if err != nil {
