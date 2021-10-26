@@ -47,7 +47,7 @@ func TestAddressUnMarshall(t *testing.T) {
 
 }
 
-func TestAddressDetailsMarshall(t *testing.T) {
+func TestAddressDetailsUnMarshall(t *testing.T) {
 	want := blockfrost.AddressDetails{
 		Address: "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz",
 		ReceivedSum: []blockfrost.AddressAmount{
@@ -118,22 +118,9 @@ func TestResourceAddress(t *testing.T) {
 		t.Fatal(err)
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
-	if *update {
-		data, err := json.Marshal(got)
-		if err != nil {
-			t.Fatal(err)
-		}
-		WriteGoldenFile(t, fp, data)
-	}
-	bytes := ReadOrGenerateGoldenFile(t, fp, got)
-	want := blockfrost.Address{}
-	if err = json.Unmarshal(bytes, &want); err != nil {
-		t.Fatal(err)
-	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
-	}
+	want := blockfrost.Address{}
+	testIntUtil(t, fp, &got, &want)
 }
 
 func TestResourceAddressDetails(t *testing.T) {
@@ -145,22 +132,9 @@ func TestResourceAddressDetails(t *testing.T) {
 		t.Fatal(err)
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
-	if *update {
-		data, err := json.Marshal(got)
-		if err != nil {
-			t.Fatal(err)
-		}
-		WriteGoldenFile(t, fp, data)
-	}
-	bytes := ReadOrGenerateGoldenFile(t, fp, got)
 	want := blockfrost.AddressDetails{}
-	if err = json.Unmarshal(bytes, &want); err != nil {
-		t.Fatal(err)
-	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
-	}
+	testIntUtil(t, fp, &got, &want)
 }
 
 func TestResourceAddressTransactions(t *testing.T) {
@@ -178,22 +152,8 @@ func TestResourceAddressTransactions(t *testing.T) {
 	}
 
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
-	if *update {
-		data, err := json.Marshal(got)
-		if err != nil {
-			t.Fatal(err)
-		}
-		WriteGoldenFile(t, fp, data)
-	}
-	bytes := ReadOrGenerateGoldenFile(t, fp, got)
 	var want []blockfrost.AddressTransactions
-	if err = json.Unmarshal(bytes, &want); err != nil {
-		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
-	}
+	testIntUtil(t, fp, &got, &want)
 }
 
 func TestAddressUTXOs(t *testing.T) {
@@ -211,21 +171,6 @@ func TestAddressUTXOs(t *testing.T) {
 	}
 
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
-	if *update {
-		data, err := json.Marshal(got)
-		if err != nil {
-			t.Fatal(err)
-		}
-		WriteGoldenFile(t, fp, data)
-	}
-
-	bytes := ReadOrGenerateGoldenFile(t, fp, got)
 	var want []blockfrost.AddressUTXO
-	if err = json.Unmarshal(bytes, &want); err != nil {
-		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
-	}
+	testIntUtil(t, fp, &got, &want)
 }

@@ -158,8 +158,8 @@ func testIPFSResourcePinnedObjectsIntegration(t *testing.T, ipfs blockfrost.IPFS
 		t.Fatalf("want len and got len not matching")
 	}
 
-	for i, _ := range got {
-		igot := got[i]
+	for i, igot := range got {
+		// igot := igot
 		igot.TimeCreated = 0
 		igot.TimePinned = 0
 		igot.State = ""

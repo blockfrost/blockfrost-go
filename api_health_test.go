@@ -2,87 +2,60 @@ package blockfrost_test
 
 import (
 	"context"
-	"net/http"
-	"net/http/httptest"
+	"path/filepath"
+	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
 )
 
-func TestResourceInfo(t *testing.T) {
+func TestResourceInfoIntegration(t *testing.T) {
 	t.Parallel()
-	sUrl := "https://blockfrost.io/"
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(
-			[]byte(
-				`{
-					"url": "https://blockfrost.io/",
-					"version": "0.1.0"
-				  }`,
-			))
-	}))
-
 	api := blockfrost.NewAPIClient(
-		blockfrost.APIClientOptions{Server: s.URL},
+		blockfrost.APIClientOptions{},
 	)
 
-	info, err := api.Info(context.TODO())
+	got, err := api.Info(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if info.Url != sUrl {
-		t.Fatalf("Expected info.Url to be %s got %s", sUrl, info.Url)
-	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := blockfrost.Info{}
+	testIntUtil(t, fp, &got, &want)
 }
 
-func TestResourceHealth(t *testing.T) {
+func TestResourceHealthIntegration(t *testing.T) {
 	t.Parallel()
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(
-			[]byte(
-				`{
-					"is_healthy": true
-				  }`,
-			))
-	}))
-
 	api := blockfrost.NewAPIClient(
-		blockfrost.APIClientOptions{Server: s.URL},
+		blockfrost.APIClientOptions{},
 	)
 
-	health, err := api.Health(context.TODO())
+	got, err := api.Health(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
+	want := blockfrost.Health{}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
 
-	if health.IsHealthy != true {
-		t.Fatalf("Expected health.IsHealthy to be %t, got %t", true, health.IsHealthy)
-	}
+	testIntUtil(t, fp, &got, &want)
 }
 
-func TestResourceHealthClock(t *testing.T) {
+func TestResourceHealthClockIntegration(t *testing.T) {
 	t.Parallel()
-	serverTime := 1603400958947
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(
-			[]byte(
-				`{
-					"server_time": 1603400958947
-				  }`,
-			))
-	}))
 
 	api := blockfrost.NewAPIClient(
-		blockfrost.APIClientOptions{Server: s.URL},
+		blockfrost.APIClientOptions{},
 	)
 
-	healthClock, err := api.HealthClock(context.TODO())
+	got, err := api.HealthClock(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
+	nullGot := blockfrost.HealthClock{}
 
-	if healthClock.ServerTime != int64(serverTime) {
-		t.Fatalf("Expected healthClock.ServerTime to be %v, got %v", serverTime, healthClock.ServerTime)
+	if reflect.DeepEqual(got, nullGot) {
+		t.Fatalf("got null healthclock, %+v", got)
 	}
+
 }

@@ -2,9 +2,7 @@ package blockfrost_test
 
 import (
 	"context"
-	"encoding/json"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -37,20 +35,6 @@ func TestGenesisIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
-	if *update {
-		data, err := json.Marshal(got)
-		if err != nil {
-			t.Fatal(err)
-		}
-		WriteGoldenFile(t, fp, data)
-	}
-	bytes := ReadOrGenerateGoldenFile(t, fp, got)
 	want := blockfrost.GenesisBlock{}
-	if err = json.Unmarshal(bytes, &want); err != nil {
-		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
-	}
+	testStructGotWant(t, fp, &got, &want)
 }
