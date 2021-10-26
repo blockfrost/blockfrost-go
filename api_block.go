@@ -8,6 +8,54 @@ import (
 	"net/url"
 )
 
+// Block defines content of a block
+type Block struct {
+	// Block creation time in UNIX time
+	Time int `json:"time"`
+
+	// Block number
+	Height int `json:"height"`
+
+	// Hash of the block
+	Hash string `json:"hash"`
+
+	// Slot number
+	Slot int `json:"slot"`
+
+	// Epoch number
+	Epoch int `json:"epoch"`
+
+	// Slot within the epoch
+	EpochSlot int `json:"epoch_slot"`
+
+	// Bech32 ID of the slot leader or specific block description in case there is no slot leader
+	SlotLeader string `json:"slot_leader"`
+
+	// Block size in Bytes
+	Size int `json:"size"`
+
+	// Number of transactions in the block
+	TxCount int `json:"tx_count"`
+
+	// Total output within the block in Lovelaces
+	Output string `json:"output"`
+
+	// Total fees within the block in Lovelaces
+	Fees string `json:"fees"`
+
+	// VRF key of the block
+	BlockVRF string `json:"block_vrf"`
+
+	// Hash of the previous block
+	PreviousBlock string `json:"previous_block"`
+
+	// Hash of the next block
+	NextBlock string `json:"next_block"`
+
+	// Number of block confirmations
+	Confirmations int `json:"confirmations"`
+}
+
 // BlocksLatest Return the latest block available to the backends, also known as the
 // tip of the blockchain.
 func (c *apiClient) BlockLatest(ctx context.Context) (b Block, err error) {

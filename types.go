@@ -73,25 +73,6 @@ type UnauthorizedError struct {
 	StatusCode int    `json:"status_code"`
 }
 
-// Block defines content of a block
-type Block struct {
-	Time          int    `json:"time,"`
-	Height        int    `json:"height,"`
-	Hash          string `json:"hash,"`
-	Slot          int    `json:"slot,"`
-	Epoch         int    `json:"epoch,"`
-	EpochSlot     int    `json:"epoch_slot,"`
-	SlotLeader    string `json:"slot_leader"`
-	Size          int    `json:"size,"`
-	TxCount       int    `json:"tx_count,"`
-	Output        string `json:"output,"`
-	Fees          string `json:"fees,"`
-	BlockVRF      string `json:"block_vrf,"`
-	PreviousBlock string `json:"previous_block,"`
-	NextBlock     string `json:"next_block,"`
-	Confirmations int    `json:"confirmations,"`
-}
-
 type Transaction string
 
 // APIQueryParams contains query parameters. Marshalled to
