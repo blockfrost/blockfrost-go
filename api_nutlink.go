@@ -23,22 +23,39 @@ type NutlinkAddressMeta struct {
 }
 
 type NutlinkAddress struct {
-	Address      string             `json:"address,"`
-	MetadataUrl  string             `json:"metadata_url,"`
-	MetadataHash string             `json:"metadata_hash,"`
-	Metadata     NutlinkAddressMeta `json:"metadata,"`
+	// Bech32 encoded address
+	Address string `json:"address"`
+
+	// URL of the specific metadata file
+	MetadataUrl string `json:"metadata_url"`
+
+	// Hash of the metadata file
+	MetadataHash string `json:"metadata_hash"`
+
+	// The cached metadata of the `metadata_url` file.
+	Metadata NutlinkAddressMeta `json:"metadata"`
 }
 
 type Ticker struct {
-	Name        string `json:"name,"`
-	Count       int    `json:"count,"`
-	LatestBlock int    `json:"latest_block,"`
+	// Name of the ticker
+	Name string `json:"name"`
+
+	// Number of ticker records
+	Count int `json:"count"`
+
+	// Block height of the latest record
+	LatestBlock int `json:"latest_block"`
 }
 
 type TickerRecord struct {
-	TxHash      string `json:"tx_hash,"`
-	BlockHeight int    `json:"block_height,"`
-	TxIndex     int    `json:"tx_index,"`
+	// Hash of the transaction
+	TxHash string `json:"tx_hash"`
+
+	// Block height of the record
+	BlockHeight int `json:"block_height"`
+
+	// Transaction index within the block
+	TxIndex int `json:"tx_index"`
 }
 
 type TickerResult struct {
