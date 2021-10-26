@@ -33,9 +33,7 @@ func TestResourceNetworkIntegration(t *testing.T) {
 	nullGot := blockfrost.NetworkInfo{}
 
 	api := blockfrost.NewAPIClient(
-		blockfrost.APIClientOptions{
-			Server: "http://192.168.8.110:8000",
-		},
+		blockfrost.APIClientOptions{},
 	)
 
 	got, err := api.Network(context.TODO())
