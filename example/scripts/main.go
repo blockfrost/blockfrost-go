@@ -9,10 +9,7 @@ import (
 )
 
 func main() {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		log.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
 	scripts, err := api.Scripts(context.TODO(), blockfrost.APIQueryParams{})
 	if err != nil {

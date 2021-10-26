@@ -32,9 +32,7 @@ func handleError(err error) {
 func main() {
 	flag.Parse()
 
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	handleError(err)
-
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 	file, err := os.Create(*fp)
 	handleError(err)
 

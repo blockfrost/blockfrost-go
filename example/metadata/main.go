@@ -16,12 +16,10 @@ import (
 )
 
 func main() {
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{}, // Add ProjectID or exclude to load from env:BLOCKFROST_PROJECT_ID
 	)
-	if err != nil {
-		log.Fatal(err)
-	}
+
 	q := blockfrost.APIQueryParams{}
 	m, err := api.MetadataTxLabels(context.TODO(), q)
 	if err != nil {
