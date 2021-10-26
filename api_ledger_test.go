@@ -36,5 +36,5 @@ func TestGenesisIntegration(t *testing.T) {
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
 	want := blockfrost.GenesisBlock{}
-	testStructGotWant(t, fp, &got, &want)
+	testIntUtil(t, fp, &got, &want)
 }

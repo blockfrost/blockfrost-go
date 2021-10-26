@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -32,19 +31,8 @@ func TestAddressUnMarshall(t *testing.T) {
 		Script:       false,
 	}
 	fp := filepath.Join(testdata, "json", "address", "address.json")
-	file, err := ioutil.ReadFile(fp)
-	if err != nil {
-		t.Fatalf("an error ocurred while trying to read json test file %s", fp)
-	}
 	got := blockfrost.Address{}
-	if err = json.Unmarshal([]byte(file), &got); err != nil {
-		t.Fatalf("failed to unmarshal %s with err %v", fp, err)
-	}
-
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
-	}
-
+	testStructGotWant(t, fp, &got, &want)
 }
 
 func TestAddressDetailsUnMarshall(t *testing.T) {
@@ -60,18 +48,8 @@ func TestAddressDetailsUnMarshall(t *testing.T) {
 	}
 
 	fp := filepath.Join(testdata, "json", "address", "address_details.json")
-	file, err := ioutil.ReadFile(fp)
-	if err != nil {
-		t.Fatalf("an error ocurred while trying to read json test file %s", fp)
-	}
 	got := blockfrost.AddressDetails{}
-	if err = json.Unmarshal([]byte(file), &got); err != nil {
-		t.Fatalf("failed to unmarshal %s with err %v", fp, err)
-	}
-
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected  %v got %v", want, got)
-	}
+	testStructGotWant(t, fp, &got, &want)
 }
 
 func WriteGoldenFile(t *testing.T, path string, bytes []byte) {
