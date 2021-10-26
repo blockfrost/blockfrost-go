@@ -63,14 +63,19 @@ func TestUnmarshalRedeemer(t *testing.T) {
 func TestIntegrationResourceRedeemers(t *testing.T) {
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
-	addr := "e1457a0c47dfb7a2f6b8fbb059bdceab163c05d34f195b87b9f2b30e"
-	got, err := api.ScriptRedeemers(context.TODO(), addr, blockfrost.APIQueryParams{})
+	scripts, err := api.Scripts(context.TODO(), blockfrost.APIQueryParams{})
+	testErrorHelper(t, err)
+	if len(scripts) == 0 {
+		t.Fatal("Failed to fetch scripts")
+	}
+
+	got, err := api.ScriptRedeemers(context.TODO(), scripts[0].ScriptHash, blockfrost.APIQueryParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if reflect.DeepEqual(got, []blockfrost.ScriptRedeemer{}) {
-		t.Fatalf("got null %+v", got)
+		t.Logf("got null %+v", got)
 	}
 }
 
@@ -90,12 +95,17 @@ func TestIntegrationResourceScripts(t *testing.T) {
 func TestIntegrationResourceScript(t *testing.T) {
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
-	got, err := api.Script(context.TODO(), "")
+	scripts, err := api.Scripts(context.TODO(), blockfrost.APIQueryParams{})
+	testErrorHelper(t, err)
+	if len(scripts) == 0 {
+		t.Fatal("Failed to fetch scripts")
+	}
+	got, err := api.Script(context.TODO(), scripts[0].ScriptHash)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(got, blockfrost.Script{}) {
+	if reflect.DeepEqual(got, blockfrost.Script{}) {
 		t.Fatalf("got null %+v", got)
 	}
 }

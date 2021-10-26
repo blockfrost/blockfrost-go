@@ -17,37 +17,37 @@ const (
 )
 
 type AddressAmount struct {
-	Unit     string `json:"unit,omitempty"`
-	Quantity string `json:"quantity,omitempty"`
+	Unit     string `json:"unit,"`
+	Quantity string `json:"quantity,"`
 }
 
 type Address struct {
-	Address      string          `json:"address,omitempty"`
-	Amount       []AddressAmount `json:"amount,omitempty"`
-	StakeAddress string          `json:"stake_address,omitempty"`
-	Type         string          `json:"type,omitempty"`
-	Script       bool            `json:"script,omitempty"`
+	Address      string          `json:"address,"`
+	Amount       []AddressAmount `json:"amount,"`
+	StakeAddress string          `json:"stake_address,"`
+	Type         string          `json:"type,"`
+	Script       bool            `json:"script,"`
 }
 
 type AddressDetails struct {
-	Address     string          `json:"address,omitempty"`
-	ReceivedSum []AddressAmount `json:"received_sum,omitempty"`
-	SentSum     []AddressAmount `json:"sent_sum,omitempty"`
+	Address     string          `json:"address,"`
+	ReceivedSum []AddressAmount `json:"received_sum,"`
+	SentSum     []AddressAmount `json:"sent_sum,"`
 	TxCount     int             `json:"tx_count"`
 }
 
 type AddressTransactions struct {
-	TxHash      string `json:"tx_hash,omitempty"`
-	TxIndex     int    `json:"tx_index,omitempty"`
-	BlockHeight int    `json:"block_height,omitempty"`
+	TxHash      string `json:"tx_hash,"`
+	TxIndex     int    `json:"tx_index,"`
+	BlockHeight int    `json:"block_height,"`
 }
 
 type AddressUTXO struct {
-	TxHash      string          `json:"tx_hash,omitempty"`
-	OutputIndex int             `json:"output_index,omitempty"`
-	Amount      []AddressAmount `json:"amount,omitempty"`
-	Block       string          `json:"block,omitempty"`
-	DataHash    string          `json:"data_hash,omitempty"`
+	TxHash      string          `json:"tx_hash,"`
+	OutputIndex int             `json:"output_index,"`
+	Amount      []AddressAmount `json:"amount,"`
+	Block       string          `json:"block,"`
+	DataHash    string          `json:"data_hash,"`
 }
 
 type AddressTxResult struct {

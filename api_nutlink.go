@@ -15,30 +15,30 @@ const (
 )
 
 type NutlinkAddressMeta struct {
-	Ticker      string `json:"ticker,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
-	HomePage    string `json:"homepage,omitempty"`
-	Address     string `json:"address,omitempty"`
+	Ticker      string `json:"ticker,"`
+	Name        string `json:"name,"`
+	Description string `json:"description,"`
+	HomePage    string `json:"homepage,"`
+	Address     string `json:"address,"`
 }
 
 type NutlinkAddress struct {
-	Address      string             `json:"address,omitempty"`
-	MetadataUrl  string             `json:"metadata_url,omitempty"`
-	MetadataHash string             `json:"metadata_hash,omitempty"`
-	Metadata     NutlinkAddressMeta `json:"metadata,omitempty"`
+	Address      string             `json:"address,"`
+	MetadataUrl  string             `json:"metadata_url,"`
+	MetadataHash string             `json:"metadata_hash,"`
+	Metadata     NutlinkAddressMeta `json:"metadata,"`
 }
 
 type Ticker struct {
-	Name        string `json:"name,omitempty"`
-	Count       int    `json:"count,omitempty"`
-	LatestBlock int    `json:"latest_block,omitempty"`
+	Name        string `json:"name,"`
+	Count       int    `json:"count,"`
+	LatestBlock int    `json:"latest_block,"`
 }
 
 type TickerRecord struct {
-	TxHash      string `json:"tx_hash,omitempty"`
-	BlockHeight int    `json:"block_height,omitempty"`
-	TxIndex     int    `json:"tx_index,omitempty"`
+	TxHash      string `json:"tx_hash,"`
+	BlockHeight int    `json:"block_height,"`
+	TxIndex     int    `json:"tx_index,"`
 }
 
 type TickerResult struct {

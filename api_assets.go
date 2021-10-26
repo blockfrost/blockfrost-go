@@ -18,51 +18,51 @@ const (
 )
 
 type AssetOnchainMetadata struct {
-	Name  string `json:"name,omitempty"`
-	Image string `json:"image,omitempty"`
+	Name  string `json:"name,"`
+	Image string `json:"image,"`
 }
 
 // Contains metadata information about an asset.
 type AssetMetadata struct {
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
-	Ticker      string `json:"ticker,omitempty"`
-	URL         string `json:"url,omitempty"`
-	Logo        string `json:"logo,omitempty"`
-	Decimals    int    `json:"decimals,omitempty"`
+	Name        string `json:"name,"`
+	Description string `json:"description,"`
+	Ticker      string `json:"ticker,"`
+	URL         string `json:"url,"`
+	Logo        string `json:"logo,"`
+	Decimals    int    `json:"decimals,"`
 }
 
 // Assets contains information on an asset.
 type Asset struct {
-	Asset             string               `json:"asset,omitempty"`
-	PolicyId          string               `json:"policy_id,omitempty"`
-	AssetName         string               `json:"asset_name,omitempty"`
-	Fingerprint       string               `json:"fingerprint,omitempty"`
-	Quantity          string               `json:"quantity,omitempty"`
-	InitialMintTxHash string               `json:"initial_mint_tx_hash,omitempty"`
-	MintOrBurnCount   int                  `json:"mint_or_burn_count,omitempty"`
-	OnchainMetadata   AssetOnchainMetadata `json:"onchain_metadata,omitempty"`
-	Metadata          AssetMetadata        `json:"metadata,omitempty"`
+	Asset             string               `json:"asset,"`
+	PolicyId          string               `json:"policy_id,"`
+	AssetName         string               `json:"asset_name,"`
+	Fingerprint       string               `json:"fingerprint,"`
+	Quantity          string               `json:"quantity,"`
+	InitialMintTxHash string               `json:"initial_mint_tx_hash,"`
+	MintOrBurnCount   int                  `json:"mint_or_burn_count,"`
+	OnchainMetadata   AssetOnchainMetadata `json:"onchain_metadata,"`
+	Metadata          AssetMetadata        `json:"metadata,"`
 }
 
 // AssetHistory contains history of an asset.
 type AssetHistory struct {
-	TxHash string `json:"tx_hash,omitempty"`
-	Action string `json:"action,omitempty"`
-	Amount string `json:"amount,omitempty"`
+	TxHash string `json:"tx_hash,"`
+	Action string `json:"action,"`
+	Amount string `json:"amount,"`
 }
 
 // AssetTransaction contains information on transactions belonging
 // to an asset.
 type AssetTransaction struct {
-	TxHash      string `json:"tx_hash,omitempty"`
-	TxIndex     int    `json:"tx_index,omitempty"`
-	BlockHeight int    `json:"block_height,omitempty"`
+	TxHash      string `json:"tx_hash,"`
+	TxIndex     int    `json:"tx_index,"`
+	BlockHeight int    `json:"block_height,"`
 }
 
 type AssetAddress struct {
-	Address  string `json:"address,omitempty"`
-	Quantity string `json:"quantity,omitempty"`
+	Address  string `json:"address,"`
+	Quantity string `json:"quantity,"`
 }
 
 type AssetResult struct {

@@ -20,9 +20,9 @@ const (
 )
 
 type EpochStake struct {
-	StakeAddress string `json:"stake_address,omitempty"`
-	PoolID       string `json:"pool_id,omitempty"`
-	Amount       string `json:"amount,omitempty"`
+	StakeAddress string `json:"stake_address,"`
+	PoolID       string `json:"pool_id,"`
+	Amount       string `json:"amount,"`
 }
 
 // Epoch contains information on an epoch.

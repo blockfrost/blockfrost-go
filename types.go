@@ -75,21 +75,21 @@ type UnauthorizedError struct {
 
 // Block defines content of a block
 type Block struct {
-	Time          int    `json:"time,omitempty"`
-	Height        int    `json:"height,omitempty"`
-	Hash          string `json:"hash,omitempty"`
-	Slot          int    `json:"slot,omitempty"`
-	Epoch         int    `json:"epoch,omitempty"`
-	EpochSlot     int    `json:"epoch_slot,omitempty"`
+	Time          int    `json:"time,"`
+	Height        int    `json:"height,"`
+	Hash          string `json:"hash,"`
+	Slot          int    `json:"slot,"`
+	Epoch         int    `json:"epoch,"`
+	EpochSlot     int    `json:"epoch_slot,"`
 	SlotLeader    string `json:"slot_leader"`
-	Size          int    `json:"size,omitempty"`
-	TxCount       int    `json:"tx_count,omitempty"`
-	Output        string `json:"output,omitempty"`
-	Fees          string `json:"fees,omitempty"`
-	BlockVRF      string `json:"block_vrf,omitempty"`
-	PreviousBlock string `json:"previous_block,omitempty"`
-	NextBlock     string `json:"next_block,omitempty"`
-	Confirmations int    `json:"confirmations,omitempty"`
+	Size          int    `json:"size,"`
+	TxCount       int    `json:"tx_count,"`
+	Output        string `json:"output,"`
+	Fees          string `json:"fees,"`
+	BlockVRF      string `json:"block_vrf,"`
+	PreviousBlock string `json:"previous_block,"`
+	NextBlock     string `json:"next_block,"`
+	Confirmations int    `json:"confirmations,"`
 }
 
 type Transaction string
