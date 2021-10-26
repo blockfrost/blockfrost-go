@@ -28,70 +28,70 @@ type Pools []string
 // List of retired stake pools
 // List of already retired pools.
 type PoolRetired struct {
-	PoolID string `json:"pool_id,"`
-	Epoch  int    `json:"epoch,"`
+	PoolID string `json:"pool_id"`
+	Epoch  int    `json:"epoch"`
 }
 
 type PoolRetiring struct {
-	PoolID string `json:"pool_id,"`
-	Epoch  int    `json:"epoch,"`
+	PoolID string `json:"pool_id"`
+	Epoch  int    `json:"epoch"`
 }
 
 // Pool information.
 type Pool struct {
-	PoolID         string   `json:"pool_id,"`
-	Hex            string   `json:"hex,"`
-	VrfKey         string   `json:"vrf_key,"`
-	BlocksMinted   int      `json:"blocks_minted,"`
-	LiveStake      string   `json:"live_stake,"`
-	LiveSize       float64  `json:"live_size,"`
-	LiveSaturation float64  `json:"live_saturation,"`
-	LiveDelegators int      `json:"live_delegators,"`
-	ActiveStake    string   `json:"active_stake,"`
-	ActiveSize     float64  `json:"active_size,"`
-	DeclaredPledge string   `json:"declared_pledge,"`
-	LivePledge     string   `json:"live_pledge,"`
-	MarginCost     float64  `json:"margin_cost,"`
-	FixedCost      string   `json:"fixed_cost,"`
-	RewardAccount  string   `json:"reward_account,"`
-	Owners         []string `json:"owners,"`
-	Registration   []string `json:"registration,"`
-	Retirement     []string `json:"retirement,"`
+	PoolID         string   `json:"pool_id"`
+	Hex            string   `json:"hex"`
+	VrfKey         string   `json:"vrf_key"`
+	BlocksMinted   int      `json:"blocks_minted"`
+	LiveStake      string   `json:"live_stake"`
+	LiveSize       float64  `json:"live_size"`
+	LiveSaturation float64  `json:"live_saturation"`
+	LiveDelegators int      `json:"live_delegators"`
+	ActiveStake    string   `json:"active_stake"`
+	ActiveSize     float64  `json:"active_size"`
+	DeclaredPledge string   `json:"declared_pledge"`
+	LivePledge     string   `json:"live_pledge"`
+	MarginCost     float64  `json:"margin_cost"`
+	FixedCost      string   `json:"fixed_cost"`
+	RewardAccount  string   `json:"reward_account"`
+	Owners         []string `json:"owners"`
+	Registration   []string `json:"registration"`
+	Retirement     []string `json:"retirement"`
 }
 
 // PoolHistory return Stake pool history
 // History of stake pool parameters over epochs.
 type PoolHistory struct {
-	Epoch           int     `json:"epoch,"`
-	Blocks          int     `json:"blocks,"`
-	ActiveStake     string  `json:"active_stake,"`
-	ActiveSize      float64 `json:"active_size,"`
-	DelegatorsCount int     `json:"delegators_count,"`
-	Rewards         string  `json:"rewards,"`
-	Fees            string  `json:"fees,"`
+	Epoch           int     `json:"epoch"`
+	Blocks          int     `json:"blocks"`
+	ActiveStake     string  `json:"active_stake"`
+	ActiveSize      float64 `json:"active_size"`
+	DelegatorsCount int     `json:"delegators_count"`
+	Rewards         string  `json:"rewards"`
+	Fees            string  `json:"fees"`
 }
 
 // PoolMetadata return Stake pool metadata
 // Stake pool registration metadata.
 type PoolMetadata struct {
-	PoolID      string `json:"pool_id,"`
-	Hex         string `json:"hex,"`
-	URL         string `json:"url,"`
-	Hash        string `json:"hash,"`
-	Ticker      string `json:"ticker,"`
-	Name        string `json:"name,"`
-	Description string `json:"description,"`
-	Homepage    string `json:"homepage,"`
+	PoolID      string `json:"pool_id"`
+	Hex         string `json:"hex"`
+	URL         string `json:"url"`
+	Hash        string `json:"hash"`
+	Ticker      string `json:"ticker"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Homepage    string `json:"homepage"`
 }
 
 // PoolRelay return Stake pool relays
 // Relays of a stake pool.
 type PoolRelay struct {
-	Ipv4   string `json:"ipv4,"`
-	Ipv6   string `json:"ipv6,"`
-	DNS    string `json:"dns,"`
-	DNSSrv string `json:"dns_srv,"`
-	Port   int    `json:"port,"`
+	Ipv4   string `json:"ipv4"`
+	Ipv6   string `json:"ipv6"`
+	DNS    string `json:"dns"`
+	DNSSrv string `json:"dns_srv"`
+	Port   int    `json:"port"`
 }
 
 // PoolDelegator return Stake pool delegators
@@ -108,9 +108,9 @@ type PoolBlocks []string
 // PoolUpdate return Stake pool updates
 // List of certificate updates to the stake pool.
 type PoolUpdate struct {
-	TxHash    string `json:"tx_hash,"`
-	CERTIndex int    `json:"cert_index,"`
-	Action    string `json:"action,"`
+	TxHash    string `json:"tx_hash"`
+	CERTIndex int    `json:"cert_index"`
+	Action    string `json:"action"`
 }
 
 type PoolsResult struct {

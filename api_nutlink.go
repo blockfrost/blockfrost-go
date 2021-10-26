@@ -15,11 +15,11 @@ const (
 )
 
 type NutlinkAddressMeta struct {
-	Ticker      string `json:"ticker,"`
-	Name        string `json:"name,"`
-	Description string `json:"description,"`
-	HomePage    string `json:"homepage,"`
-	Address     string `json:"address,"`
+	Ticker      string `json:"ticker"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	HomePage    string `json:"homepage"`
+	Address     string `json:"address"`
 }
 
 type NutlinkAddress struct {

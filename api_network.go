@@ -14,16 +14,16 @@ const (
 
 // NetworkSupply contains information on network supply
 type NetworkSupply struct {
-	Max         string `json:"max,"`
-	Total       string `json:"total,"`
-	Circulating string `json:"circulating,"`
-	Locked      string `json:"locked,"`
+	Max         string `json:"max"`
+	Total       string `json:"total"`
+	Circulating string `json:"circulating"`
+	Locked      string `json:"locked"`
 }
 
 // NetworkStake contains information on the cardano network stake
 type NetworkStake struct {
-	Live   string `json:"live,"`
-	Active string `json:"active,"`
+	Live   string `json:"live"`
+	Active string `json:"active"`
 }
 
 // NetworkInfo contains network stake and supply information on the network

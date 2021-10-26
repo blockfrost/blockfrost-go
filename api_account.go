@@ -24,76 +24,76 @@ const (
 // Account return Specific account address
 // Obtain information about a specific stake account.
 type Account struct {
-	StakeAddress       string `json:"stake_address,"`
-	Active             bool   `json:"active,"`
-	ActiveEpoch        int64  `json:"active_epoch,"`
-	ControlledAmount   string `json:"controlled_amount,"`
-	RewardsSum         string `json:"rewards_sum,"`
-	WithdrawalsSum     string `json:"withdrawals_sum,"`
-	ReservesSum        string `json:"reserves_sum,"`
-	TreasurySum        string `json:"treasury_sum,"`
-	WithdrawableAmount string `json:"withdrawable_amount,"`
-	PoolID             string `json:"pool_id,"`
+	StakeAddress       string `json:"stake_address"`
+	Active             bool   `json:"active"`
+	ActiveEpoch        int64  `json:"active_epoch"`
+	ControlledAmount   string `json:"controlled_amount"`
+	RewardsSum         string `json:"rewards_sum"`
+	WithdrawalsSum     string `json:"withdrawals_sum"`
+	ReservesSum        string `json:"reserves_sum"`
+	TreasurySum        string `json:"treasury_sum"`
+	WithdrawableAmount string `json:"withdrawable_amount"`
+	PoolID             string `json:"pool_id"`
 }
 
 // AccountRewardsHist return Account reward history
 // Obtain information about the reward history of a specific account.
 type AccountRewardsHistory struct {
-	Epoch  int32  `json:"epoch,"`
-	Amount string `json:"amount,"`
-	PoolID string `json:"pool_id,"`
+	Epoch  int32  `json:"epoch"`
+	Amount string `json:"amount"`
+	PoolID string `json:"pool_id"`
 }
 
 // AccountHistory return Account history
 // Obtain information about the history of a specific account.
 type AccountHistory struct {
-	ActiveEpoch int32  `json:"active_epoch,"`
-	Amount      string `json:"amount,"`
-	PoolID      string `json:"pool_id,"`
+	ActiveEpoch int32  `json:"active_epoch"`
+	Amount      string `json:"amount"`
+	PoolID      string `json:"pool_id"`
 }
 
 // AccountDelegationHistory return Account delegation history
 // Obtain information about the delegation of a specific account.
 type AccountDelegationHistory struct {
-	ActiveEpoch int32  `json:"active_epoch,"`
-	TXHash      string `json:"tx_hash,"`
-	Amount      string `json:"amount,"`
-	PoolID      string `json:"pool_id,"`
+	ActiveEpoch int32  `json:"active_epoch"`
+	TXHash      string `json:"tx_hash"`
+	Amount      string `json:"amount"`
+	PoolID      string `json:"pool_id"`
 }
 
 // AccountRegistrationHistory return Account registration history
 // Obtain information about the registrations and deregistrations of a specific account.
 type AccountRegistrationHistory struct {
-	TXHash string `json:"tx_hash,"`
-	Action string `json:"action,"`
+	TXHash string `json:"tx_hash"`
+	Action string `json:"action"`
 }
 
 // AccountWithdrawalHistory return Account withdrawal history
 // Obtain information about the withdrawals of a specific account.
 type AccountWithdrawalHistory struct {
-	TXHash string `json:"tx_hash,"`
-	Amount string `json:"amount,"`
+	TXHash string `json:"tx_hash"`
+	Amount string `json:"amount"`
 }
 
 // AccountMIRHistory return Account MIR history
 // Obtain information about the MIRs of a specific account.
 type AccountMIRHistory struct {
-	TXHash string `json:"tx_hash,"`
-	Amount string `json:"amount,"`
+	TXHash string `json:"tx_hash"`
+	Amount string `json:"amount"`
 }
 
 // AccountAssociatedAddress return Account associated addresses
 // Obtain information about the addresses of a specific account.
 type AccountAssociatedAddress struct {
-	Address string `json:"address,"`
+	Address string `json:"address"`
 }
 
 // AccountAssociatedAsset return Assets associated with the account addresses
 // Obtain information about assets associated with addresses of a specific account.
 // Be careful, as an account could be part of a mangled address and does not necessarily mean the addresses are owned by user as the account.
 type AccountAssociatedAsset struct {
-	Unit     string `json:"unit,"`
-	Quantity string `json:"quantity,"`
+	Unit     string `json:"unit"`
+	Quantity string `json:"quantity"`
 }
 
 type AccountHistoryResult struct {

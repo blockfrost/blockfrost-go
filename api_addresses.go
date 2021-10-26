@@ -17,37 +17,37 @@ const (
 )
 
 type AddressAmount struct {
-	Unit     string `json:"unit,"`
-	Quantity string `json:"quantity,"`
+	Unit     string `json:"unit"`
+	Quantity string `json:"quantity"`
 }
 
 type Address struct {
-	Address      string          `json:"address,"`
-	Amount       []AddressAmount `json:"amount,"`
-	StakeAddress string          `json:"stake_address,"`
-	Type         string          `json:"type,"`
-	Script       bool            `json:"script,"`
+	Address      string          `json:"address"`
+	Amount       []AddressAmount `json:"amount"`
+	StakeAddress string          `json:"stake_address"`
+	Type         string          `json:"type"`
+	Script       bool            `json:"script"`
 }
 
 type AddressDetails struct {
-	Address     string          `json:"address,"`
-	ReceivedSum []AddressAmount `json:"received_sum,"`
-	SentSum     []AddressAmount `json:"sent_sum,"`
+	Address     string          `json:"address"`
+	ReceivedSum []AddressAmount `json:"received_sum"`
+	SentSum     []AddressAmount `json:"sent_sum"`
 	TxCount     int             `json:"tx_count"`
 }
 
 type AddressTransactions struct {
-	TxHash      string `json:"tx_hash,"`
-	TxIndex     int    `json:"tx_index,"`
-	BlockHeight int    `json:"block_height,"`
+	TxHash      string `json:"tx_hash"`
+	TxIndex     int    `json:"tx_index"`
+	BlockHeight int    `json:"block_height"`
 }
 
 type AddressUTXO struct {
-	TxHash      string          `json:"tx_hash,"`
-	OutputIndex int             `json:"output_index,"`
-	Amount      []AddressAmount `json:"amount,"`
-	Block       string          `json:"block,"`
-	DataHash    string          `json:"data_hash,"`
+	TxHash      string          `json:"tx_hash"`
+	OutputIndex int             `json:"output_index"`
+	Amount      []AddressAmount `json:"amount"`
+	Block       string          `json:"block"`
+	DataHash    string          `json:"data_hash"`
 }
 
 type AddressTxResult struct {
