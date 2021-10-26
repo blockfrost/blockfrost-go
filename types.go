@@ -89,27 +89,6 @@ type HealthClock struct {
 	ServerTime int64 `json:"server_time,omitempty"`
 }
 
-// Metric describes the Blockfrost usage metrics
-type Metric struct {
-	// Sum of all calls for a particular day
-	Calls int `json:"calls,omitempty"`
-
-	// Starting time of the call count interval (ends midnight UTC) in UNIX time
-	Time int `json:"time,omitempty"`
-}
-
-// MetricsEndpoint
-type MetricsEndpoint struct {
-	// Sum of all calls for a particular day and endpoint
-	Calls int `json:"calls,omitempty"`
-
-	// Endpoint parent name
-	Endpoint string `json:"endpoint,omitempty"`
-
-	// Starting time of the call count interval (ends midnight UTC) in UNIX time
-	Time int `json:"time,omitempty"`
-}
-
 // Block defines content of a block
 type Block struct {
 	Time          int    `json:"time,omitempty"`

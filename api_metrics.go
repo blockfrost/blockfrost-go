@@ -8,6 +8,27 @@ import (
 	"net/url"
 )
 
+// Metric describes the Blockfrost usage metrics
+type Metric struct {
+	// Sum of all calls for a particular day
+	Calls int `json:"calls"`
+
+	// Starting time of the call count interval (ends midnight UTC) in UNIX time
+	Time int `json:"time"`
+}
+
+// MetricsEndpoint
+type MetricsEndpoint struct {
+	// Sum of all calls for a particular day and endpoint
+	Calls int `json:"calls"`
+
+	// Endpoint parent name
+	Endpoint string `json:"endpoint"`
+
+	// Starting time of the call count interval (ends midnight UTC) in UNIX time
+	Time int `json:"time"`
+}
+
 // Metrics returns the history of your Blockfrost usage metrics in the past 30 days.
 func (c *apiClient) Metrics(ctx context.Context) (mes []Metric, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceMetrics))

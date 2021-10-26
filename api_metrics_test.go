@@ -8,7 +8,7 @@ import (
 	"github.com/blockfrost/blockfrost-go"
 )
 
-func TestResourceMetrics(t *testing.T) {
+func TestResourceMetricsIntegration(t *testing.T) {
 	t.Parallel()
 	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
@@ -23,7 +23,7 @@ func TestResourceMetrics(t *testing.T) {
 	}
 }
 
-func TestResourceMetricsEndpoints(t *testing.T) {
+func TestResourceMetricsEndpointsIntegration(t *testing.T) {
 	t.Parallel()
 	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
