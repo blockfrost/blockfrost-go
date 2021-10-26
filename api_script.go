@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"sync"
@@ -16,19 +17,38 @@ const (
 
 // Script contains information about a script
 type Script struct {
-	ScriptHash     string `json:"script_hash,omitempty"`
-	Type           string `json:"type,omitempty"`
-	SerialisedSize int    `json:"serialised_size,omitempty"`
+	// Script hash
+	ScriptHash string `json:"script_hash"`
+
+	// Type of the script language
+	Type string `json:"type"`
+
+	// The size of the CBOR serialised script, if a Plutus script
+	SerialisedSize int `json:"serialised_size"`
 }
 
 // ScriptRedeemer contains information about a script redeemer.
 type ScriptRedeemer struct {
-	TxHash    string `json:"tx_hash,omitempty"`
-	TxIndex   int    `json:"tx_index,omitempty"`
-	Purpose   string `json:"purpose,omitempty"`
-	UnitMem   string `json:"unit_mem,omitempty"`
-	UnitSteps string `json:"unit_steps,omitempty"`
-	Fee       string `json:"fee,omitempty"`
+	// Hash of the transaction
+	TxHash string `json:"tx_hash"`
+
+	// The index of the redeemer pointer in the transaction
+	TxIndex int `json:"tx_index"`
+
+	// Validation purpose. Enum: "spend" "mint" "cert" "reward"
+	Purpose string `json:"purpose"`
+
+	// Datum hash
+	DatumHash string `json:"datum_hash"`
+
+	// The budget in Memory to run a script
+	UnitMem string `json:"unit_mem"`
+
+	// The budget in CPU steps to run a script
+	UnitSteps string `json:"unit_steps"`
+
+	// The fee consumed to run the script
+	Fee string `json:"fee"`
 }
 
 type methodOptions struct {
@@ -143,6 +163,7 @@ func (c *apiClient) ScriptRedeemers(ctx context.Context, address string, query A
 	if err != nil {
 		return
 	}
+	log.Println(requestUrl.String())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return

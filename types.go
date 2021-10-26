@@ -94,7 +94,8 @@ type Block struct {
 
 type Transaction string
 
-//APIQueryParams ...
+// APIQueryParams contains query parameters. Marshalled to
+// "count", "page", "order", "from", "to".
 type APIQueryParams struct {
 	Count int
 	Page  int

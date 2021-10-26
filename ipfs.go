@@ -46,18 +46,18 @@ type IPFSClientOptions struct {
 
 // IPFSObject contains information on an IPFS object
 type IPFSObject struct {
-	Name     string `json:"name,omitempty"`
-	IPFSHash string `json:"ipfs_hash,omitempty"`
-	Size     string `json:"size,omitempty"`
+	Name     string `json:"name"`
+	IPFSHash string `json:"ipfs_hash"`
+	Size     string `json:"size"`
 }
 
 // IPFSPinnedObject contains information on a pinned object
 type IPFSPinnedObject struct {
-	TimeCreated int    `json:"time_created,omitempty"`
-	TimePinned  int    `json:"time_pinned,omitempty"`
-	IPFSHash    string `json:"ipfs_hash,omitempty"`
-	State       string `json:"state,omitempty"`
-	Size        string `json:"size,omitempty"`
+	TimeCreated int    `json:"time_created"`
+	TimePinned  int    `json:"time_pinned"`
+	IPFSHash    string `json:"ipfs_hash"`
+	State       string `json:"state"`
+	Size        string `json:"size"`
 }
 
 // NewIPFSClient creates and returns an IPFS client configured using
