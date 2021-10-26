@@ -46,18 +46,37 @@ type IPFSClientOptions struct {
 
 // IPFSObject contains information on an IPFS object
 type IPFSObject struct {
-	Name     string `json:"name"`
+	// Name of the file
+	Name string `json:"name"`
+
+	// IPFS hash of the file
 	IPFSHash string `json:"ipfs_hash"`
-	Size     string `json:"size"`
+
+	// IPFS node size in Bytes
+	Size string `json:"size"`
 }
 
 // IPFSPinnedObject contains information on a pinned object
 type IPFSPinnedObject struct {
-	TimeCreated int    `json:"time_created"`
-	TimePinned  int    `json:"time_pinned"`
-	IPFSHash    string `json:"ipfs_hash"`
-	State       string `json:"state"`
-	Size        string `json:"size"`
+	// Creation time of the IPFS object on our backends
+	TimeCreated int `json:"time_created"`
+
+	// Pin time of the IPFS object on our backends
+	TimePinned int `json:"time_pinned"`
+
+	// IPFS hash of the pinned object
+	IPFSHash string `json:"ipfs_hash"`
+
+	// Size of the object in Bytes
+	State string `json:"state"`
+
+	// State of the pinned object, which is queued when we are retriving object.
+	// If this is successful the state is changed to pinned or failed if not.
+	// The state gc means the pinned item has been garbage collected due to account being
+	// over storage quota or after it has been moved to unpinned state by removing the object pin.
+	//
+	// Value: "queued|pinned|unpinned|failed|gc"
+	Size string `json:"size"`
 }
 
 // NewIPFSClient creates and returns an IPFS client configured using

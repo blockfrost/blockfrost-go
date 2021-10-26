@@ -18,51 +18,81 @@ const (
 )
 
 type AssetOnchainMetadata struct {
-	Name  string `json:"name,"`
-	Image string `json:"image,"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
 }
 
 // Contains metadata information about an asset.
 type AssetMetadata struct {
-	Name        string `json:"name,"`
-	Description string `json:"description,"`
-	Ticker      string `json:"ticker,"`
-	URL         string `json:"url,"`
-	Logo        string `json:"logo,"`
-	Decimals    int    `json:"decimals,"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Ticker      string `json:"ticker"`
+	URL         string `json:"url"`
+	Logo        string `json:"logo"`
+	Decimals    int    `json:"decimals"`
 }
 
 // Assets contains information on an asset.
 type Asset struct {
-	Asset             string               `json:"asset,"`
-	PolicyId          string               `json:"policy_id,"`
-	AssetName         string               `json:"asset_name,"`
-	Fingerprint       string               `json:"fingerprint,"`
-	Quantity          string               `json:"quantity,"`
-	InitialMintTxHash string               `json:"initial_mint_tx_hash,"`
-	MintOrBurnCount   int                  `json:"mint_or_burn_count,"`
-	OnchainMetadata   AssetOnchainMetadata `json:"onchain_metadata,"`
-	Metadata          AssetMetadata        `json:"metadata,"`
+	// Hex-encoded asset full name
+	Asset string `json:"asset"`
+
+	// Policy ID of the asset
+	PolicyId string `json:"policy_id"`
+
+	// Hex-encoded asset name of the asset
+	AssetName string `json:"asset_name"`
+
+	// CIP14 based user-facing fingerprint
+	Fingerprint string `json:"fingerprint"`
+
+	// Current asset quantity
+	Quantity string `json:"quantity"`
+
+	// ID of the initial minting transaction
+	InitialMintTxHash string `json:"initial_mint_tx_hash"`
+
+	// Count of mint and burn transactions
+	MintOrBurnCount int `json:"mint_or_burn_count"`
+
+	// On-chain metadata stored in the minting transaction under label 721,
+	// community discussion around the standard ongoing at https://github.com/cardano-foundation/CIPs/pull/85
+	OnchainMetadata AssetOnchainMetadata `json:"onchain_metadata"`
+	Metadata        AssetMetadata        `json:"metadata"`
 }
 
 // AssetHistory contains history of an asset.
 type AssetHistory struct {
-	TxHash string `json:"tx_hash,"`
-	Action string `json:"action,"`
-	Amount string `json:"amount,"`
+	// Hash of the transaction containing the asset actio
+	TxHash string `json:"tx_hash"`
+
+	// Action executed upon the asset policy.
+	// Enum: "minted" "burned"
+	Action string `json:"action"`
+
+	// Asset amount of the specific action
+	Amount string `json:"amount"`
 }
 
 // AssetTransaction contains information on transactions belonging
 // to an asset.
 type AssetTransaction struct {
-	TxHash      string `json:"tx_hash,"`
-	TxIndex     int    `json:"tx_index,"`
-	BlockHeight int    `json:"block_height,"`
+	// Hash of the transaction
+	TxHash string `json:"tx_hash"`
+
+	// Transaction index within the block
+	TxIndex int `json:"tx_index"`
+
+	// Block height
+	BlockHeight int `json:"block_height"`
 }
 
 type AssetAddress struct {
-	Address  string `json:"address,"`
-	Quantity string `json:"quantity,"`
+	// Address containing the specific asset
+	Address string `json:"address"`
+
+	// Asset quantity on the specific address
+	Quantity string `json:"quantity"`
 }
 
 type AssetResult struct {
