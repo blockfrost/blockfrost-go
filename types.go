@@ -73,22 +73,6 @@ type UnauthorizedError struct {
 	StatusCode int    `json:"status_code"`
 }
 
-// Info defines model for root endpoint `/`
-type Info struct {
-	Url     string `json:"url,omitempty"`
-	Version string `json:"version,omitempty"`
-}
-
-// Health describes boolean for backend server health status.
-type Health struct {
-	IsHealthy bool `json:"is_healthy,omitempty"`
-}
-
-// HealthClock describes current UNIX time
-type HealthClock struct {
-	ServerTime int64 `json:"server_time,omitempty"`
-}
-
 // Block defines content of a block
 type Block struct {
 	Time          int    `json:"time,omitempty"`

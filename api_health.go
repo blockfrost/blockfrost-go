@@ -8,6 +8,22 @@ import (
 	"net/url"
 )
 
+// Info defines model for root endpoint `/`
+type Info struct {
+	Url     string `json:"url"`
+	Version string `json:"version"`
+}
+
+// Health describes boolean for backend server health status.
+type Health struct {
+	IsHealthy bool `json:"is_healthy"`
+}
+
+// HealthClock describes current UNIX time
+type HealthClock struct {
+	ServerTime int64 `json:"server_time"`
+}
+
 // Info returns the root endpoint `/`. Root endpoint has
 // no other function than to point end users to documentation.
 func (c *apiClient) Info(ctx context.Context) (info Info, err error) {
