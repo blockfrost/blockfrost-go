@@ -24,67 +24,114 @@ const (
 // Account return Specific account address
 // Obtain information about a specific stake account.
 type Account struct {
-	StakeAddress       string `json:"stake_address"`
-	Active             bool   `json:"active"`
-	ActiveEpoch        int64  `json:"active_epoch"`
-	ControlledAmount   string `json:"controlled_amount"`
-	RewardsSum         string `json:"rewards_sum"`
-	WithdrawalsSum     string `json:"withdrawals_sum"`
-	ReservesSum        string `json:"reserves_sum"`
-	TreasurySum        string `json:"treasury_sum"`
+	// Bech32 stake address
+	StakeAddress string `json:"stake_address"`
+
+	// Registration state of an account
+	Active bool `json:"active"`
+
+	// Epoch of the most recent action - registration or deregistration
+	ActiveEpoch int64 `json:"active_epoch"`
+
+	// Balance of the account in Lovelaces
+	ControlledAmount string `json:"controlled_amount"`
+
+	// Sum of all rewards for the account in the Lovelaces
+	RewardsSum string `json:"rewards_sum"`
+
+	// Sum of all the withdrawals for the account in Lovelaces
+	WithdrawalsSum string `json:"withdrawals_sum"`
+
+	// Sum of all funds from reserves for the account in the Lovelaces
+	ReservesSum string `json:"reserves_sum"`
+
+	// Sum of all funds from treasury for the account in the Lovelaces
+	TreasurySum string `json:"treasury_sum"`
+
+	// Sum of available rewards that haven't been withdrawn yet for the account in the Lovelaces
 	WithdrawableAmount string `json:"withdrawable_amount"`
-	PoolID             string `json:"pool_id"`
+
+	// Bech32 pool ID that owns the account
+	PoolID string `json:"pool_id"`
 }
 
 // AccountRewardsHist return Account reward history
 // Obtain information about the reward history of a specific account.
 type AccountRewardsHistory struct {
-	Epoch  int32  `json:"epoch"`
+	// Epoch of the associated reward
+	Epoch int32 `json:"epoch"`
+
+	// Rewards for given epoch in Lovelaces
 	Amount string `json:"amount"`
+
+	// Bech32 pool ID being delegated to
 	PoolID string `json:"pool_id"`
 }
 
 // AccountHistory return Account history
 // Obtain information about the history of a specific account.
 type AccountHistory struct {
-	ActiveEpoch int32  `json:"active_epoch"`
-	Amount      string `json:"amount"`
-	PoolID      string `json:"pool_id"`
+	// Epoch in which the stake was active
+	ActiveEpoch int32 `json:"active_epoch"`
+
+	// Stake amount in Lovelaces
+	Amount string `json:"amount"`
+
+	// Bech32 ID of pool being delegated to
+	PoolID string `json:"pool_id"`
 }
 
 // AccountDelegationHistory return Account delegation history
 // Obtain information about the delegation of a specific account.
 type AccountDelegationHistory struct {
-	ActiveEpoch int32  `json:"active_epoch"`
-	TXHash      string `json:"tx_hash"`
-	Amount      string `json:"amount"`
-	PoolID      string `json:"pool_id"`
+	// Epoch in which the delegation becomes active
+	ActiveEpoch int32 `json:"active_epoch"`
+
+	// Hash of the transaction containing the delegation
+	TXHash string `json:"tx_hash"`
+
+	// Rewards for given epoch in Lovelaces
+	Amount string `json:"amount"`
+
+	// Bech32 ID of pool being delegated to
+	PoolID string `json:"pool_id"`
 }
 
 // AccountRegistrationHistory return Account registration history
 // Obtain information about the registrations and deregistrations of a specific account.
 type AccountRegistrationHistory struct {
+	// Hash of the transaction containing the (de)registration certificate
 	TXHash string `json:"tx_hash"`
+
+	// Action in the certificate
+	// Enum: "registered" "deregistered"
 	Action string `json:"action"`
 }
 
 // AccountWithdrawalHistory return Account withdrawal history
 // Obtain information about the withdrawals of a specific account.
 type AccountWithdrawalHistory struct {
+	// Hash of the transaction containing the withdrawal
 	TXHash string `json:"tx_hash"`
+
+	// Withdrawal amount in Lovelaces
 	Amount string `json:"amount"`
 }
 
 // AccountMIRHistory return Account MIR history
 // Obtain information about the MIRs of a specific account.
 type AccountMIRHistory struct {
+	// Hash of the transaction containing the MIR
 	TXHash string `json:"tx_hash"`
+
+	// MIR amount in Lovelaces
 	Amount string `json:"amount"`
 }
 
 // AccountAssociatedAddress return Account associated addresses
 // Obtain information about the addresses of a specific account.
 type AccountAssociatedAddress struct {
+	// Address associated with the stake key
 	Address string `json:"address"`
 }
 
@@ -92,7 +139,11 @@ type AccountAssociatedAddress struct {
 // Obtain information about assets associated with addresses of a specific account.
 // Be careful, as an account could be part of a mangled address and does not necessarily mean the addresses are owned by user as the account.
 type AccountAssociatedAsset struct {
-	Unit     string `json:"unit"`
+	// The unit of the value.
+	// Concatenation of asset policy_id and hex-encoded asset_name
+	Unit string `json:"unit"`
+
+	// The quantity of the unit
 	Quantity string `json:"quantity"`
 }
 
