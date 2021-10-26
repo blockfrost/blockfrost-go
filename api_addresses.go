@@ -22,32 +22,55 @@ type AddressAmount struct {
 }
 
 type Address struct {
-	Address      string          `json:"address"`
-	Amount       []AddressAmount `json:"amount"`
-	StakeAddress string          `json:"stake_address"`
-	Type         string          `json:"type"`
-	Script       bool            `json:"script"`
+	// Bech32 encoded addresses
+	Address string          `json:"address"`
+	Amount  []AddressAmount `json:"amount"`
+
+	// Stake address that controls the key
+	StakeAddress string `json:"stake_address"`
+
+	// Address era.
+	// Enum: "byron" "shelley"
+	Type string `json:"type"`
+
+	// True if this is a script address
+	Script bool `json:"script"`
 }
 
 type AddressDetails struct {
+	// Bech32 encoded address
 	Address     string          `json:"address"`
 	ReceivedSum []AddressAmount `json:"received_sum"`
 	SentSum     []AddressAmount `json:"sent_sum"`
-	TxCount     int             `json:"tx_count"`
+
+	// Count of all transactions on the address
+	TxCount int `json:"tx_count"`
 }
 
 type AddressTransactions struct {
-	TxHash      string `json:"tx_hash"`
-	TxIndex     int    `json:"tx_index"`
-	BlockHeight int    `json:"block_height"`
+	// Hash of the transaction
+	TxHash string `json:"tx_hash"`
+
+	// Transaction index within the block
+	TxIndex int `json:"tx_index"`
+
+	// Block height
+	BlockHeight int `json:"block_height"`
 }
 
 type AddressUTXO struct {
-	TxHash      string          `json:"tx_hash"`
+	// Transaction hash of the UTXO
+	TxHash string `json:"tx_hash"`
+
+	// UTXO index in the transaction
 	OutputIndex int             `json:"output_index"`
 	Amount      []AddressAmount `json:"amount"`
-	Block       string          `json:"block"`
-	DataHash    string          `json:"data_hash"`
+
+	// Block hash of the UTXO
+	Block string `json:"block"`
+
+	// The hash of the transaction output datum
+	DataHash string `json:"data_hash"`
 }
 
 type AddressTxResult struct {
