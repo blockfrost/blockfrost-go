@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/blockfrost/blockfrost-go/internal/version"
 	"github.com/hashicorp/go-retryablehttp"
 )
 
@@ -95,6 +96,9 @@ func formatParams(v url.Values, query APIQueryParams) url.Values {
 
 func (c *apiClient) handleRequest(req *http.Request) (res *http.Response, err error) {
 	req.Header.Add("project_id", c.projectId)
+
+	userAgent := fmt.Sprintf("%s/%s", "blockfrost-go", version.String())
+	req.Header.Set("User-Agent", userAgent)
 	rreq, err := retryablehttp.FromRequest(req)
 	if err != nil {
 		return
