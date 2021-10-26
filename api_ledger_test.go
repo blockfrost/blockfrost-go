@@ -30,10 +30,8 @@ func TestGenesisUnmarshall(t *testing.T) {
 }
 
 func TestGenesisIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.Genesis(context.TODO())
 	if err != nil {
 		t.Fatal(err)

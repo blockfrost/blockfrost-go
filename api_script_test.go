@@ -75,10 +75,7 @@ func TestIntegrationResourceRedeemers(t *testing.T) {
 		w.Write(data)
 	}))
 
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: s.URL})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: s.URL})
 
 	addr := "e1457a0c47dfb7a2f6b8fbb059bdceab163c05d34f195b87b9f2b30e"
 	got, err := api.ScriptRedeemers(context.TODO(), addr, blockfrost.APIQueryParams{})
@@ -104,10 +101,7 @@ func TestIntegrationResourceScripts(t *testing.T) {
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write(data)
 	}))
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: s.URL})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: s.URL})
 
 	got, err := api.Scripts(context.TODO(), blockfrost.APIQueryParams{})
 	if err != nil {
@@ -132,10 +126,7 @@ func TestIntegrationResourceScript(t *testing.T) {
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write(data)
 	}))
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: s.URL})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: s.URL})
 
 	got, err := api.Script(context.TODO(), "")
 	if err != nil {

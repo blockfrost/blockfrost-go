@@ -29,12 +29,10 @@ func TestResourceAccount(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	accountAddr, err := api.Account(context.TODO(), inputStakeAddr)
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -63,12 +61,10 @@ func TestResourceAccountRewardsHistory(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
@@ -101,12 +97,10 @@ func TestResourceAccountHistory(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
@@ -140,12 +134,9 @@ func TestResourceAccountDelegationHistory(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
@@ -177,12 +168,10 @@ func TestResourceAccountRegistrationHistory(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
@@ -214,12 +203,10 @@ func TestResourceAccountWithdrawalHistory(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
@@ -251,12 +238,10 @@ func TestResourceAccountMIRHistory(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
@@ -287,12 +272,10 @@ func TestResourceAccountAssociatedAddresses(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
@@ -324,12 +307,10 @@ func TestResourceAccountAssociatedAssets(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}

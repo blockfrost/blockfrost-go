@@ -44,10 +44,8 @@ func TestTickerRecordUnmarshal(t *testing.T) {
 }
 
 func TestNutlinkIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	addr := "addr1qygvjldfxxhp7q96w729c6gvq7hy6pfc937jqlvpms2833rah0c4wey5zfgnuar9eyf6q7pzjzv56c542q7zctpkz9wqay69js"
 	got, err := api.Nutlink(context.TODO(), addr)
 	if err != nil {
@@ -59,10 +57,8 @@ func TestNutlinkIntegration(t *testing.T) {
 }
 
 func TestTickersIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	addr := "addr1qygvjldfxxhp7q96w729c6gvq7hy6pfc937jqlvpms2833rah0c4wey5zfgnuar9eyf6q7pzjzv56c542q7zctpkz9wqay69js"
 	got, err := api.Tickers(context.TODO(), addr, blockfrost.APIQueryParams{Count: 5})
 	if err != nil {
@@ -74,12 +70,9 @@ func TestTickersIntegration(t *testing.T) {
 }
 
 func TestTickerRecordsIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	got, err := api.TickerRecords(context.TODO(), "ADAUSD", blockfrost.APIQueryParams{Count: 5})
 	if err != nil {
@@ -91,12 +84,9 @@ func TestTickerRecordsIntegration(t *testing.T) {
 }
 
 func TestAddressTickerRecordsIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
 	addr := "addr1qygvjldfxxhp7q96w729c6gvq7hy6pfc937jqlvpms2833rah0c4wey5zfgnuar9eyf6q7pzjzv56c542q7zctpkz9wqay69js"
 	got, err := api.AddressTickerRecords(context.TODO(), addr, "ADAUSD", blockfrost.APIQueryParams{Count: 5})
 	if err != nil {

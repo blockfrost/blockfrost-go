@@ -2,10 +2,6 @@ package blockfrost_test
 
 import (
 	"context"
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -28,51 +24,27 @@ func TestNetworkUnmarshal(t *testing.T) {
 	}
 
 	fp := filepath.Join(testdata, "json", "network", "network.json")
-	bytes, err := ioutil.ReadFile(fp)
-	if err != nil {
-		t.Fatalf("an error ocurred while trying to read json test file %s", fp)
-	}
-
 	got := blockfrost.NetworkInfo{}
-	if err := json.Unmarshal(bytes, &got); err != nil {
-		t.Fatalf("failed to unmarshal %s with err %v", fp, err)
-	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
-	}
+	testStructGotWant(t, fp, &got, &want)
 }
 
 func TestResourceNetworkIntegration(t *testing.T) {
-	fp := filepath.Join(testdata, "json", "network", "network.json")
-	bytes, err := ioutil.ReadFile(fp)
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := blockfrost.NetworkInfo{}
-	if err = json.Unmarshal(bytes, &want); err != nil {
-		t.Fatal(err)
-	}
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(bytes)
-	}))
-	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	nullGot := blockfrost.NetworkInfo{}
+
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{
-			Server: s.URL,
+			Server: "http://192.168.8.110:8000",
 		},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	got, err := api.Network(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected  %v got %v", want, got)
+	if reflect.DeepEqual(got, nullGot) {
+		t.Fatalf("got null %+v", got)
 	}
 
 }

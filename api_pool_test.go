@@ -30,12 +30,10 @@ func TestResourcePools(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	q := blockfrost.APIQueryParams{}
 	pools, err := api.Pools(context.TODO(), q)
 	if err != nil {
@@ -62,12 +60,10 @@ func TestResourcePoolsRetired(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	q := blockfrost.APIQueryParams{}
 	pools, err := api.PoolsRetired(context.TODO(), q)
 	if err != nil {
@@ -94,12 +90,10 @@ func TestResourcePoolsRetiring(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	q := blockfrost.APIQueryParams{}
 	pools, err := api.PoolsRetiring(context.TODO(), q)
 	if err != nil {
@@ -147,12 +141,10 @@ func TestResourcePoolSpecific(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	pool, err := api.Pool(context.TODO(), inputPoolID)
 	if err != nil {
 		t.Fatal(err)
@@ -184,12 +176,10 @@ func TestResourcePoolHistory(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	q := blockfrost.APIQueryParams{}
 	got, err := api.PoolHistory(context.TODO(), inputPoolID, q)
 	if err != nil {
@@ -223,12 +213,10 @@ func TestResourcePoolMetadata(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	pool, err := api.PoolMetadata(context.TODO(), inputPoolID)
 	if err != nil {
 		t.Fatal(err)
@@ -251,12 +239,10 @@ func TestResourcePoolRelays(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	got, err := api.PoolRelays(context.TODO(), "")
 	if err != nil {
 		t.Fatal(err)
@@ -282,12 +268,10 @@ func TestResourcePoolDelegators(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	q := blockfrost.APIQueryParams{}
 	pool, err := api.PoolDelegators(context.TODO(), inputPoolID, q)
 	if err != nil {
@@ -317,12 +301,10 @@ func TestResourcePoolBlocks(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	q := blockfrost.APIQueryParams{}
 	pool, err := api.PoolBlocks(context.TODO(), inputPoolID, q)
 	if err != nil {
@@ -351,12 +333,10 @@ func TestResourcePoolUpdate(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	q := blockfrost.APIQueryParams{}
 	pool, err := api.PoolUpdates(context.TODO(), inputPoolID, q)
 	if err != nil {

@@ -37,12 +37,10 @@ func TestResourceMetadataTxLabels(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
@@ -83,12 +81,10 @@ func TestResourceMetadataTxContentInJSON(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}
@@ -121,12 +117,10 @@ func TestResourceMetadataTxContentInCBOR(t *testing.T) {
 		}),
 	)
 	defer s.Close()
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+
 	q := blockfrost.APIQueryParams{
 		Count: 1,
 	}

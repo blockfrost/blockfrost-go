@@ -28,12 +28,9 @@ func TestResourceMetrics(t *testing.T) {
 			))
 	}))
 
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	metrics, err := api.Metrics(context.TODO())
 	if err != nil {
@@ -69,12 +66,9 @@ func TestResourceMetricsEndpoints(t *testing.T) {
 				  ]`,
 			))
 	}))
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	metricsEndpoints, err := api.MetricsEndpoints(context.TODO())
 	if err != nil {

@@ -16,10 +16,13 @@ type apiClient struct {
 	routines  int
 }
 
+// HttpRequestDoer defines methods for a http client.
 type HttpRequestDoer interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
+// APIClientOptions contains optios used to initialize an API Client using
+// NewAPIClient
 type APIClientOptions struct {
 	// The project_id to use from blockfrost. If not set
 	// `BLOCKFROST_PROJECT_ID` is loaded from env
@@ -36,7 +39,9 @@ type APIClientOptions struct {
 	RetryMax     int           // Maximum number of retries
 }
 
-func NewAPIClient(options APIClientOptions) (APIClient, error) {
+// NewAPICLient creates a client from APIClientOptions. If no options are provided,
+//  client with default configurations is returned.
+func NewAPIClient(options APIClientOptions) APIClient {
 	if options.Server == "" {
 		options.Server = CardanoMainNet
 	}
@@ -59,9 +64,10 @@ func NewAPIClient(options APIClientOptions) (APIClient, error) {
 		routines:  options.MaxRoutines,
 	}
 
-	return client, nil
+	return client
 }
 
+// APIClient defines methods implemented by the api client.
 type APIClient interface {
 	Info(ctx context.Context) (Info, error)
 	Health(ctx context.Context) (Health, error)

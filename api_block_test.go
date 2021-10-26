@@ -9,10 +9,9 @@ import (
 )
 
 func TestResourceBlockLatest(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	testErrorHelper(t, err)
 	got, err := api.BlockLatest(context.TODO())
 	testErrorHelper(t, err)
 	nullGot := blockfrost.Block{}
@@ -23,10 +22,9 @@ func TestResourceBlockLatest(t *testing.T) {
 
 func TestResourceBlock(t *testing.T) {
 	hash := "b2466aac25c5d620fd99ae6e0faa72bec3acb9aeb29961363f464dab51b5ac05"
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	testErrorHelper(t, err)
 	got, err := api.Block(context.TODO(), hash)
 	testErrorHelper(t, err)
 	nullGot := blockfrost.Block{}
@@ -37,10 +35,9 @@ func TestResourceBlock(t *testing.T) {
 
 func TestResourceBlockBySlot(t *testing.T) {
 	slot := 30895909
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	testErrorHelper(t, err)
 	got, err := api.BlockBySlot(context.TODO(), slot)
 	testErrorHelper(t, err)
 	nullGot := blockfrost.Block{}
@@ -51,10 +48,9 @@ func TestResourceBlockBySlot(t *testing.T) {
 
 func TestResourceBlockBySlotAndEpoch(t *testing.T) {
 	slot := 106397
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	testErrorHelper(t, err)
 	got, err := api.BlocksBySlotAndEpoch(context.TODO(), slot, 297)
 	testErrorHelper(t, err)
 	nullGot := blockfrost.Block{}
@@ -64,10 +60,9 @@ func TestResourceBlockBySlotAndEpoch(t *testing.T) {
 }
 
 func TestBlockLatestTransactionsIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	testErrorHelper(t, err)
 	got, err := api.BlockLatestTransactions(context.TODO())
 	testErrorHelper(t, err)
 	nullGot := []blockfrost.Transaction{}
@@ -78,10 +73,9 @@ func TestBlockLatestTransactionsIntegration(t *testing.T) {
 
 func TestBlockTransactions(t *testing.T) {
 	block := "4873401"
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	testErrorHelper(t, err)
 	got, err := api.BlockTransactions(context.TODO(), block)
 	testErrorHelper(t, err)
 	nullGot := []blockfrost.Transaction{}
@@ -92,10 +86,9 @@ func TestBlockTransactions(t *testing.T) {
 
 func TestBlockNextIntegration(t *testing.T) {
 	hash := "5ea1ba291e8eef538635a53e59fddba7810d1679631cc3aed7c8e6c4091a516a"
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	testErrorHelper(t, err)
 	got, err := api.BlocksNext(context.TODO(), hash)
 	testErrorHelper(t, err)
 	nullGot := []blockfrost.Block{}
@@ -106,10 +99,9 @@ func TestBlockNextIntegration(t *testing.T) {
 
 func TestBlockPreviousIntegration(t *testing.T) {
 	hash := "5ea1ba291e8eef538635a53e59fddba7810d1679631cc3aed7c8e6c4091a516a"
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	testErrorHelper(t, err)
 	got, err := api.BlocksPrevious(context.TODO(), hash)
 	testErrorHelper(t, err)
 	nullGot := []blockfrost.Block{}

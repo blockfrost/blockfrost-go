@@ -117,6 +117,8 @@ func (c *apiClient) handleRequest(req *http.Request) (res *http.Response, err er
 
 func (ip *ipfsClient) handleRequest(req *http.Request) (res *http.Response, err error) {
 	req.Header.Add("project_id", ip.projectId)
+	userAgent := fmt.Sprintf("%s/%s", "blockfrost-go", version.String())
+	req.Header.Set("User-Agent", userAgent)
 	rreq, err := retryablehttp.FromRequest(req)
 	if err != nil {
 		return

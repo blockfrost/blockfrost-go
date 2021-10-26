@@ -22,12 +22,9 @@ func TestResourceInfo(t *testing.T) {
 			))
 	}))
 
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	info, err := api.Info(context.TODO())
 	if err != nil {
@@ -50,12 +47,9 @@ func TestResourceHealth(t *testing.T) {
 			))
 	}))
 
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	health, err := api.Health(context.TODO())
 	if err != nil {
@@ -79,12 +73,9 @@ func TestResourceHealthClock(t *testing.T) {
 			))
 	}))
 
-	api, err := blockfrost.NewAPIClient(
+	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{Server: s.URL},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	healthClock, err := api.HealthClock(context.TODO())
 	if err != nil {

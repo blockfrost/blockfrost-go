@@ -11,10 +11,8 @@ import (
 )
 
 func TestEpochLatestIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.EpochLatest(context.TODO())
 	if err != nil {
 		t.Fatal(err)
@@ -26,10 +24,8 @@ func TestEpochLatestIntegration(t *testing.T) {
 }
 
 func TestLatestEpochParametersIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.LatestEpochParameters(context.TODO())
 	if err != nil {
 		t.Fatal(err)
@@ -41,10 +37,8 @@ func TestLatestEpochParametersIntegration(t *testing.T) {
 }
 
 func TestEpochIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.Epoch(context.TODO(), 225)
 	if err != nil {
 		t.Fatal(err)
@@ -55,10 +49,8 @@ func TestEpochIntegration(t *testing.T) {
 }
 
 func TestEpochNextIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.EpochsNext(context.TODO(), 225, blockfrost.APIQueryParams{Count: 5})
 	if err != nil {
 		t.Fatal(err)
@@ -69,10 +61,8 @@ func TestEpochNextIntegration(t *testing.T) {
 }
 
 func TestEpochsPreviousIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.EpochsPrevious(context.TODO(), 225, blockfrost.APIQueryParams{Count: 5})
 	if err != nil {
 		t.Fatal(err)
@@ -83,10 +73,8 @@ func TestEpochsPreviousIntegration(t *testing.T) {
 }
 
 func TestEpochStakeDistributionIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.EpochStakeDistribution(context.TODO(), 225, blockfrost.APIQueryParams{Count: 5})
 	if err != nil {
 		t.Fatal(err)
@@ -97,10 +85,8 @@ func TestEpochStakeDistributionIntegration(t *testing.T) {
 }
 
 func TestEpochStakeDistributionByPoolIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	pool := "pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy"
 	got, err := api.EpochStakeDistributionByPool(context.TODO(), 225, pool, blockfrost.APIQueryParams{Count: 5})
 	if err != nil {
@@ -112,10 +98,8 @@ func TestEpochStakeDistributionByPoolIntegration(t *testing.T) {
 }
 
 func TestEpochBlockDistributionIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.EpochBlockDistribution(context.TODO(), 225, blockfrost.APIQueryParams{Count: 5})
 	if err != nil {
 		t.Fatal(err)
@@ -126,10 +110,8 @@ func TestEpochBlockDistributionIntegration(t *testing.T) {
 }
 
 func TestEpochBlockDistributionByPoolIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	pool := "pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy"
 	got, err := api.EpochBlockDistributionByPool(context.TODO(), 225, pool, blockfrost.APIQueryParams{Count: 5})
 	if err != nil {
@@ -141,10 +123,8 @@ func TestEpochBlockDistributionByPoolIntegration(t *testing.T) {
 }
 
 func TestEpochParametersIntegration(t *testing.T) {
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.EpochParameters(context.TODO(), 225)
 	if err != nil {
 		t.Fatal(err)

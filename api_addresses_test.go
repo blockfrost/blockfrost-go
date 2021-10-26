@@ -111,10 +111,8 @@ func ReadOrGenerateGoldenFile(t *testing.T, path string, v interface{}) []byte {
 
 func TestResourceAddress(t *testing.T) {
 	addr := "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.Address(context.TODO(), addr)
 	if err != nil {
 		t.Fatal(err)
@@ -140,10 +138,8 @@ func TestResourceAddress(t *testing.T) {
 
 func TestResourceAddressDetails(t *testing.T) {
 	addr := "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.AddressDetails(context.TODO(), addr)
 	if err != nil {
 		t.Fatal(err)
@@ -170,10 +166,7 @@ func TestResourceAddressDetails(t *testing.T) {
 func TestResourceAddressTransactions(t *testing.T) {
 	addr := "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
 
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
 	got, err := api.AddressTransactions(
 		context.TODO(),
@@ -206,10 +199,7 @@ func TestResourceAddressTransactions(t *testing.T) {
 func TestAddressUTXOs(t *testing.T) {
 	addr := "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
 
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
 	got, err := api.AddressUTXOs(
 		context.TODO(),

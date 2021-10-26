@@ -102,10 +102,7 @@ func TestTransactionMetadataCborUnmarshal(t *testing.T) {
 
 func TestTransactionIntegration(t *testing.T) {
 	hash := "6e5f825c82c1c6d6b77f2a14092f3b78c8f1b66db6f4cf8caec1555b6f967b3b"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
 	got, err := api.Transaction(context.TODO(), hash)
 	if err != nil {
@@ -118,10 +115,7 @@ func TestTransactionIntegration(t *testing.T) {
 
 func TestTransactionUTXOs(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
 	got, err := api.TransactionUTXOs(context.TODO(), hash)
 	if err != nil {
@@ -134,10 +128,7 @@ func TestTransactionUTXOs(t *testing.T) {
 
 func TestTransactionStakeAddressCertsIntegration(t *testing.T) {
 	hash := "6e5f825c82c1c6d6b77f2a14092f3b78c8f1b66db6f4cf8caec1555b6f967b3b"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 	got, err := api.TransactionStakeAddressCerts(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
@@ -149,10 +140,8 @@ func TestTransactionStakeAddressCertsIntegration(t *testing.T) {
 
 func TestTransactionWithdrawlsIntegration(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.TransactionWithdrawals(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
@@ -164,10 +153,8 @@ func TestTransactionWithdrawlsIntegration(t *testing.T) {
 
 func TestTransactionMIRsIntegration(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.TransactionMIRs(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
@@ -179,10 +166,8 @@ func TestTransactionMIRsIntegration(t *testing.T) {
 
 func TestTransactionMetadata(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.TransactionMetadata(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
@@ -194,10 +179,8 @@ func TestTransactionMetadata(t *testing.T) {
 
 func TestTransactionMetadataInCBORsIntegration(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.TransactionMetadataInCBORs(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
@@ -209,10 +192,7 @@ func TestTransactionMetadataInCBORsIntegration(t *testing.T) {
 
 func TestTransactionRedeemersIntegration(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 	got, err := api.TransactionRedeemers(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
@@ -224,10 +204,7 @@ func TestTransactionRedeemersIntegration(t *testing.T) {
 
 func TestTransactionDelegationCertsIntegration(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 	got, err := api.TransactionDelegationCerts(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
@@ -239,10 +216,8 @@ func TestTransactionDelegationCertsIntegration(t *testing.T) {
 
 func TestTransactionPoolUpdatesIntegration(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.TransactionPoolUpdates(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
@@ -254,10 +229,8 @@ func TestTransactionPoolUpdatesIntegration(t *testing.T) {
 
 func TestTransactionPoolUpdateCertsIntegration(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
 	got, err := api.TransactionPoolUpdateCerts(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
@@ -269,10 +242,7 @@ func TestTransactionPoolUpdateCertsIntegration(t *testing.T) {
 
 func TestTransactionPoolRetirementsIntegration(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
-	api, err := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 	got, err := api.TransactionPoolRetirementCerts(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
