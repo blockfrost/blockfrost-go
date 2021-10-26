@@ -14,16 +14,36 @@ var (
 
 // GenesisBlock contains the information of the genesis block of the network.
 type GenesisBlock struct {
+	// The proportion of slots in which blocks should be issued
 	ActiveSlotsCoefficient float32 `json:"active_slots_coefficient"`
-	UpdateQuorum           float32 `json:"update_quorum"`
-	MaxLovelaceSupply      string  `json:"max_lovelace_supply"`
-	NetworkMagic           int     `json:"network_magic"`
-	EpochLength            int     `json:"epoch_length"`
-	SystemStart            int     `json:"system_start"`
-	SlotsPerKesPeriod      int     `json:"slots_per_kes_period"`
-	SlotLength             int     `json:"slot_length"`
-	MaxKesEvolutions       int     `json:"max_kes_evolutions"`
-	SecurityParam          int     `json:"security_param"`
+
+	// Determines the quorum needed for votes on the protocol parameter updates
+	UpdateQuorum float32 `json:"update_quorum"`
+
+	// The total number of lovelace in the system
+	MaxLovelaceSupply string `json:"max_lovelace_supply"`
+
+	// Network identifier
+	NetworkMagic int `json:"network_magic"`
+
+	// Number of slots in an epoch
+	EpochLength int `json:"epoch_length"`
+
+	// Time of slot 0 in UNIX time
+	SystemStart int `json:"system_start"`
+
+	// Number of slots in an KES period
+	SlotsPerKesPeriod int `json:"slots_per_kes_period"`
+
+	// Duration of one slot in seconds
+	SlotLength int `json:"slot_length"`
+
+	// The maximum number of time a KES key can be evolved before
+	// a pool operator must create a new operational certificate
+	MaxKesEvolutions int `json:"max_kes_evolutions"`
+
+	// Security parameter k
+	SecurityParam int `json:"security_param"`
 }
 
 // Genesis returns the information about blockchain genesis.
