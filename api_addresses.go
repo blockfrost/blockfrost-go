@@ -135,7 +135,7 @@ func (c *apiClient) AddressTransactions(ctx context.Context, address string, que
 func (c *apiClient) AddressTransactionsAll(ctx context.Context, address string) <-chan AddressTxResult {
 	ch := make(chan AddressTxResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -146,7 +146,10 @@ func (c *apiClient) AddressTransactionsAll(ctx context.Context, address string) 
 			for j := range jobs {
 				atx, err := c.AddressTransactions(j.ctx, address, j.query)
 				if len(atx) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AddressTxResult{Res: atx, Err: err}
 				ch <- res
@@ -161,12 +164,12 @@ func (c *apiClient) AddressTransactionsAll(ctx context.Context, address string) 
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -223,7 +226,7 @@ func (c *apiClient) AddressUTXOs(ctx context.Context, address string, query APIQ
 func (c *apiClient) AddressUTXOsAll(ctx context.Context, address string) <-chan AddressUTXOResult {
 	ch := make(chan AddressUTXOResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -234,7 +237,10 @@ func (c *apiClient) AddressUTXOsAll(ctx context.Context, address string) <-chan 
 			for j := range jobs {
 				autxo, err := c.AddressUTXOs(j.ctx, address, j.query)
 				if len(autxo) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AddressUTXOResult{Res: autxo, Err: err}
 				ch <- res
@@ -249,12 +255,12 @@ func (c *apiClient) AddressUTXOsAll(ctx context.Context, address string) <-chan 
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch

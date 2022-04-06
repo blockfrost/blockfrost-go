@@ -170,7 +170,7 @@ func (ip *ipfsClient) Add(ctx context.Context, filePath string) (ipo IPFSObject,
 func (ip *ipfsClient) PinnedObjectsAll(ctx context.Context) <-chan PinnedObjectResult {
 	ch := make(chan PinnedObjectResult, ip.routines)
 	jobs := make(chan methodOptions, ip.routines)
-	quit := make(chan bool, ip.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -181,7 +181,10 @@ func (ip *ipfsClient) PinnedObjectsAll(ctx context.Context) <-chan PinnedObjectR
 			for j := range jobs {
 				objs, err := ip.PinnedObjects(j.ctx, j.query)
 				if len(objs) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := PinnedObjectResult{Res: objs, Err: err}
 				ch <- res
@@ -196,12 +199,12 @@ func (ip *ipfsClient) PinnedObjectsAll(ctx context.Context) <-chan PinnedObjectR
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch

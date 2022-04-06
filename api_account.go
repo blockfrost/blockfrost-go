@@ -243,7 +243,7 @@ func (c *apiClient) AccountRewardsHistory(ctx context.Context, stakeAddress stri
 func (c *apiClient) AccountRewardsHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountRewardHisResult {
 	ch := make(chan AccountRewardHisResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -254,7 +254,10 @@ func (c *apiClient) AccountRewardsHistoryAll(ctx context.Context, stakeAddress s
 			for j := range jobs {
 				his, err := c.AccountRewardsHistory(j.ctx, stakeAddress, j.query)
 				if len(his) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AccountRewardHisResult{Res: his, Err: err}
 				ch <- res
@@ -269,12 +272,12 @@ func (c *apiClient) AccountRewardsHistoryAll(ctx context.Context, stakeAddress s
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -312,7 +315,7 @@ func (c *apiClient) AccountHistory(ctx context.Context, stakeAddress string, que
 func (c *apiClient) AccountHistoryAll(ctx context.Context, address string) <-chan AccountHistoryResult {
 	ch := make(chan AccountHistoryResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -323,7 +326,10 @@ func (c *apiClient) AccountHistoryAll(ctx context.Context, address string) <-cha
 			for j := range jobs {
 				his, err := c.AccountHistory(j.ctx, address, j.query)
 				if len(his) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AccountHistoryResult{Res: his, Err: err}
 				ch <- res
@@ -338,12 +344,12 @@ func (c *apiClient) AccountHistoryAll(ctx context.Context, address string) <-cha
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -381,7 +387,7 @@ func (c *apiClient) AccountDelegationHistory(ctx context.Context, stakeAddress s
 func (c *apiClient) AccountDelegationHistoryAll(ctx context.Context, stakeAddress string) <-chan AccDelegationHistoryResult {
 	ch := make(chan AccDelegationHistoryResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -392,7 +398,10 @@ func (c *apiClient) AccountDelegationHistoryAll(ctx context.Context, stakeAddres
 			for j := range jobs {
 				his, err := c.AccountDelegationHistory(j.ctx, stakeAddress, j.query)
 				if len(his) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AccDelegationHistoryResult{Res: his, Err: err}
 				ch <- res
@@ -407,12 +416,12 @@ func (c *apiClient) AccountDelegationHistoryAll(ctx context.Context, stakeAddres
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -450,7 +459,7 @@ func (c *apiClient) AccountRegistrationHistory(ctx context.Context, stakeAddress
 func (c *apiClient) AccountRegistrationHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountRegistrationHistoryResult {
 	ch := make(chan AccountRegistrationHistoryResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -461,7 +470,10 @@ func (c *apiClient) AccountRegistrationHistoryAll(ctx context.Context, stakeAddr
 			for j := range jobs {
 				his, err := c.AccountRegistrationHistory(j.ctx, stakeAddress, j.query)
 				if len(his) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AccountRegistrationHistoryResult{Res: his, Err: err}
 				ch <- res
@@ -476,12 +488,12 @@ func (c *apiClient) AccountRegistrationHistoryAll(ctx context.Context, stakeAddr
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -519,7 +531,7 @@ func (c *apiClient) AccountWithdrawalHistory(ctx context.Context, stakeAddress s
 func (c *apiClient) AccountWithdrawalHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountWithdrawalHistoryResult {
 	ch := make(chan AccountWithdrawalHistoryResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -530,7 +542,10 @@ func (c *apiClient) AccountWithdrawalHistoryAll(ctx context.Context, stakeAddres
 			for j := range jobs {
 				his, err := c.AccountWithdrawalHistory(j.ctx, stakeAddress, j.query)
 				if len(his) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AccountWithdrawalHistoryResult{Res: his, Err: err}
 				ch <- res
@@ -545,12 +560,12 @@ func (c *apiClient) AccountWithdrawalHistoryAll(ctx context.Context, stakeAddres
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -588,7 +603,7 @@ func (c *apiClient) AccountMIRHistory(ctx context.Context, stakeAddress string, 
 func (c *apiClient) AccountMIRHistoryAll(ctx context.Context, stakeAddress string) <-chan AccountMIRHistoryResult {
 	ch := make(chan AccountMIRHistoryResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -599,7 +614,10 @@ func (c *apiClient) AccountMIRHistoryAll(ctx context.Context, stakeAddress strin
 			for j := range jobs {
 				his, err := c.AccountMIRHistory(j.ctx, stakeAddress, j.query)
 				if len(his) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AccountMIRHistoryResult{Res: his, Err: err}
 				ch <- res
@@ -614,12 +632,12 @@ func (c *apiClient) AccountMIRHistoryAll(ctx context.Context, stakeAddress strin
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -656,7 +674,7 @@ func (c *apiClient) AccountAssociatedAddresses(ctx context.Context, stakeAddress
 func (c *apiClient) AccountAssociatedAddressesAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAddressesAll {
 	ch := make(chan AccountAssociatedAddressesAll, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -667,7 +685,10 @@ func (c *apiClient) AccountAssociatedAddressesAll(ctx context.Context, stakeAddr
 			for j := range jobs {
 				addrs, err := c.AccountAssociatedAddresses(j.ctx, stakeAddress, j.query)
 				if len(addrs) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AccountAssociatedAddressesAll{Res: addrs, Err: err}
 				ch <- res
@@ -682,12 +703,12 @@ func (c *apiClient) AccountAssociatedAddressesAll(ctx context.Context, stakeAddr
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -725,7 +746,7 @@ func (c *apiClient) AccountAssociatedAssets(ctx context.Context, stakeAddress st
 func (c *apiClient) AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll {
 	ch := make(chan AccountAssociatedAssetsAll, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -736,7 +757,10 @@ func (c *apiClient) AccountAssociatedAssetsAll(ctx context.Context, stakeAddress
 			for j := range jobs {
 				as, err := c.AccountAssociatedAssets(j.ctx, stakeAddress, j.query)
 				if len(as) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AccountAssociatedAssetsAll{Res: as, Err: err}
 				ch <- res
@@ -751,12 +775,12 @@ func (c *apiClient) AccountAssociatedAssetsAll(ctx context.Context, stakeAddress
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch

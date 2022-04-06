@@ -181,7 +181,7 @@ func (c *apiClient) Pools(ctx context.Context, query APIQueryParams) (ps Pools, 
 func (c *apiClient) PoolsAll(ctx context.Context) <-chan PoolsResult {
 	ch := make(chan PoolsResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -192,7 +192,10 @@ func (c *apiClient) PoolsAll(ctx context.Context) <-chan PoolsResult {
 			for j := range jobs {
 				pools, err := c.Pools(j.ctx, j.query)
 				if len(pools) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := PoolsResult{Res: pools, Err: err}
 				ch <- res
@@ -207,12 +210,12 @@ func (c *apiClient) PoolsAll(ctx context.Context) <-chan PoolsResult {
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -250,7 +253,7 @@ func (c *apiClient) PoolsRetired(ctx context.Context, query APIQueryParams) (prs
 func (c *apiClient) PoolsRetiredAll(ctx context.Context) <-chan PoolsRetiredResult {
 	ch := make(chan PoolsRetiredResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -261,7 +264,10 @@ func (c *apiClient) PoolsRetiredAll(ctx context.Context) <-chan PoolsRetiredResu
 			for j := range jobs {
 				pools, err := c.PoolsRetired(j.ctx, j.query)
 				if len(pools) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := PoolsRetiredResult{Res: pools, Err: err}
 				ch <- res
@@ -276,12 +282,12 @@ func (c *apiClient) PoolsRetiredAll(ctx context.Context) <-chan PoolsRetiredResu
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -320,7 +326,7 @@ func (c *apiClient) PoolsRetiring(ctx context.Context, query APIQueryParams) (pr
 func (c *apiClient) PoolsRetiringAll(ctx context.Context) <-chan PoolsRetiringResult {
 	ch := make(chan PoolsRetiringResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -331,7 +337,10 @@ func (c *apiClient) PoolsRetiringAll(ctx context.Context) <-chan PoolsRetiringRe
 			for j := range jobs {
 				pools, err := c.PoolsRetiring(j.ctx, j.query)
 				if len(pools) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := PoolsRetiringResult{Res: pools, Err: err}
 				ch <- res
@@ -346,12 +355,12 @@ func (c *apiClient) PoolsRetiringAll(ctx context.Context) <-chan PoolsRetiringRe
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -412,7 +421,7 @@ func (c *apiClient) PoolHistory(ctx context.Context, poolID string, query APIQue
 func (c *apiClient) PoolHistoryAll(ctx context.Context, poolId string) <-chan PoolHistoryResult {
 	ch := make(chan PoolHistoryResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -423,7 +432,10 @@ func (c *apiClient) PoolHistoryAll(ctx context.Context, poolId string) <-chan Po
 			for j := range jobs {
 				pools, err := c.PoolHistory(j.ctx, poolId, j.query)
 				if len(pools) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := PoolHistoryResult{Res: pools, Err: err}
 				ch <- res
@@ -438,12 +450,12 @@ func (c *apiClient) PoolHistoryAll(ctx context.Context, poolId string) <-chan Po
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -529,7 +541,7 @@ func (c *apiClient) PoolDelegators(ctx context.Context, poolID string, query API
 func (c *apiClient) PoolDelegatorsAll(ctx context.Context, poolId string) <-chan PoolDelegatorsResult {
 	ch := make(chan PoolDelegatorsResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -540,7 +552,10 @@ func (c *apiClient) PoolDelegatorsAll(ctx context.Context, poolId string) <-chan
 			for j := range jobs {
 				pools, err := c.PoolDelegators(j.ctx, poolId, j.query)
 				if len(pools) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := PoolDelegatorsResult{Res: pools, Err: err}
 				ch <- res
@@ -555,12 +570,12 @@ func (c *apiClient) PoolDelegatorsAll(ctx context.Context, poolId string) <-chan
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -598,7 +613,7 @@ func (c *apiClient) PoolBlocks(ctx context.Context, poolID string, query APIQuer
 func (c *apiClient) PoolBlocksAll(ctx context.Context, poolId string) <-chan PoolBlocksResult {
 	ch := make(chan PoolBlocksResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -609,7 +624,10 @@ func (c *apiClient) PoolBlocksAll(ctx context.Context, poolId string) <-chan Poo
 			for j := range jobs {
 				pools, err := c.PoolBlocks(j.ctx, poolId, j.query)
 				if len(pools) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := PoolBlocksResult{Res: pools, Err: err}
 				ch <- res
@@ -624,12 +642,12 @@ func (c *apiClient) PoolBlocksAll(ctx context.Context, poolId string) <-chan Poo
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -667,7 +685,7 @@ func (c *apiClient) PoolUpdates(ctx context.Context, poolID string, query APIQue
 func (c *apiClient) PoolUpdatesAll(ctx context.Context, poolId string) <-chan PoolUpdateResult {
 	ch := make(chan PoolUpdateResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -678,7 +696,10 @@ func (c *apiClient) PoolUpdatesAll(ctx context.Context, poolId string) <-chan Po
 			for j := range jobs {
 				pools, err := c.PoolUpdates(j.ctx, poolId, j.query)
 				if len(pools) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := PoolUpdateResult{Res: pools, Err: err}
 				ch <- res
@@ -693,12 +714,12 @@ func (c *apiClient) PoolUpdatesAll(ctx context.Context, poolId string) <-chan Po
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch

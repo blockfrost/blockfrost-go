@@ -90,7 +90,7 @@ func (c *apiClient) MetadataTxLabels(ctx context.Context, query APIQueryParams) 
 func (c *apiClient) MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLabelResult {
 	ch := make(chan MetadataTxLabelResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -101,7 +101,10 @@ func (c *apiClient) MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLa
 			for j := range jobs {
 				as, err := c.MetadataTxLabels(j.ctx, j.query)
 				if len(as) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := MetadataTxLabelResult{Res: as, Err: err}
 				ch <- res
@@ -116,12 +119,12 @@ func (c *apiClient) MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLa
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -160,7 +163,7 @@ func (c *apiClient) MetadataTxContentInJSON(ctx context.Context, label string, q
 func (c *apiClient) MetadataTxContentInJSONAll(ctx context.Context, label string) <-chan MetadataTxContentInJSONResult {
 	ch := make(chan MetadataTxContentInJSONResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -171,7 +174,10 @@ func (c *apiClient) MetadataTxContentInJSONAll(ctx context.Context, label string
 			for j := range jobs {
 				tc, err := c.MetadataTxContentInJSON(j.ctx, label, j.query)
 				if len(tc) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := MetadataTxContentInJSONResult{Res: tc, Err: err}
 				ch <- res
@@ -186,12 +192,12 @@ func (c *apiClient) MetadataTxContentInJSONAll(ctx context.Context, label string
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -230,7 +236,7 @@ func (c *apiClient) MetadataTxContentInCBOR(ctx context.Context, label string, q
 func (c *apiClient) MetadataTxContentInCBORAll(ctx context.Context, label string) <-chan MetadataTxContentInCBORResult {
 	ch := make(chan MetadataTxContentInCBORResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -241,7 +247,10 @@ func (c *apiClient) MetadataTxContentInCBORAll(ctx context.Context, label string
 			for j := range jobs {
 				tc, err := c.MetadataTxContentInCBOR(j.ctx, label, j.query)
 				if len(tc) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := MetadataTxContentInCBORResult{Res: tc, Err: err}
 				ch <- res
@@ -256,12 +265,12 @@ func (c *apiClient) MetadataTxContentInCBORAll(ctx context.Context, label string
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch

@@ -123,7 +123,7 @@ func (c *apiClient) Tickers(ctx context.Context, address string, query APIQueryP
 func (c *apiClient) TickersAll(ctx context.Context, address string) <-chan TickerResult {
 	ch := make(chan TickerResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -134,7 +134,10 @@ func (c *apiClient) TickersAll(ctx context.Context, address string) <-chan Ticke
 			for j := range jobs {
 				as, err := c.Tickers(j.ctx, address, j.query)
 				if len(as) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := TickerResult{Res: as, Err: err}
 				ch <- res
@@ -149,12 +152,12 @@ func (c *apiClient) TickersAll(ctx context.Context, address string) <-chan Ticke
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -192,7 +195,7 @@ func (c *apiClient) TickerRecords(ctx context.Context, ticker string, query APIQ
 func (c *apiClient) TickerRecordsAll(ctx context.Context, ticker string) <-chan TickerRecordResult {
 	ch := make(chan TickerRecordResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -203,7 +206,10 @@ func (c *apiClient) TickerRecordsAll(ctx context.Context, ticker string) <-chan 
 			for j := range jobs {
 				as, err := c.TickerRecords(j.ctx, ticker, j.query)
 				if len(as) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := TickerRecordResult{Res: as, Err: err}
 				ch <- res
@@ -218,12 +224,12 @@ func (c *apiClient) TickerRecordsAll(ctx context.Context, ticker string) <-chan 
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -259,7 +265,7 @@ func (c *apiClient) AddressTickerRecords(ctx context.Context, address string, ti
 func (c *apiClient) AddressTickerRecordsAll(ctx context.Context, address string, ticker string) <-chan TickerRecordResult {
 	ch := make(chan TickerRecordResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -270,7 +276,10 @@ func (c *apiClient) AddressTickerRecordsAll(ctx context.Context, address string,
 			for j := range jobs {
 				as, err := c.AddressTickerRecords(j.ctx, address, ticker, j.query)
 				if len(as) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := TickerRecordResult{Res: as, Err: err}
 				ch <- res
@@ -285,12 +294,12 @@ func (c *apiClient) AddressTickerRecordsAll(ctx context.Context, address string,
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
