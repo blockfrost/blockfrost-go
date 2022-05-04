@@ -104,11 +104,16 @@ type TransactionUTXOs struct {
 
 		// Hash of the UTXO transaction
 		TxHash string `json:"tx_hash"`
+
+		DataHash string `json:"data_hash"`
+		Collateral bool `json:"collateral"`
 	} `json:"inputs"`
 	Outputs []struct {
 		// Output address
 		Address string     `json:"address"`
 		Amount  []TxAmount `json:"amount"`
+		OutputIndex int `json:"output_index"`
+		DataHash string `json:"data_hash"`
 	} `json:"outputs"`
 }
 
