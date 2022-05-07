@@ -1,9 +1,11 @@
 package blockfrost
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 )
@@ -519,8 +521,10 @@ func (c *apiClient) TransactionSubmit(ctx context.Context, cbor []byte) (hash st
 		return
 	}
 	defer res.Body.Close()
-	if err = json.NewDecoder(res.Body).Decode(&hash); err != nil {
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
 		return
 	}
+	hash = string(bodyBytes)
 	return hash, nil
 }
