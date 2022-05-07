@@ -177,4 +177,5 @@ type APIClient interface {
 	TransactionPoolUpdates(ctx context.Context, hash string) ([]TransactionPoolCert, error)
 	TransactionPoolUpdateCerts(ctx context.Context, hash string) ([]TransactionPoolCert, error)
 	TransactionPoolRetirementCerts(ctx context.Context, hash string) ([]TransactionPoolCert, error)
+	TransactionSubmit(ctx context.Context, cbor []byte) (string, error)
 }
