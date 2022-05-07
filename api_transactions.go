@@ -503,3 +503,24 @@ func (c *apiClient) TransactionPoolRetirementCerts(ctx context.Context, hash str
 	}
 	return tcs, nil
 }
+
+func (c *apiClient) TransactionSubmit(ctx context.Context, cbor []byte) (hash string, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceTx, resourceTxSubmit))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl.String(), bytes.NewReader(cbor))
+	if err != nil {
+		return
+	}
+	req.Header.Add("Content-Type", "application/cbor")
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&hash); err != nil {
+		return
+	}
+	return hash, nil
+}
