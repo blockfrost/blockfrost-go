@@ -12,6 +12,7 @@ import (
 
 const (
 	resourceTxs           = "txs"
+	resourceTx            = "tx"
 	resourceTxStakes      = "stakes"
 	resourceTxUTXOs       = "utxos"
 	resourceTxWithdrawals = "withdrawals"
@@ -20,6 +21,7 @@ const (
 	resourceTxDelegations = "delegations"
 	resourceTxPoolUpdates = "pool_updates"
 	resourceTxPoolRetires = "pool_retires"
+	resourceTxSubmit      = "submit"
 )
 
 type TransactionContent struct {
