@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 )
@@ -523,10 +522,8 @@ func (c *apiClient) TransactionSubmit(ctx context.Context, cbor []byte) (hash st
 		return
 	}
 	defer res.Body.Close()
-	bodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
+	if err = json.NewDecoder(res.Body).Decode(&hash); err != nil {
 		return
 	}
-	hash = string(bodyBytes)
 	return hash, nil
 }
