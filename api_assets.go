@@ -130,7 +130,7 @@ func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset
 func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
 	ch := make(chan AssetResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -141,7 +141,10 @@ func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
 			for j := range jobs {
 				assets, err := c.Assets(j.ctx, j.query)
 				if len(assets) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := AssetResult{Res: assets, Err: err}
 				ch <- res
@@ -156,12 +159,12 @@ func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch

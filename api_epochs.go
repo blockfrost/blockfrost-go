@@ -233,7 +233,7 @@ func (c *apiClient) EpochsNext(ctx context.Context, epochNumber int, query APIQu
 func (c *apiClient) EpochNextAll(ctx context.Context, epochNumber int) <-chan EpochResult {
 	ch := make(chan EpochResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -244,7 +244,10 @@ func (c *apiClient) EpochNextAll(ctx context.Context, epochNumber int) <-chan Ep
 			for j := range jobs {
 				as, err := c.EpochsNext(j.ctx, epochNumber, j.query)
 				if len(as) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := EpochResult{Res: as, Err: err}
 				ch <- res
@@ -259,12 +262,12 @@ func (c *apiClient) EpochNextAll(ctx context.Context, epochNumber int) <-chan Ep
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -301,7 +304,7 @@ func (c *apiClient) EpochsPrevious(ctx context.Context, epochNumber int, query A
 func (c *apiClient) EpochPreviousAll(ctx context.Context, epochNumber int) <-chan EpochResult {
 	ch := make(chan EpochResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -312,7 +315,10 @@ func (c *apiClient) EpochPreviousAll(ctx context.Context, epochNumber int) <-cha
 			for j := range jobs {
 				as, err := c.EpochsPrevious(j.ctx, epochNumber, j.query)
 				if len(as) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := EpochResult{Res: as, Err: err}
 				ch <- res
@@ -327,12 +333,12 @@ func (c *apiClient) EpochPreviousAll(ctx context.Context, epochNumber int) <-cha
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -369,7 +375,7 @@ func (c *apiClient) EpochStakeDistribution(ctx context.Context, epochNumber int,
 func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber int) <-chan EpochStakeResult {
 	ch := make(chan EpochStakeResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -380,7 +386,10 @@ func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber i
 			for j := range jobs {
 				eps, err := c.EpochStakeDistribution(j.ctx, epochNumber, j.query)
 				if len(eps) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := EpochStakeResult{Res: eps, Err: err}
 				ch <- res
@@ -395,12 +404,12 @@ func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber i
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -437,7 +446,7 @@ func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumbe
 func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeResult {
 	ch := make(chan EpochStakeResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -448,7 +457,10 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 			for j := range jobs {
 				eps, err := c.EpochStakeDistributionByPool(j.ctx, epochNumber, poolId, j.query)
 				if len(eps) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := EpochStakeResult{Res: eps, Err: err}
 				ch <- res
@@ -463,12 +475,12 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -505,7 +517,7 @@ func (c *apiClient) EpochBlockDistribution(ctx context.Context, epochNumber int,
 func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber int) <-chan BlockDistributionResult {
 	ch := make(chan BlockDistributionResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -516,7 +528,10 @@ func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber i
 			for j := range jobs {
 				eps, err := c.EpochBlockDistribution(j.ctx, epochNumber, j.query)
 				if len(eps) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := BlockDistributionResult{Res: eps, Err: err}
 				ch <- res
@@ -531,12 +546,12 @@ func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber i
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -573,7 +588,7 @@ func (c *apiClient) EpochBlockDistributionByPool(ctx context.Context, epochNumbe
 func (c *apiClient) EpochBlockDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan BlockDistributionResult {
 	ch := make(chan BlockDistributionResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -584,7 +599,10 @@ func (c *apiClient) EpochBlockDistributionByPoolAll(ctx context.Context, epochNu
 			for j := range jobs {
 				eps, err := c.EpochBlockDistributionByPool(j.ctx, epochNumber, poolId, j.query)
 				if len(eps) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := BlockDistributionResult{Res: eps, Err: err}
 				ch <- res
@@ -599,12 +617,12 @@ func (c *apiClient) EpochBlockDistributionByPoolAll(ctx context.Context, epochNu
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch

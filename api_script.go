@@ -96,7 +96,7 @@ func (c *apiClient) Scripts(ctx context.Context, query APIQueryParams) (scripts 
 func (c *apiClient) ScriptsAll(ctx context.Context) <-chan ScriptAllResult {
 	ch := make(chan ScriptAllResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -107,7 +107,10 @@ func (c *apiClient) ScriptsAll(ctx context.Context) <-chan ScriptAllResult {
 			for j := range jobs {
 				sc, err := c.Scripts(j.ctx, j.query)
 				if len(sc) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := ScriptAllResult{Res: sc, Err: err}
 				ch <- res
@@ -122,12 +125,12 @@ func (c *apiClient) ScriptsAll(ctx context.Context) <-chan ScriptAllResult {
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
@@ -183,7 +186,7 @@ func (c *apiClient) ScriptRedeemers(ctx context.Context, address string, query A
 func (c *apiClient) ScriptRedeemersAll(ctx context.Context, address string) <-chan ScriptRedeemerResult {
 	ch := make(chan ScriptRedeemerResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
-	quit := make(chan bool, c.routines)
+	quit := make(chan bool, 1)
 
 	wg := sync.WaitGroup{}
 
@@ -194,7 +197,10 @@ func (c *apiClient) ScriptRedeemersAll(ctx context.Context, address string) <-ch
 			for j := range jobs {
 				sr, err := c.ScriptRedeemers(j.ctx, address, j.query)
 				if len(sr) != j.query.Count || err != nil {
-					quit <- true
+					select {
+					case quit <- true:
+					default:
+					}
 				}
 				res := ScriptRedeemerResult{Res: sr, Err: err}
 				ch <- res
@@ -209,12 +215,12 @@ func (c *apiClient) ScriptRedeemersAll(ctx context.Context, address string) <-ch
 			select {
 			case <-quit:
 				fetchScripts = false
-				return
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
 		}
 
+		close(jobs)
 		wg.Wait()
 	}()
 	return ch
