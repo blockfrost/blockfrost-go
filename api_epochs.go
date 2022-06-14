@@ -85,6 +85,9 @@ type EpochParameters struct {
 
 	// Maximum transaction size
 	MaxTxSize int `json:"max_tx_size"`
+	
+	// The maximum Val size
+	MaxValSize string `json:"max_val_size"`
 
 	// The linear factor for the minimum fee calculation for given epoch
 	MinFeeA int `json:"min_fee_a"`
@@ -118,6 +121,9 @@ type EpochParameters struct {
 
 	// Treasury expansion
 	Tau float32 `json:"tau"`
+	
+	// The cost per UTXO word
+	CoinsPerUtxOWord string `json:"coins_per_utxo_word"`
 }
 
 type EpochResult struct {
