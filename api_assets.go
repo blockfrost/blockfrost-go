@@ -85,6 +85,9 @@ type AssetTransaction struct {
 
 	// Block height
 	BlockHeight int `json:"block_height"`
+
+	// Block time
+	BlockTime int `json:"block_time"`
 }
 
 type AssetAddress struct {

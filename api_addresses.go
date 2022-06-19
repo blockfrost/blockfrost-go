@@ -56,6 +56,9 @@ type AddressTransactions struct {
 
 	// Block height
 	BlockHeight int `json:"block_height"`
+
+	// Block Time (Unix time)
+	BlockTime int `json:"block_time"`
 }
 
 type AddressUTXO struct {
