@@ -126,7 +126,8 @@ type APIClient interface {
 	AssetsAll(ctx context.Context) <-chan AssetResult
 	AssetHistory(ctx context.Context, asset string) ([]AssetHistory, error)
 	AssetTransactions(ctx context.Context, asset string) ([]AssetTransaction, error)
-	AssetAddresses(ctx context.Context, asset string) ([]AssetAddress, error)
+	AssetAddresses(ctx context.Context, asset string, query APIQueryParams) ([]AssetAddress, error)
+	AssetAddressesAll(ctx context.Context, asset string) <-chan AssetAddressesAll
 	AssetsByPolicy(ctx context.Context, policyId string) ([]Asset, error)
 	Genesis(ctx context.Context) (GenesisBlock, error)
 	MetadataTxLabels(ctx context.Context, query APIQueryParams) ([]MetadataTxLabel, error)

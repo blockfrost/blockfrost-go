@@ -103,6 +103,11 @@ type AssetResult struct {
 	Err error
 }
 
+type AssetAddressesAll struct {
+	Res []AssetAddress
+	Err error
+}
+
 // Assets returns a paginated list of assets.
 func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceAssets))
@@ -240,16 +245,20 @@ func (c *apiClient) AssetTransactions(ctx context.Context, asset string) (trs []
 	return trs, nil
 }
 
-// AssetAddresses returns list of a addresses containing a specific asset.
-func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []AssetAddress, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetHistory))
+func (c *apiClient) AssetAddresses(ctx context.Context, asset string, query APIQueryParams) (addrs []AssetAddress, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAddresses))
 	if err != nil {
 		return
 	}
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
 	if err != nil {
 		return
 	}
+
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 
 	res, err := c.handleRequest(req)
 	if err != nil {
@@ -261,6 +270,50 @@ func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []A
 		return
 	}
 	return addrs, nil
+}
+
+// AssetAddresses returns list of a addresses containing a specific asset.
+func (c *apiClient) AssetAddressesAll(ctx context.Context, asset string) <-chan AssetAddressesAll {
+	ch := make(chan AssetAddressesAll, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AssetAddressesAll, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				ad, err := c.AssetAddresses(j.ctx, asset, j.query)
+				if len(ad) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := AssetAddressesAll{Res: ad, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
 }
 
 // AssetsByPolicy returns list of assets minted under a specific policy.
