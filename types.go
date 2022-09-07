@@ -5,6 +5,8 @@ import "fmt"
 const (
 	CardanoMainNet = "https://cardano-mainnet.blockfrost.io/api/v0"
 	CardanoTestNet = "https://cardano-testnet.blockfrost.io/api/v0"
+	CardanoPreProd = "https://cardano-preprod.blockfrost.io/api/v0"
+	CardanoPreview = "https://cardano-preview.blockfrost.io/api/v0"
 	IPFSNet        = "https://ipfs.blockfrost.io/api/v0"
 )
 
