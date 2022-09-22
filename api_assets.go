@@ -242,7 +242,7 @@ func (c *apiClient) AssetTransactions(ctx context.Context, asset string) (trs []
 
 // AssetAddresses returns list of a addresses containing a specific asset.
 func (c *apiClient) AssetAddresses(ctx context.Context, asset string) (addrs []AssetAddress, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetAddresses))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetHistory))
 	if err != nil {
 		return
 	}
