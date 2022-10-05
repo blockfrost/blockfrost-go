@@ -104,6 +104,8 @@ type APIClient interface {
 	AddressTransactionsAll(ctx context.Context, address string) <-chan AddressTxResult
 	AddressUTXOs(ctx context.Context, address string, query APIQueryParams) ([]AddressUTXO, error)
 	AddressUTXOsAll(ctx context.Context, address string) <-chan AddressUTXOResult
+	AddressUTXOsAsset(ctx context.Context, address, asset string, query APIQueryParams) ([]AddressUTXO, error)
+	AddressUTXOsAssetAll(ctx context.Context, address, asset string) <-chan AddressUTXOResult
 	Account(ctx context.Context, stakeAddress string) (Account, error)
 	AccountHistory(ctx context.Context, stakeAddress string, query APIQueryParams) ([]AccountHistory, error)
 	AccountHistoryAll(ctx context.Context, address string) <-chan AccountHistoryResult

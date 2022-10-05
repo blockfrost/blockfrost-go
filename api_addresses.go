@@ -268,3 +268,73 @@ func (c *apiClient) AddressUTXOsAll(ctx context.Context, address string) <-chan 
 	}()
 	return ch
 }
+
+func (c *apiClient) AddressUTXOsAsset(ctx context.Context, address, asset string, query APIQueryParams) (utxos []AddressUTXO, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceAddresses, address, resourceUTXOs, asset))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	query.From = ""
+	query.To = ""
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&utxos); err != nil {
+		return
+	}
+	return utxos, nil
+}
+
+func (c *apiClient) AddressUTXOsAssetAll(ctx context.Context, address, asset string) <-chan AddressUTXOResult {
+	ch := make(chan AddressUTXOResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AddressUTXOResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				autxo, err := c.AddressUTXOsAsset(j.ctx, address, asset, j.query)
+				if len(autxo) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := AddressUTXOResult{Res: autxo, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
