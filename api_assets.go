@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 )
 
@@ -17,6 +18,7 @@ const (
 	resourcePolicyAssets      = "assets/policy"
 )
 
+// Note UnmarshalJSON function to convert image arrays to string (see CIP-25)
 type AssetOnchainMetadata struct {
 	Name  string `json:"name"`
 	Image string `json:"image"`
@@ -337,4 +339,32 @@ func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []As
 		return
 	}
 	return a, nil
+}
+
+// Add conversion of image arrays to strings (see CIP-25)
+func (w *AssetOnchainMetadata) UnmarshalJSON(data []byte) (err error) {
+
+	var ocmStr struct {
+		Name  string `json:"name"`
+		Image string `json:"image"`
+	}
+
+	if err = json.Unmarshal(data, &ocmStr); err == nil {
+		*w = AssetOnchainMetadata(ocmStr)
+		return nil
+	}
+
+	var ocmArr struct {
+		Name  string   `json:"name"`
+		Image []string `json:"image"`
+	}
+
+	if err = json.Unmarshal(data, &ocmArr); err == nil {
+		*w = AssetOnchainMetadata{
+			Name:  ocmArr.Name,
+			Image: strings.Join(ocmArr.Image, ""),
+		}
+	}
+
+	return err
 }
