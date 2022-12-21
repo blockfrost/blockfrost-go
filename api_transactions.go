@@ -33,6 +33,9 @@ type TransactionContent struct {
 	// Block number
 	BlockHeight int `json:"block_height"`
 
+	// Block creation time
+	BlockTime int `json:"block_time"`
+
 	// Count of the delegations within the transaction
 	DelegationCount int `json:"delegation_count"`
 
@@ -70,6 +73,9 @@ type TransactionContent struct {
 	// Count of the stake pool registration and update certificates within the transaction
 	PoolUpdateCount int `json:"pool_update_count"`
 
+	// Count of redeemers within the transaction
+	RedeemerCount int `json:"redeemer_count"`
+
 	// Size of the transaction in Bytes
 	Size int `json:"size"`
 
@@ -81,6 +87,9 @@ type TransactionContent struct {
 
 	// Count of UTXOs within the transaction
 	UtxoCount int `json:"utxo_count"`
+
+	// Script passed validation
+	ValidContract bool `json:"valid_contract"`
 
 	// Count of the withdrawals within the transaction
 	WithdrawalCount int `json:"withdrawal_count"`
@@ -108,15 +117,15 @@ type TransactionUTXOs struct {
 		// Hash of the UTXO transaction
 		TxHash string `json:"tx_hash"`
 
-		DataHash string `json:"data_hash"`
-		Collateral bool `json:"collateral"`
+		DataHash   string `json:"data_hash"`
+		Collateral bool   `json:"collateral"`
 	} `json:"inputs"`
 	Outputs []struct {
 		// Output address
-		Address string     `json:"address"`
-		Amount  []TxAmount `json:"amount"`
-		OutputIndex int `json:"output_index"`
-		DataHash string `json:"data_hash"`
+		Address     string     `json:"address"`
+		Amount      []TxAmount `json:"amount"`
+		OutputIndex int        `json:"output_index"`
+		DataHash    string     `json:"data_hash"`
 	} `json:"outputs"`
 }
 
