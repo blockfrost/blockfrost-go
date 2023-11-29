@@ -1,22 +1,22 @@
 [
   {
     "stake_address": "stake1uyq0yr438xvf533765w8s62eh5cmj33sed73cypt37l2m9ch78kup",
-    "pool_id": "",
     "amount": "2473962"
   },
   {
     "stake_address": "stake1uyzrq7fqfyk3nz3z7wtcxpehf9euz6x7u739pyvc25zm8ec30p6h6",
-    "pool_id": "",
     "amount": "602852649955"
   },
   {
     "stake_address": "stake1uyyvs6u6lqfc64xz6jztw8sqlv8p4fkpwzthhcjt8hfsvdc6z649m",
-    "pool_id": "",
     "amount": "10583216396"
   },
   {
     "stake_address": "stake1uy9ynpevcnv32efnh3v73cm2ap4ys3d4dc82yxm7ccntlzcrdza5z",
-    "pool_id": "",
     "amount": "782838060"
+  },
+  {
+    "stake_address": "stake1uy9xjxmldxflvxaz2znpkmgcq8z3svuq0v7tv6y3l4kja7clta3gj",
+    "amount": "100455621428"
   }
 ]
