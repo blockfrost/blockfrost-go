@@ -267,11 +267,11 @@ func (c *apiClient) AccountRewardsHistoryAll(ctx context.Context, stakeAddress s
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -339,11 +339,11 @@ func (c *apiClient) AccountHistoryAll(ctx context.Context, address string) <-cha
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -411,11 +411,11 @@ func (c *apiClient) AccountDelegationHistoryAll(ctx context.Context, stakeAddres
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -483,11 +483,11 @@ func (c *apiClient) AccountRegistrationHistoryAll(ctx context.Context, stakeAddr
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -555,11 +555,11 @@ func (c *apiClient) AccountWithdrawalHistoryAll(ctx context.Context, stakeAddres
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -627,11 +627,11 @@ func (c *apiClient) AccountMIRHistoryAll(ctx context.Context, stakeAddress strin
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -698,11 +698,11 @@ func (c *apiClient) AccountAssociatedAddressesAll(ctx context.Context, stakeAddr
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -770,11 +770,11 @@ func (c *apiClient) AccountAssociatedAssetsAll(ctx context.Context, stakeAddress
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}

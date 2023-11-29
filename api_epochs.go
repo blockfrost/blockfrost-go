@@ -272,11 +272,11 @@ func (c *apiClient) EpochNextAll(ctx context.Context, epochNumber int) <-chan Ep
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -343,11 +343,11 @@ func (c *apiClient) EpochPreviousAll(ctx context.Context, epochNumber int) <-cha
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -414,11 +414,11 @@ func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber i
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -485,11 +485,11 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -556,11 +556,11 @@ func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber i
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -627,11 +627,11 @@ func (c *apiClient) EpochBlockDistributionByPoolAll(ctx context.Context, epochNu
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
