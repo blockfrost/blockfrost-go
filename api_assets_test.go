@@ -46,7 +46,7 @@ func TestResourceAssetsIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
-	want := []blockfrost.Asset{}
+	want := []blockfrost.AssetByPolicy{}
 	testIntUtil(t, fp, &got, &want)
 }
 
@@ -112,7 +112,7 @@ func TestResourceAssetsByPolicyIntegration(t *testing.T) {
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
 
-	want := []blockfrost.Asset{}
+	want := []blockfrost.AssetByPolicy{}
 	testIntUtil(t, fp, &got, &want)
 }
 

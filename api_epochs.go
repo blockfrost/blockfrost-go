@@ -25,6 +25,11 @@ type EpochStake struct {
 	Amount       string `json:"amount"`
 }
 
+type EpochStakeByPool struct {
+	StakeAddress string `json:"stake_address"`
+	Amount       string `json:"amount"`
+}
+
 // Epoch contains information on an epoch.
 type Epoch struct {
 	// Sum of all the active stakes within the epoch in Lovelaces
@@ -85,7 +90,7 @@ type EpochParameters struct {
 
 	// Maximum transaction size
 	MaxTxSize int `json:"max_tx_size"`
-	
+
 	// The maximum Val size
 	MaxValSize string `json:"max_val_size"`
 
@@ -121,7 +126,7 @@ type EpochParameters struct {
 
 	// Treasury expansion
 	Tau float32 `json:"tau"`
-	
+
 	// The cost per UTXO word
 	CoinsPerUtxOWord string `json:"coins_per_utxo_word"`
 }
@@ -133,6 +138,10 @@ type EpochResult struct {
 
 type EpochStakeResult struct {
 	Res []EpochStake
+	Err error
+}
+type EpochStakeByPoolResult struct {
+	Res []EpochStakeByPool
 	Err error
 }
 
@@ -422,7 +431,7 @@ func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber i
 }
 
 // EpochStakeDistributionByPool returns the active stake distribution for the epoch specified by stake pool.
-func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) (eps []EpochStake, err error) {
+func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) (eps []EpochStakeByPool, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes, poolId))
 	if err != nil {
 		return
@@ -449,8 +458,8 @@ func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumbe
 
 // EpochStakeDistributionByPoolAll fetches all active stake distribution for the epoch specified by stake pool.
 // Returns a channel of type EpochStakeResult
-func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeResult {
-	ch := make(chan EpochStakeResult, c.routines)
+func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeByPoolResult {
+	ch := make(chan EpochStakeByPoolResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
 	quit := make(chan bool, 1)
 
@@ -458,7 +467,7 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 
 	for i := 0; i < c.routines; i++ {
 		wg.Add(1)
-		go func(jobs chan methodOptions, ch chan EpochStakeResult, wg *sync.WaitGroup) {
+		go func(jobs chan methodOptions, ch chan EpochStakeByPoolResult, wg *sync.WaitGroup) {
 			defer wg.Done()
 			for j := range jobs {
 				eps, err := c.EpochStakeDistributionByPool(j.ctx, epochNumber, poolId, j.query)
@@ -468,7 +477,7 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 					default:
 					}
 				}
-				res := EpochStakeResult{Res: eps, Err: err}
+				res := EpochStakeByPoolResult{Res: eps, Err: err}
 				ch <- res
 			}
 

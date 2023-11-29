@@ -34,7 +34,7 @@ type APIClientOptions struct {
 	MaxRoutines int
 }
 
-// NewAPICLient creates a client from APIClientOptions. If no options are provided,
+// NewAPIClient creates a client from APIClientOptions. If no options are provided,
 // client with default configurations is returned.
 func NewAPIClient(options APIClientOptions) APIClient {
 	if options.Server == "" {
@@ -86,8 +86,8 @@ type APIClient interface {
 	EpochPreviousAll(ctx context.Context, epochNumber int) <-chan EpochResult
 	EpochStakeDistribution(ctx context.Context, epochNumber int, query APIQueryParams) ([]EpochStake, error)
 	EpochStakeDistributionAll(ctx context.Context, epochNumber int) <-chan EpochStakeResult
-	EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) ([]EpochStake, error)
-	EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeResult
+	EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) ([]EpochStakeByPool, error)
+	EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeByPoolResult
 	EpochBlockDistribution(ctx context.Context, epochNumber int, query APIQueryParams) ([]string, error)
 	EpochBlockDistributionAll(ctx context.Context, epochNumber int) <-chan BlockDistributionResult
 	EpochBlockDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) ([]string, error)
@@ -117,13 +117,13 @@ type APIClient interface {
 	AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIQueryParams) ([]AccountAssociatedAsset, error)
 	AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll
 	Asset(ctx context.Context, asset string) (Asset, error)
-	Assets(ctx context.Context, query APIQueryParams) ([]Asset, error)
-	AssetsAll(ctx context.Context) <-chan AssetResult
+	Assets(ctx context.Context, query APIQueryParams) ([]AssetByPolicy, error)
+	AssetsAll(ctx context.Context) <-chan AssetByPolicyResult
 	AssetHistory(ctx context.Context, asset string) ([]AssetHistory, error)
 	AssetTransactions(ctx context.Context, asset string) ([]AssetTransaction, error)
 	AssetAddresses(ctx context.Context, asset string, query APIQueryParams) ([]AssetAddress, error)
 	AssetAddressesAll(ctx context.Context, asset string) <-chan AssetAddressesAll
-	AssetsByPolicy(ctx context.Context, policyId string) ([]Asset, error)
+	AssetsByPolicy(ctx context.Context, policyId string) ([]AssetByPolicy, error)
 	Genesis(ctx context.Context) (GenesisBlock, error)
 	MetadataTxLabels(ctx context.Context, query APIQueryParams) ([]MetadataTxLabel, error)
 	MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLabelResult

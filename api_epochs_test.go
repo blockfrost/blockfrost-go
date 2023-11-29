@@ -92,7 +92,7 @@ func TestEpochStakeDistributionByPoolIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []blockfrost.EpochStake{}
+	want := []blockfrost.EpochStakeByPool{}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
 	testIntUtil(t, fp, &got, &want)
 }

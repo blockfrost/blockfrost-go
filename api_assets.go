@@ -61,6 +61,15 @@ type Asset struct {
 	Metadata        AssetMetadata        `json:"metadata"`
 }
 
+// Assets minted under a specific policy.
+type AssetByPolicy struct {
+	// Hex-encoded asset full name
+	Asset string `json:"asset"`
+
+	// Current asset quantity
+	Quantity string `json:"quantity"`
+}
+
 // AssetHistory contains history of an asset.
 type AssetHistory struct {
 	// Hash of the transaction containing the asset actio
@@ -102,6 +111,10 @@ type AssetResult struct {
 	Res []Asset
 	Err error
 }
+type AssetByPolicyResult struct {
+	Res []AssetByPolicy
+	Err error
+}
 
 type AssetAddressesAll struct {
 	Res []AssetAddress
@@ -109,7 +122,7 @@ type AssetAddressesAll struct {
 }
 
 // Assets returns a paginated list of assets.
-func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset, err error) {
+func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []AssetByPolicy, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceAssets))
 	if err != nil {
 		return
@@ -135,8 +148,8 @@ func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset
 }
 
 // AssetsAll returns all assets.
-func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
-	ch := make(chan AssetResult, c.routines)
+func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetByPolicyResult {
+	ch := make(chan AssetByPolicyResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
 	quit := make(chan bool, 1)
 
@@ -144,7 +157,7 @@ func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
 
 	for i := 0; i < c.routines; i++ {
 		wg.Add(1)
-		go func(jobs chan methodOptions, ch chan AssetResult, wg *sync.WaitGroup) {
+		go func(jobs chan methodOptions, ch chan AssetByPolicyResult, wg *sync.WaitGroup) {
 			defer wg.Done()
 			for j := range jobs {
 				assets, err := c.Assets(j.ctx, j.query)
@@ -154,7 +167,7 @@ func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
 					default:
 					}
 				}
-				res := AssetResult{Res: assets, Err: err}
+				res := AssetByPolicyResult{Res: assets, Err: err}
 				ch <- res
 			}
 
@@ -317,7 +330,7 @@ func (c *apiClient) AssetAddressesAll(ctx context.Context, asset string) <-chan 
 }
 
 // AssetsByPolicy returns list of assets minted under a specific policy.
-func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []Asset, err error) {
+func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []AssetByPolicy, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourcePolicyAssets, policyId))
 	if err != nil {
 		return
