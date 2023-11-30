@@ -125,6 +125,11 @@ type APIClient interface {
 	AssetAddressesAll(ctx context.Context, asset string) <-chan AssetAddressesAll
 	AssetsByPolicy(ctx context.Context, policyId string) ([]AssetByPolicy, error)
 	Genesis(ctx context.Context) (GenesisBlock, error)
+	Mempool(ctx context.Context, query APIQueryParams) ([]Mempool, error)
+	MempoolAll(ctx context.Context) <-chan MempoolResult
+	MempoolTx(ctx context.Context, hash string) (MempoolTransactionContent, error)
+	MempoolByAddress(ctx context.Context, address string, query APIQueryParams) ([]Mempool, error)
+	MempoolByAddressAll(ctx context.Context, address string) <-chan MempoolResult
 	MetadataTxLabels(ctx context.Context, query APIQueryParams) ([]MetadataTxLabel, error)
 	MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLabelResult
 	MetadataTxContentInJSON(ctx context.Context, label string, query APIQueryParams) ([]MetadataTxContentInJSON, error)
