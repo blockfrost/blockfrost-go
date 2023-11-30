@@ -107,25 +107,23 @@ type TransactionUTXOs struct {
 	// Transaction hash
 	Hash   string `json:"hash"`
 	Inputs []struct {
-		// Input address
-		Address string     `json:"address"`
-		Amount  []TxAmount `json:"amount"`
-
-		// UTXO index in the transaction
-		OutputIndex float32 `json:"output_index"`
-
-		// Hash of the UTXO transaction
-		TxHash string `json:"tx_hash"`
-
-		DataHash   string `json:"data_hash"`
-		Collateral bool   `json:"collateral"`
+		Address             string     `json:"address"`
+		Amount              []TxAmount `json:"amount"`
+		OutputIndex         float32    `json:"output_index"`
+		TxHash              string     `json:"tx_hash"`
+		DataHash            string     `json:"data_hash"`
+		Collateral          bool       `json:"collateral"`
+		InlineDatum         string     `json:"inline_datum"`
+		ReferenceScriptHash string     `json:"reference_script_hash"`
+		Reference           bool       `json:"reference"`
 	} `json:"inputs"`
 	Outputs []struct {
-		// Output address
-		Address     string     `json:"address"`
-		Amount      []TxAmount `json:"amount"`
-		OutputIndex int        `json:"output_index"`
-		DataHash    string     `json:"data_hash"`
+		Address             string     `json:"address"`
+		Amount              []TxAmount `json:"amount"`
+		OutputIndex         int        `json:"output_index"`
+		DataHash            string     `json:"data_hash"`
+		InlineDatum         string     `json:"inline_datum"`
+		ReferenceScriptHash string     `json:"reference_script_hash"`
 	} `json:"outputs"`
 }
 
