@@ -152,3 +152,24 @@ func TestAddressUTXOs(t *testing.T) {
 	var want []blockfrost.AddressUTXO
 	testIntUtil(t, fp, &got, &want)
 }
+
+func TestAddressUTXOsAsset(t *testing.T) {
+	addr := "addr1q8zsjx7vxkl4esfejafhxthyew8c54c9ch95gkv3nz37sxrc9ty742qncmffaesxqarvqjmxmy36d9aht2duhmhvekgq3jd3w2"
+	asset := "d436d9f6b754582f798fe33f4bed12133d47493f78b944b9cc55fd1853756d6d69744c6f64676534393539"
+
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
+	got, err := api.AddressUTXOsAsset(
+		context.TODO(),
+		addr,
+		asset,
+		blockfrost.APIQueryParams{},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	var want []blockfrost.AddressUTXO
+	testIntUtil(t, fp, &got, &want)
+}

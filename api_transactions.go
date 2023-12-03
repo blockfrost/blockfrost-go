@@ -576,34 +576,6 @@ func (c *apiClient) TransactionSubmit(ctx context.Context, cbor []byte) (hash st
 	return hash, nil
 }
 
-// func readSubmitTx(data []byte) error {
-// 	value, dataType, _, err := jsonparser.Get(data, "result", "SubmitFail")
-// 	if err != nil {
-// 		if errors.Is(err, jsonparser.KeyPathNotFoundError) {
-// 			return nil
-// 		}
-// 		return fmt.Errorf("failed to parse SubmitTx response: %w", err)
-// 	}
-
-// 	switch dataType {
-// 	case jsonparser.Array:
-// 		var messages []json.RawMessage
-// 		if err := json.Unmarshal(value, &messages); err != nil {
-// 			return fmt.Errorf("failed to parse SubmitTx response: array: %w", err)
-// 		}
-// 		if len(messages) == 0 {
-// 			return nil
-// 		}
-// 		return SubmitTxError{messages: messages}
-
-// 	case jsonparser.Object:
-// 		return SubmitTxError{messages: []json.RawMessage{value}}
-
-// 	default:
-// 		return fmt.Errorf("SubmitTx failed: %v", string(value))
-// 	}
-// }
-
 func (c *apiClient) TransactionEvaluate(ctx context.Context, cbor []byte) (jsonResponse OgmiosResponse, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceTxEvaluate))
 
