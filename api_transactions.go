@@ -10,17 +10,19 @@ import (
 )
 
 const (
-	resourceTxs           = "txs"
-	resourceTx            = "tx"
-	resourceTxStakes      = "stakes"
-	resourceTxUTXOs       = "utxos"
-	resourceTxWithdrawals = "withdrawals"
-	resourceTxMetadata    = "metadata"
-	resourceCbor          = "cbor"
-	resourceTxDelegations = "delegations"
-	resourceTxPoolUpdates = "pool_updates"
-	resourceTxPoolRetires = "pool_retires"
-	resourceTxSubmit      = "submit"
+	resourceTxs             = "txs"
+	resourceTx              = "tx"
+	resourceTxStakes        = "stakes"
+	resourceTxUTXOs         = "utxos"
+	resourceTxWithdrawals   = "withdrawals"
+	resourceTxMetadata      = "metadata"
+	resourceCbor            = "cbor"
+	resourceTxDelegations   = "delegations"
+	resourceTxPoolUpdates   = "pool_updates"
+	resourceTxPoolRetires   = "pool_retires"
+	resourceTxSubmit        = "submit"
+	resourceTxEvaluate      = "utils/txs/evaluate"
+	resourceTxEvaluateUtxos = "utils/txs/evaluate/utxos"
 )
 
 type TransactionContent struct {
@@ -272,6 +274,45 @@ type TransactionRedeemer struct {
 	UnitMem   string `json:"unit_mem"`
 	UnitSteps string `json:"unit_steps"`
 	Fee       string `json:"fee"`
+}
+
+type Quantity string
+
+type Value struct {
+	Coins  Quantity            `json:"coins"`
+	Assets map[string]Quantity `json:"assets,omitempty"`
+}
+
+type TxOutScript interface{} // This is an interface, actual implementation depends on usage
+
+type TxIn struct {
+	TxID  string `json:"txId"`
+	Index int    `json:"index"`
+}
+
+type TxOut struct {
+	Address   string       `json:"address"`
+	Value     Value        `json:"value"`
+	DatumHash *string      `json:"datumHash,omitempty"` // Pointer to handle null
+	Datum     interface{}  `json:"datum,omitempty"`     // Could be various types
+	Script    *TxOutScript `json:"script,omitempty"`    // Pointer to handle null
+}
+
+// AdditionalUtxoSet represents a slice of tuples (TxIn, TxOut)
+type AdditionalUtxoSet []struct {
+	TxIn  TxIn  `json:"txIn"`
+	TxOut TxOut `json:"txOut"`
+}
+
+type OgmiosResponse struct {
+	Type        string `json:"type"`
+	Version     string `json:"version"`
+	ServiceName string `json:"servicename"`
+	MethodName  string `json:"methodname"`
+	Reflection  struct {
+		Id string `json:"id"`
+	} `json:"reflection"`
+	Result json.RawMessage `json:"result"`
 }
 
 func (c *apiClient) Transaction(ctx context.Context, hash string) (tc TransactionContent, err error) {
@@ -533,4 +574,98 @@ func (c *apiClient) TransactionSubmit(ctx context.Context, cbor []byte) (hash st
 		return
 	}
 	return hash, nil
+}
+
+// func readSubmitTx(data []byte) error {
+// 	value, dataType, _, err := jsonparser.Get(data, "result", "SubmitFail")
+// 	if err != nil {
+// 		if errors.Is(err, jsonparser.KeyPathNotFoundError) {
+// 			return nil
+// 		}
+// 		return fmt.Errorf("failed to parse SubmitTx response: %w", err)
+// 	}
+
+// 	switch dataType {
+// 	case jsonparser.Array:
+// 		var messages []json.RawMessage
+// 		if err := json.Unmarshal(value, &messages); err != nil {
+// 			return fmt.Errorf("failed to parse SubmitTx response: array: %w", err)
+// 		}
+// 		if len(messages) == 0 {
+// 			return nil
+// 		}
+// 		return SubmitTxError{messages: messages}
+
+// 	case jsonparser.Object:
+// 		return SubmitTxError{messages: []json.RawMessage{value}}
+
+// 	default:
+// 		return fmt.Errorf("SubmitTx failed: %v", string(value))
+// 	}
+// }
+
+func (c *apiClient) TransactionEvaluate(ctx context.Context, cbor []byte) (jsonResponse OgmiosResponse, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceTxEvaluate))
+
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl.String(), bytes.NewReader(cbor))
+	if err != nil {
+		return
+	}
+	req.Header.Add("Content-Type", "application/cbor")
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&jsonResponse); err != nil {
+		return
+	}
+	return jsonResponse, nil
+}
+
+func (c *apiClient) TransactionEvaluateUTXOs(ctx context.Context, cbor []byte, additionalUtxoSet AdditionalUtxoSet) (jsonResponse OgmiosResponse, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceTxEvaluateUtxos))
+	if err != nil {
+		return
+	}
+
+	// Convert addition utxo set from custom go data type (array of struct with TxIn, TxOut properties) to
+	// format required by the API endpoint ([[TxIn, TxOut], ...])
+	convertedAdditionalUtxoSet := make([][]interface{}, len(additionalUtxoSet))
+	for i, utxo := range additionalUtxoSet {
+		convertedAdditionalUtxoSet[i] = []interface{}{utxo.TxIn, utxo.TxOut}
+	}
+
+	payload := struct {
+		Cbor              string          `json:"cbor"`
+		AdditionalUtxoSet [][]interface{} `json:"additionalUtxoSet"`
+	}{
+		Cbor:              string(cbor),
+		AdditionalUtxoSet: convertedAdditionalUtxoSet,
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl.String(), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return
+	}
+	req.Header.Add("Content-Type", "application/json")
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&jsonResponse); err != nil {
+		return
+	}
+
+	return jsonResponse, nil
 }

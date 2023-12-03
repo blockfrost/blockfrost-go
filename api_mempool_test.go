@@ -83,8 +83,6 @@ func TestMempoolIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Logf("Got response: %+v", got)
-
 	var want []blockfrost.Mempool
 	if reflect.TypeOf(got) != reflect.TypeOf(want) {
 		t.Fatalf("Expected type []blockfrost.Mempool, got type %T", got)
