@@ -50,7 +50,7 @@ type Block struct {
 	PreviousBlock string `json:"previous_block"`
 
 	// Hash of the next block
-	NextBlock string `json:"next_block"`
+	NextBlock *string `json:"next_block"`
 
 	// Number of block confirmations
 	Confirmations int `json:"confirmations"`

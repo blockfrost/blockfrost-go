@@ -105,28 +105,31 @@ type TxAmount struct {
 	Unit string `json:"unit"`
 }
 
+type TransactionInput struct {
+	Address             string     `json:"address"`
+	Amount              []TxAmount `json:"amount"`
+	OutputIndex         float32    `json:"output_index"`
+	TxHash              string     `json:"tx_hash"`
+	DataHash            string     `json:"data_hash"`
+	Collateral          bool       `json:"collateral"`
+	InlineDatum         string     `json:"inline_datum"`
+	ReferenceScriptHash string     `json:"reference_script_hash"`
+	Reference           bool       `json:"reference"`
+}
+
+type TransactionOutput struct {
+	Address             string     `json:"address"`
+	Amount              []TxAmount `json:"amount"`
+	OutputIndex         int        `json:"output_index"`
+	DataHash            string     `json:"data_hash"`
+	InlineDatum         string     `json:"inline_datum"`
+	ReferenceScriptHash string     `json:"reference_script_hash"`
+}
 type TransactionUTXOs struct {
 	// Transaction hash
-	Hash   string `json:"hash"`
-	Inputs []struct {
-		Address             string     `json:"address"`
-		Amount              []TxAmount `json:"amount"`
-		OutputIndex         float32    `json:"output_index"`
-		TxHash              string     `json:"tx_hash"`
-		DataHash            string     `json:"data_hash"`
-		Collateral          bool       `json:"collateral"`
-		InlineDatum         string     `json:"inline_datum"`
-		ReferenceScriptHash string     `json:"reference_script_hash"`
-		Reference           bool       `json:"reference"`
-	} `json:"inputs"`
-	Outputs []struct {
-		Address             string     `json:"address"`
-		Amount              []TxAmount `json:"amount"`
-		OutputIndex         int        `json:"output_index"`
-		DataHash            string     `json:"data_hash"`
-		InlineDatum         string     `json:"inline_datum"`
-		ReferenceScriptHash string     `json:"reference_script_hash"`
-	} `json:"outputs"`
+	Hash    string              `json:"hash"`
+	Inputs  []TransactionInput  `json:"inputs"`
+	Outputs []TransactionOutput `json:"outputs"`
 }
 
 type TransactionStakeAddressCert struct {
@@ -285,12 +288,12 @@ type Value struct {
 
 type TxOutScript interface{} // This is an interface, actual implementation depends on usage
 
-type TxIn struct {
+type AdditionalUtxoSetTxIn struct {
 	TxID  string `json:"txId"`
 	Index int    `json:"index"`
 }
 
-type TxOut struct {
+type AdditionalUtxoSetTxOut struct {
 	Address   string       `json:"address"`
 	Value     Value        `json:"value"`
 	DatumHash *string      `json:"datumHash,omitempty"` // Pointer to handle null
@@ -300,8 +303,8 @@ type TxOut struct {
 
 // AdditionalUtxoSet represents a slice of tuples (TxIn, TxOut)
 type AdditionalUtxoSet []struct {
-	TxIn  TxIn  `json:"txIn"`
-	TxOut TxOut `json:"txOut"`
+	TxIn  AdditionalUtxoSetTxIn  `json:"txIn"`
+	TxOut AdditionalUtxoSetTxOut `json:"txOut"`
 }
 
 type OgmiosResponse struct {

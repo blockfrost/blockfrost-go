@@ -276,11 +276,11 @@ func TestTransactionEvaluateUTXOsIntegration(t *testing.T) {
 
 	additionalUtxoSet := blockfrost.AdditionalUtxoSet{
 		{
-			TxIn: blockfrost.TxIn{
+			TxIn: blockfrost.AdditionalUtxoSetTxIn{
 				TxID:  "ec6eb047f74e5412c116a819cdd43f1c27a29f2871241453019637b850461b43",
 				Index: 0,
 			},
-			TxOut: blockfrost.TxOut{
+			TxOut: blockfrost.AdditionalUtxoSetTxOut{
 				Address: "addr1qxvduldkktan65x4dg5gkfaaehc798pjg755yckuk5tjcedre5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qgcyhcc",
 				Value: blockfrost.Value{
 					Coins: "1300000000",

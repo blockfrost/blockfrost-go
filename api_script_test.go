@@ -3,7 +3,7 @@ package blockfrost_test
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -25,7 +25,7 @@ func TestScriptUnmarshal(t *testing.T) {
 }
 
 func testStructGotWant(t *testing.T, fp string, got interface{}, want interface{}) {
-	bytes, err := ioutil.ReadFile(fp)
+	bytes, err := os.ReadFile(fp)
 	if err != nil {
 		t.Fatalf("failed to open json test file %s with err %v", fp, err)
 	}

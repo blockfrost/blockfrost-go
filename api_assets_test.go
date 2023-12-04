@@ -136,6 +136,13 @@ func testIntUtil(t *testing.T, fp string, got interface{}, want interface{}, opt
 	}
 
 	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
+		gotJSON, err := json.Marshal(got)
+		wantJSON, err := json.Marshal(want)
+		if err != nil {
+			t.Fatalf("\nexpected %v \ngot %v", want, got)
+		}
+
+		t.Fatalf("\nexpected %s \ngot %s", string(wantJSON), string(gotJSON))
+
 	}
 }
