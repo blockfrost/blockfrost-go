@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
 )
@@ -33,14 +32,10 @@ type APIClientOptions struct {
 
 	// Max number of routines to use for *All methods
 	MaxRoutines int
-
-	RetryWaitMin time.Duration // Minimum time to wait
-	RetryWaitMax time.Duration // Maximum time to wait
-	RetryMax     int           // Maximum number of retries
 }
 
 // NewAPICLient creates a client from APIClientOptions. If no options are provided,
-//  client with default configurations is returned.
+// client with default configurations is returned.
 func NewAPIClient(options APIClientOptions) APIClient {
 	if options.Server == "" {
 		options.Server = CardanoMainNet
