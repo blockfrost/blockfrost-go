@@ -33,7 +33,7 @@ type EpochStakeByPool struct {
 // Epoch contains information on an epoch.
 type Epoch struct {
 	// Sum of all the active stakes within the epoch in Lovelaces
-	ActiveStake string `json:"active_stake"`
+	ActiveStake *string `json:"active_stake"`
 
 	// Number of blocks within the epoch
 	BlockCount int `json:"block_count"`
@@ -92,7 +92,7 @@ type EpochParameters struct {
 	MaxTxSize int `json:"max_tx_size"`
 
 	// The maximum Val size
-	MaxValSize string `json:"max_val_size"`
+	MaxValSize *string `json:"max_val_size	"`
 
 	// The linear factor for the minimum fee calculation for given epoch
 	MinFeeA int `json:"min_fee_a"`
@@ -127,8 +127,39 @@ type EpochParameters struct {
 	// Treasury expansion
 	Tau float32 `json:"tau"`
 
-	// The cost per UTXO word
+	// Cost per UTxO word for Alonzo. Cost per UTxO byte for Babbage and later.
+	// Deprecated: Use CoinsPerUTxOSize instead
 	CoinsPerUtxOWord string `json:"coins_per_utxo_word"`
+
+	// Cost models parameters for Plutus Core scripts
+	CostModels *interface{} `json:"cost_models"`
+
+	// The per word cost of script memory usage
+	PriceMem *float32 `json:"price_mem"`
+
+	// The cost of script execution step usage
+	PriceStep *float32 `json:"price_step"`
+
+	// The maximum number of execution memory allowed to be used in a single transaction
+	MaxTxExMem *string `json:"max_tx_ex_mem"`
+
+	// The maximum number of execution steps allowed to be used in a single transaction
+	MaxTxExSteps *string `json:"max_tx_ex_steps"`
+
+	// The maximum number of execution memory allowed to be used in a single block
+	MaxBlockExMem *string `json:"max_block_ex_mem"`
+
+	// The maximum number of execution steps allowed to be used in a single block
+	MaxBlockExSteps *string `json:"max_block_ex_steps"`
+
+	// The percentage of the transactions fee which must be provided as collateral when including non-native scripts
+	CollateralPercent *int `json:"collateral_percent"`
+
+	// The maximum number of collateral inputs allowed in a transaction
+	MaxCollateralInputs *int `json:"max_collateral_inputs"`
+
+	// Cost per UTxO word for Alonzo. Cost per UTxO byte for Babbage and later.
+	CoinsPerUTxOSize *string `json:"coins_per_utxo_size"`
 }
 
 type EpochResult struct {

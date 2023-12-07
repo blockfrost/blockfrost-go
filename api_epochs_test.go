@@ -125,7 +125,7 @@ func TestEpochBlockDistributionByPoolIntegration(t *testing.T) {
 func TestEpochParametersIntegration(t *testing.T) {
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
-	got, err := api.EpochParameters(context.TODO(), 225)
+	got, err := api.EpochParameters(context.TODO(), 453)
 	if err != nil {
 		t.Fatal(err)
 	}
