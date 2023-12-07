@@ -55,10 +55,15 @@ type Asset struct {
 	// Count of mint and burn transactions
 	MintOrBurnCount int `json:"mint_or_burn_count"`
 
-	// On-chain metadata stored in the minting transaction under label 721,
-	// community discussion around the standard ongoing at https://github.com/cardano-foundation/CIPs/pull/85
-	OnchainMetadata AssetOnchainMetadata `json:"onchain_metadata"`
-	Metadata        AssetMetadata        `json:"metadata"`
+	// On-chain metadata which SHOULD adhere to the valid standards, based on which we perform the look up and display the asset (best effort)
+	OnchainMetadata *AssetOnchainMetadata `json:"onchain_metadata"`
+	// Enum: "CIP25v1" "CIP25v2" "CIP68v1"
+	// If on-chain metadata passes validation, we display the standard under which it is valid
+	OnchainMetadataStandard *string `json:"onchain_metadata_standard"`
+	// Arbitrary plutus data (CIP68).
+	OnchainMetadataExtra *string `json:"onchain_metadata_extra"`
+	// Off-chain metadata fetched from GitHub based on network.
+	Metadata *AssetMetadata `json:"metadata"`
 }
 
 // Assets minted under a specific policy.

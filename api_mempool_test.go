@@ -20,6 +20,7 @@ func TestMempoolUnmarshal(t *testing.T) {
 }
 
 func TestMempoolTransactionContentUnmarshal(t *testing.T) {
+	invalidHereafter := "109798439"
 	want := blockfrost.MempoolTransactionContent{
 		Tx: blockfrost.MempoolTransaction{
 			Hash: "1f96d3824eb2aeeb0b09b99748bb70ac681e0cae6e37e01c43958b79ca69c986",
@@ -37,8 +38,8 @@ func TestMempoolTransactionContentUnmarshal(t *testing.T) {
 			Fees:             "369133",
 			Deposit:          "0",
 			Size:             4683,
-			InvalidBefore:    "",
-			InvalidHereafter: "109798439",
+			InvalidBefore:    nil,
+			InvalidHereafter: &invalidHereafter,
 			UtxoCount:        2,
 			ValidContract:    true,
 		},
@@ -59,13 +60,10 @@ func TestMempoolTransactionContentUnmarshal(t *testing.T) {
 					Unit:     "6787a47e9f73efe4002d763337140da27afa8eb9a39413d2c39d4286524144546f6b656e73",
 					Quantity: "15000",
 				}},
-				OutputIndex: 0,
-				// DataHash:            nil,
-				// InlineDatum:         nil,
-				// ReferenceScriptHash: nil,
-				DataHash:            "",
-				InlineDatum:         "",
-				ReferenceScriptHash: "",
+				OutputIndex:         0,
+				DataHash:            nil,
+				InlineDatum:         nil,
+				ReferenceScriptHash: nil,
 				Collateral:          false,
 			}},
 		Redeemers: nil,

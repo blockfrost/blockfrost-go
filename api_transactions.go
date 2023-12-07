@@ -16,6 +16,7 @@ const (
 	resourceTxUTXOs         = "utxos"
 	resourceTxWithdrawals   = "withdrawals"
 	resourceTxMetadata      = "metadata"
+	resourceTxRedeemers     = "redeemers"
 	resourceCbor            = "cbor"
 	resourceTxDelegations   = "delegations"
 	resourceTxPoolUpdates   = "pool_updates"
@@ -54,10 +55,10 @@ type TransactionContent struct {
 	Index int `json:"index"`
 
 	// Left (included) endpoint of the timelock validity intervals
-	InvalidBefore string `json:"invalid_before"`
+	InvalidBefore *string `json:"invalid_before"`
 
 	// Right (excluded) endpoint of the timelock validity intervals
-	InvalidHereafter string `json:"invalid_hereafter"`
+	InvalidHereafter *string `json:"invalid_hereafter"`
 
 	// Count of the MIR certificates within the transaction
 	MirCertCount int `json:"mir_cert_count"`
@@ -110,20 +111,20 @@ type TransactionInput struct {
 	Amount              []TxAmount `json:"amount"`
 	OutputIndex         float32    `json:"output_index"`
 	TxHash              string     `json:"tx_hash"`
-	DataHash            string     `json:"data_hash"`
+	DataHash            *string    `json:"data_hash"`
 	Collateral          bool       `json:"collateral"`
-	InlineDatum         string     `json:"inline_datum"`
-	ReferenceScriptHash string     `json:"reference_script_hash"`
-	Reference           bool       `json:"reference"`
+	InlineDatum         *string    `json:"inline_datum"`
+	ReferenceScriptHash *string    `json:"reference_script_hash"`
+	Reference           *bool      `json:"reference"`
 }
 
 type TransactionOutput struct {
 	Address             string     `json:"address"`
 	Amount              []TxAmount `json:"amount"`
 	OutputIndex         int        `json:"output_index"`
-	DataHash            string     `json:"data_hash"`
-	InlineDatum         string     `json:"inline_datum"`
-	ReferenceScriptHash string     `json:"reference_script_hash"`
+	DataHash            *string    `json:"data_hash"`
+	InlineDatum         *string    `json:"inline_datum"`
+	ReferenceScriptHash *string    `json:"reference_script_hash"`
 }
 type TransactionUTXOs struct {
 	// Transaction hash
@@ -194,7 +195,7 @@ type TransactionPoolCert struct {
 
 	// Margin tax cost of the stake pool
 	MarginCost float32 `json:"margin_cost"`
-	Metadata   struct {
+	Metadata   *struct {
 		// Description of the stake pool
 		Description string `json:"description"`
 
@@ -264,19 +265,23 @@ type TransactionMetadata struct {
 }
 
 type TransactionMetadataCbor struct {
+	// Deprecated: Use Metadata instead.
+	CborMetadata *string `json:"cbor_metadata"`
 	// Content of the CBOR metadata
-	CborMetadata string `json:"cbor_metadata"`
+	Metadata string `json:"metadata"`
 
 	// Metadata label
 	Label string `json:"label"`
 }
 
 type TransactionRedeemer struct {
-	TxIndex   int    `json:"tx_index"`
-	Purpose   string `json:"purpose"`
-	UnitMem   string `json:"unit_mem"`
-	UnitSteps string `json:"unit_steps"`
-	Fee       string `json:"fee"`
+	TxIndex          int    `json:"tx_index"`
+	Purpose          string `json:"purpose"`
+	ScriptHash       string `json:"script_hash"`
+	RedeemerDataHash string `json:"redeemer_data_hash"`
+	UnitMem          string `json:"unit_mem"`
+	UnitSteps        string `json:"unit_steps"`
+	Fee              string `json:"fee"`
 }
 
 type Quantity string
@@ -286,7 +291,7 @@ type Value struct {
 	Assets map[string]Quantity `json:"assets,omitempty"`
 }
 
-type TxOutScript interface{} // This is an interface, actual implementation depends on usage
+type TxOutScript interface{}
 
 type AdditionalUtxoSetTxIn struct {
 	TxID  string `json:"txId"`
@@ -296,9 +301,9 @@ type AdditionalUtxoSetTxIn struct {
 type AdditionalUtxoSetTxOut struct {
 	Address   string       `json:"address"`
 	Value     Value        `json:"value"`
-	DatumHash *string      `json:"datumHash,omitempty"` // Pointer to handle null
-	Datum     interface{}  `json:"datum,omitempty"`     // Could be various types
-	Script    *TxOutScript `json:"script,omitempty"`    // Pointer to handle null
+	DatumHash *string      `json:"datumHash"`
+	Datum     interface{}  `json:"datum"` // Could be various types
+	Script    *TxOutScript `json:"script"`
 }
 
 // AdditionalUtxoSet represents a slice of tuples (TxIn, TxOut)
@@ -439,7 +444,7 @@ func (c *apiClient) TransactionMetadata(ctx context.Context, hash string) (tm []
 }
 
 func (c *apiClient) TransactionMetadataInCBORs(ctx context.Context, hash string) (tmc []TransactionMetadataCbor, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata, resourceCbor))
 	if err != nil {
 		return
 	}
@@ -459,7 +464,7 @@ func (c *apiClient) TransactionMetadataInCBORs(ctx context.Context, hash string)
 }
 
 func (c *apiClient) TransactionRedeemers(ctx context.Context, hash string) (tm []TransactionRedeemer, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata, resourceCbor))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxRedeemers))
 	if err != nil {
 		return
 	}

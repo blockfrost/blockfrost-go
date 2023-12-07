@@ -21,11 +21,11 @@ func TestAssetUnmarshal(t *testing.T) {
 		InitialMintTxHash: "6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad",
 		MintOrBurnCount:   1,
 		Quantity:          "12000",
-		OnchainMetadata: blockfrost.AssetOnchainMetadata{
+		OnchainMetadata: &blockfrost.AssetOnchainMetadata{
 			Image: "ipfs://ipfs/QmfKyJ4tuvHowwKQCbCHj4L5T3fSj8cjs7Aau8V7BWv226",
 			Name:  "My NFT token",
 		},
-		Metadata: blockfrost.AssetMetadata{
+		Metadata: &blockfrost.AssetMetadata{
 			Name:        "nutcoin",
 			Description: "The Nut Coin",
 			Ticker:      "nutc",

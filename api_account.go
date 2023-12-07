@@ -31,7 +31,7 @@ type Account struct {
 	Active bool `json:"active"`
 
 	// Epoch of the most recent action - registration or deregistration
-	ActiveEpoch int64 `json:"active_epoch"`
+	ActiveEpoch *int64 `json:"active_epoch"`
 
 	// Balance of the account in Lovelaces
 	ControlledAmount string `json:"controlled_amount"`
@@ -52,7 +52,7 @@ type Account struct {
 	WithdrawableAmount string `json:"withdrawable_amount"`
 
 	// Bech32 pool ID that owns the account
-	PoolID string `json:"pool_id"`
+	PoolID *string `json:"pool_id"`
 }
 
 // AccountRewardsHist return Account reward history

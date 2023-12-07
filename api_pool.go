@@ -74,24 +74,24 @@ type PoolHistory struct {
 // PoolMetadata return Stake pool metadata
 // Stake pool registration metadata.
 type PoolMetadata struct {
-	PoolID      string `json:"pool_id"`
-	Hex         string `json:"hex"`
-	URL         string `json:"url"`
-	Hash        string `json:"hash"`
-	Ticker      string `json:"ticker"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Homepage    string `json:"homepage"`
+	PoolID      string  `json:"pool_id"`
+	Hex         string  `json:"hex"`
+	URL         *string `json:"url"`
+	Hash        *string `json:"hash"`
+	Ticker      *string `json:"ticker"`
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+	Homepage    *string `json:"homepage"`
 }
 
 // PoolRelay return Stake pool relays
 // Relays of a stake pool.
 type PoolRelay struct {
-	Ipv4   string `json:"ipv4"`
-	Ipv6   string `json:"ipv6"`
-	DNS    string `json:"dns"`
-	DNSSrv string `json:"dns_srv"`
-	Port   int    `json:"port"`
+	Ipv4   *string `json:"ipv4"`
+	Ipv6   *string `json:"ipv6"`
+	DNS    *string `json:"dns"`
+	DNSSrv *string `json:"dns_srv"`
+	Port   int     `json:"port"`
 }
 
 // PoolDelegator return Stake pool delegators

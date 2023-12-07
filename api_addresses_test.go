@@ -23,10 +23,12 @@ var (
 const testdata = "testdata"
 
 func TestAddressUnMarshall(t *testing.T) {
+	stakeAddress := "stake1ux3u6x5cs388djqz6awnyuvez2f6n8jzjhqq59s4yxhm8jskeh0t9"
+
 	want := blockfrost.Address{
 		Address:      "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz",
 		Amount:       []blockfrost.AddressAmount{{Unit: "lovelace", Quantity: "0"}},
-		StakeAddress: "stake1ux3u6x5cs388djqz6awnyuvez2f6n8jzjhqq59s4yxhm8jskeh0t9",
+		StakeAddress: &stakeAddress,
 		Type:         "shelley",
 		Script:       false,
 	}

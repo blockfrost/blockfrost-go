@@ -27,7 +27,7 @@ type Address struct {
 	Amount  []AddressAmount `json:"amount"`
 
 	// Stake address that controls the key
-	StakeAddress string `json:"stake_address"`
+	StakeAddress *string `json:"stake_address"`
 
 	// Address era.
 	// Enum: "byron" "shelley"
@@ -74,10 +74,10 @@ type AddressUTXO struct {
 	Block string `json:"block"`
 
 	// The hash of the transaction output datum
-	DataHash string `json:"data_hash"`
+	DataHash *string `json:"data_hash"`
 
-	InlineDatum         string `json:"inline_datum"`
-	ReferenceScriptHash string `json:"reference_script_hash"`
+	InlineDatum         *string `json:"inline_datum"`
+	ReferenceScriptHash *string `json:"reference_script_hash"`
 }
 
 type AddressTxResult struct {

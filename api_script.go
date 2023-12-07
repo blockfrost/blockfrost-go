@@ -12,6 +12,10 @@ import (
 const (
 	resourceScripts   = "scripts"
 	resourceRedeemers = "redeemers"
+	// resourceScriptsJson = "json"
+	// resourceScriptsCbor = "cbor"
+	// resourceDatum       = "datum"
+	// resourceDatumCbor   = "cbor"
 )
 
 // Script contains information about a script
@@ -23,7 +27,7 @@ type Script struct {
 	Type string `json:"type"`
 
 	// The size of the CBOR serialised script, if a Plutus script
-	SerialisedSize int `json:"serialised_size"`
+	SerialisedSize *int `json:"serialised_size"`
 }
 
 // ScriptRedeemer contains information about a script redeemer.

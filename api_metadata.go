@@ -18,9 +18,9 @@ const (
 // MetadataTxLabel return Transaction metadata labels
 // List of all used transaction metadata labels.
 type MetadataTxLabel struct {
-	Label string `json:"label"`
-	Cip10 string `json:"cip10"`
-	Count string `json:"count"`
+	Label string  `json:"label"`
+	Cip10 *string `json:"cip10"`
+	Count string  `json:"count"`
 }
 
 // MetadataTxContentInJSON Transaction metadata content raw in JSON
@@ -30,14 +30,14 @@ type MetadataTxContentInJSON struct {
 	TxHash string `json:"tx_hash"`
 	// 	string or object or Array of any or integer or number or boolean Nullable
 	// Content of the JSON metadata
-	JSONMetadata interface{} `json:"json_metadata"`
+	JSONMetadata *interface{} `json:"json_metadata"`
 }
 
 // MetadataTxContentInCBOR return Transaction metadata content in CBOR
 // Transaction metadata per label.
 type MetadataTxContentInCBOR struct {
-	TxHash       string `json:"tx_hash"`
-	CborMetadata string `json:"cbor_metadata"`
+	TxHash   string  `json:"tx_hash"`
+	Metadata *string `json:"metadata"`
 }
 
 type MetadataTxLabelResult struct {

@@ -35,10 +35,10 @@ type MempoolTransaction struct {
 	Hash string `json:"hash"`
 
 	// Left (included) endpoint of the timelock validity intervals
-	InvalidBefore string `json:"invalid_before"`
+	InvalidBefore *string `json:"invalid_before"`
 
 	// Right (excluded) endpoint of the timelock validity intervals
-	InvalidHereafter string `json:"invalid_hereafter"`
+	InvalidHereafter *string `json:"invalid_hereafter"`
 
 	// Count of the MIR certificates within the transaction
 	MirCertCount int `json:"mir_cert_count"`
@@ -80,10 +80,10 @@ type MempoolTransactionOutput struct {
 	Address             string     `json:"address"`
 	Amount              []TxAmount `json:"amount"`
 	OutputIndex         int        `json:"output_index"`
-	DataHash            string     `json:"data_hash"`
-	InlineDatum         string     `json:"inline_datum"`
+	DataHash            *string    `json:"data_hash"`
+	InlineDatum         *string    `json:"inline_datum"`
 	Collateral          bool       `json:"collateral"`
-	ReferenceScriptHash string     `json:"reference_script_hash"`
+	ReferenceScriptHash *string    `json:"reference_script_hash"`
 }
 type MempoolTransactionInput struct {
 	Address     string  `json:"address"`
