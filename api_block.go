@@ -6,6 +6,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
+)
+
+const (
+	resourceBlocksAffectedAddresses = "addresses"
 )
 
 // Block defines content of a block
@@ -38,13 +43,19 @@ type Block struct {
 	TxCount int `json:"tx_count"`
 
 	// Total output within the block in Lovelaces
-	Output string `json:"output"`
+	Output *string `json:"output"`
 
 	// Total fees within the block in Lovelaces
-	Fees string `json:"fees"`
+	Fees *string `json:"fees"`
 
 	// VRF key of the block
-	BlockVRF string `json:"block_vrf"`
+	BlockVRF *string `json:"block_vrf"`
+
+	// The hash of the operational certificate of the block producer
+	OPCert *string `json:"op_cert,omitempty"` // omitempty due to webhook test fixtures
+
+	// The value of the counter used to produce the operational certificate
+	OPCertCounter *string `json:"op_cert_counter,omitempty"` // omitempty due to webhook test fixtures
 
 	// Hash of the previous block
 	PreviousBlock string `json:"previous_block"`
@@ -54,6 +65,18 @@ type Block struct {
 
 	// Number of block confirmations
 	Confirmations int `json:"confirmations"`
+}
+
+type BlockAffectedAddresses struct {
+	Address      string `json:"address"`
+	Transactions []struct {
+		TxHash string `json:"tx_hash"`
+	} `json:"transactions"`
+}
+
+type BlockAffectedAddressesResult struct {
+	Res []BlockAffectedAddresses
+	Err error
 }
 
 // BlocksLatest Return the latest block available to the backends, also known as the
@@ -249,4 +272,74 @@ func (c *apiClient) BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, ep
 		return
 	}
 	return bl, nil
+}
+
+// BlocksAddresses returns list of addresses affected in the specified block with additional information
+func (c *apiClient) BlocksAddresses(ctx context.Context, hashOrNumber string, query APIQueryParams) (txs []BlockAffectedAddresses, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceBlock, hashOrNumber, resourceBlocksAffectedAddresses))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&txs); err != nil {
+		return
+	}
+	return txs, nil
+}
+
+func (c *apiClient) BlocksAddressesAll(ctx context.Context, hashOrNumber string) <-chan BlockAffectedAddressesResult {
+	ch := make(chan BlockAffectedAddressesResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan BlockAffectedAddressesResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				affectedAddresses, err := c.BlocksAddresses(j.ctx, hashOrNumber, j.query)
+				if len(affectedAddresses) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := BlockAffectedAddressesResult{Res: affectedAddresses, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
 }

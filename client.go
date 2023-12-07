@@ -77,6 +77,8 @@ type APIClient interface {
 	BlocksPrevious(ctx context.Context, hashOrNumber string) ([]Block, error)
 	BlockBySlot(ctx context.Context, slotNumber int) (Block, error)
 	BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (Block, error)
+	BlocksAddresses(ctx context.Context, hashOrNumber string, query APIQueryParams) ([]BlockAffectedAddresses, error)
+	BlocksAddressesAll(ctx context.Context, hashOrNumber string) <-chan BlockAffectedAddressesResult
 	EpochLatest(ctx context.Context) (Epoch, error)
 	LatestEpochParameters(ctx context.Context) (EpochParameters, error)
 	Epoch(ctx context.Context, epochNumber int) (Epoch, error)

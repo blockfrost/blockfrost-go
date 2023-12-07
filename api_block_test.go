@@ -2,7 +2,9 @@ package blockfrost_test
 
 import (
 	"context"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
@@ -108,4 +110,20 @@ func TestBlockPreviousIntegration(t *testing.T) {
 	if reflect.DeepEqual(got, nullGot) {
 		t.Fatal("got null struct")
 	}
+}
+func TestBlocksAddressesIntegration(t *testing.T) {
+	hash := "5ea1ba291e8eef538635a53e59fddba7810d1679631cc3aed7c8e6c4091a516a"
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+	got, err := api.BlocksAddresses(context.TODO(), hash, blockfrost.APIQueryParams{})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.BlockAffectedAddresses{}
+
+	testIntUtil(t, fp, &got, &want)
 }
