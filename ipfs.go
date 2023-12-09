@@ -28,7 +28,7 @@ const (
 type ipfsClient struct {
 	server    string
 	projectId string
-	client    *retryablehttp.Client
+	client    *http.Client
 	routines  int
 }
 
@@ -38,10 +38,10 @@ type IPFSClientOptions struct {
 	ProjectID string
 	// Configures server to use. Can be toggled for test servers
 	Server string
-	// Interface implementing Do method such *http.Client
-	Client *retryablehttp.Client
 	// Max goroutines to use for *All Methods
 	MaxRoutines int
+	// Underlying http client to use. If not set, default github.com/hashicorp/go-retryablehttp is used.
+	Client *http.Client
 }
 
 // IPFSObject contains information on an IPFS object
@@ -86,8 +86,12 @@ func NewIPFSClient(options IPFSClientOptions) IPFSClient {
 	if options.Server == "" {
 		options.Server = IPFSNet
 	}
-	retryclient := retryablehttp.NewClient()
-	retryclient.Logger = nil
+
+	if options.Client == nil {
+		retryclient := retryablehttp.NewClient()
+		retryclient.Logger = nil
+		options.Client = retryclient.StandardClient()
+	}
 
 	if options.ProjectID == "" {
 		options.ProjectID = os.Getenv("BLOCKFROST_IPFS_PROJECT_ID")
@@ -99,7 +103,7 @@ func NewIPFSClient(options IPFSClientOptions) IPFSClient {
 
 	client := &ipfsClient{
 		server:    options.Server,
-		client:    retryclient,
+		client:    options.Client,
 		projectId: options.ProjectID,
 		routines:  options.MaxRoutines,
 	}
