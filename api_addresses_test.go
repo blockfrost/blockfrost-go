@@ -68,7 +68,7 @@ func WriteGoldenFile(t *testing.T, path string, bytes []byte) {
 
 func ReadOrGenerateGoldenFile(t *testing.T, path string, v interface{}) []byte {
 	t.Helper()
-	b, err := ioutil.ReadFile(path)
+	b, err := os.ReadFile(path)
 	switch {
 	case errors.Is(err, os.ErrNotExist):
 		if *generate {

@@ -3,7 +3,6 @@ package blockfrost_test
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -75,7 +74,7 @@ func TestIPFSResourceAddIntegration(t *testing.T) {
 	fp_up := filepath.Join(testdata, "json", "ipfs", "ipfs_object.json")
 	got, err := ipfs.Add(context.TODO(), fp_up)
 	testErrorHelper(t, err)
-	*update = true
+	// *update = true
 
 	// want := blockfrost.IPFSObject{}
 	// fp_golden := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
@@ -188,7 +187,7 @@ func testIPFSResourceRemoveIntegration(t *testing.T, ipfs blockfrost.IPFSClient,
 func testIPFSResourceGatewayIntegration(t *testing.T, ipfs blockfrost.IPFSClient, ipfsPath string, fp_up string) {
 	got, err := ipfs.Gateway(context.TODO(), ipfsPath)
 	testErrorHelper(t, err)
-	want, err := ioutil.ReadFile(fp_up)
+	want, err := os.ReadFile(fp_up)
 	testErrorHelper(t, err)
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("expected %v got %v", want, got)
