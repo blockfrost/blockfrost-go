@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
@@ -63,20 +64,15 @@ func TestUnmarshalRedeemer(t *testing.T) {
 func TestIntegrationResourceRedeemers(t *testing.T) {
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
-	scripts, err := api.Scripts(context.TODO(), blockfrost.APIQueryParams{})
-	testErrorHelper(t, err)
-	if len(scripts) == 0 {
-		t.Fatal("Failed to fetch scripts")
-	}
-
-	got, err := api.ScriptRedeemers(context.TODO(), scripts[0].ScriptHash, blockfrost.APIQueryParams{})
+	got, err := api.ScriptRedeemers(context.TODO(), "4f590a3d80ae0312bad0b64d540c3ff5080e77250e9dbf5011630016", blockfrost.APIQueryParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if reflect.DeepEqual(got, []blockfrost.ScriptRedeemer{}) {
-		t.Logf("got null %+v", got)
-	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.ScriptRedeemer{}
+
+	testIntUtil(t, fp, &got, &want)
 }
 
 func TestIntegrationResourceScripts(t *testing.T) {
