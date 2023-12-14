@@ -8,7 +8,6 @@ import (
 	"net/url"
 
 	"github.com/blockfrost/blockfrost-go/internal/version"
-	"github.com/hashicorp/go-retryablehttp"
 )
 
 func handleAPIErrorResponse(res *http.Response) error {
@@ -99,11 +98,7 @@ func (c *apiClient) handleRequest(req *http.Request) (res *http.Response, err er
 
 	userAgent := fmt.Sprintf("%s/%s", "blockfrost-go", version.String())
 	req.Header.Set("User-Agent", userAgent)
-	rreq, err := retryablehttp.FromRequest(req)
-	if err != nil {
-		return
-	}
-	res, err = c.client.Do(rreq)
+	res, err = c.client.Do(req)
 	if err != nil {
 		return
 	}
@@ -119,11 +114,7 @@ func (ip *ipfsClient) handleRequest(req *http.Request) (res *http.Response, err 
 	req.Header.Add("project_id", ip.projectId)
 	userAgent := fmt.Sprintf("%s/%s", "blockfrost-go", version.String())
 	req.Header.Set("User-Agent", userAgent)
-	rreq, err := retryablehttp.FromRequest(req)
-	if err != nil {
-		return
-	}
-	res, err = ip.client.Do(rreq)
+	res, err = ip.client.Do(req)
 	if err != nil {
 		return
 	}

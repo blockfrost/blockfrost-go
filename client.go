@@ -11,13 +11,8 @@ import (
 type apiClient struct {
 	server    string
 	projectId string
-	client    *retryablehttp.Client
+	client    *http.Client
 	routines  int
-}
-
-// HttpRequestDoer defines methods for a http client.
-type HttpRequestDoer interface {
-	Do(req *http.Request) (*http.Response, error)
 }
 
 // APIClientOptions contains optios used to initialize an API Client using
@@ -32,6 +27,9 @@ type APIClientOptions struct {
 
 	// Max number of routines to use for *All methods
 	MaxRoutines int
+
+	// Underlying http client to use. If not set, default github.com/hashicorp/go-retryablehttp is used.
+	Client *http.Client
 }
 
 // NewAPICLient creates a client from APIClientOptions. If no options are provided,
@@ -41,8 +39,11 @@ func NewAPIClient(options APIClientOptions) APIClient {
 		options.Server = CardanoMainNet
 	}
 
-	retryclient := retryablehttp.NewClient()
-	retryclient.Logger = nil
+	if options.Client == nil {
+		retryclient := retryablehttp.NewClient()
+		retryclient.Logger = nil
+		options.Client = retryclient.StandardClient()
+	}
 
 	if options.ProjectID == "" {
 		options.ProjectID = os.Getenv("BLOCKFROST_PROJECT_ID")
@@ -54,7 +55,7 @@ func NewAPIClient(options APIClientOptions) APIClient {
 
 	client := &apiClient{
 		server:    options.Server,
-		client:    retryclient,
+		client:    options.Client,
 		projectId: options.ProjectID,
 		routines:  options.MaxRoutines,
 	}
