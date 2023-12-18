@@ -74,24 +74,24 @@ type PoolHistory struct {
 // PoolMetadata return Stake pool metadata
 // Stake pool registration metadata.
 type PoolMetadata struct {
-	PoolID      string `json:"pool_id"`
-	Hex         string `json:"hex"`
-	URL         string `json:"url"`
-	Hash        string `json:"hash"`
-	Ticker      string `json:"ticker"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Homepage    string `json:"homepage"`
+	PoolID      string  `json:"pool_id"`
+	Hex         string  `json:"hex"`
+	URL         *string `json:"url"`
+	Hash        *string `json:"hash"`
+	Ticker      *string `json:"ticker"`
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+	Homepage    *string `json:"homepage"`
 }
 
 // PoolRelay return Stake pool relays
 // Relays of a stake pool.
 type PoolRelay struct {
-	Ipv4   string `json:"ipv4"`
-	Ipv6   string `json:"ipv6"`
-	DNS    string `json:"dns"`
-	DNSSrv string `json:"dns_srv"`
-	Port   int    `json:"port"`
+	Ipv4   *string `json:"ipv4"`
+	Ipv6   *string `json:"ipv6"`
+	DNS    *string `json:"dns"`
+	DNSSrv *string `json:"dns_srv"`
+	Port   int     `json:"port"`
 }
 
 // PoolDelegator return Stake pool delegators
@@ -205,11 +205,11 @@ func (c *apiClient) PoolsAll(ctx context.Context) <-chan PoolsResult {
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -277,11 +277,11 @@ func (c *apiClient) PoolsRetiredAll(ctx context.Context) <-chan PoolsRetiredResu
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -350,11 +350,11 @@ func (c *apiClient) PoolsRetiringAll(ctx context.Context) <-chan PoolsRetiringRe
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -445,11 +445,11 @@ func (c *apiClient) PoolHistoryAll(ctx context.Context, poolId string) <-chan Po
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -565,11 +565,11 @@ func (c *apiClient) PoolDelegatorsAll(ctx context.Context, poolId string) <-chan
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -637,11 +637,11 @@ func (c *apiClient) PoolBlocksAll(ctx context.Context, poolId string) <-chan Poo
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -709,11 +709,11 @@ func (c *apiClient) PoolUpdatesAll(ctx context.Context, poolId string) <-chan Po
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}

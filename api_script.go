@@ -12,6 +12,10 @@ import (
 const (
 	resourceScripts   = "scripts"
 	resourceRedeemers = "redeemers"
+	// resourceScriptsJson = "json"
+	// resourceScriptsCbor = "cbor"
+	// resourceDatum       = "datum"
+	// resourceDatumCbor   = "cbor"
 )
 
 // Script contains information about a script
@@ -23,7 +27,7 @@ type Script struct {
 	Type string `json:"type"`
 
 	// The size of the CBOR serialised script, if a Plutus script
-	SerialisedSize int `json:"serialised_size"`
+	SerialisedSize *int `json:"serialised_size"`
 }
 
 // ScriptRedeemer contains information about a script redeemer.
@@ -120,11 +124,11 @@ func (c *apiClient) ScriptsAll(ctx context.Context) <-chan ScriptAllResult {
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -210,11 +214,11 @@ func (c *apiClient) ScriptRedeemersAll(ctx context.Context, address string) <-ch
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}

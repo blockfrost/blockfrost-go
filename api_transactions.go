@@ -10,17 +10,20 @@ import (
 )
 
 const (
-	resourceTxs           = "txs"
-	resourceTx            = "tx"
-	resourceTxStakes      = "stakes"
-	resourceTxUTXOs       = "utxos"
-	resourceTxWithdrawals = "withdrawals"
-	resourceTxMetadata    = "metadata"
-	resourceCbor          = "cbor"
-	resourceTxDelegations = "delegations"
-	resourceTxPoolUpdates = "pool_updates"
-	resourceTxPoolRetires = "pool_retires"
-	resourceTxSubmit      = "submit"
+	resourceTxs             = "txs"
+	resourceTx              = "tx"
+	resourceTxStakes        = "stakes"
+	resourceTxUTXOs         = "utxos"
+	resourceTxWithdrawals   = "withdrawals"
+	resourceTxMetadata      = "metadata"
+	resourceTxRedeemers     = "redeemers"
+	resourceCbor            = "cbor"
+	resourceTxDelegations   = "delegations"
+	resourceTxPoolUpdates   = "pool_updates"
+	resourceTxPoolRetires   = "pool_retires"
+	resourceTxSubmit        = "submit"
+	resourceTxEvaluate      = "utils/txs/evaluate"
+	resourceTxEvaluateUtxos = "utils/txs/evaluate/utxos"
 )
 
 type TransactionContent struct {
@@ -52,10 +55,10 @@ type TransactionContent struct {
 	Index int `json:"index"`
 
 	// Left (included) endpoint of the timelock validity intervals
-	InvalidBefore string `json:"invalid_before"`
+	InvalidBefore *string `json:"invalid_before"`
 
 	// Right (excluded) endpoint of the timelock validity intervals
-	InvalidHereafter string `json:"invalid_hereafter"`
+	InvalidHereafter *string `json:"invalid_hereafter"`
 
 	// Count of the MIR certificates within the transaction
 	MirCertCount int `json:"mir_cert_count"`
@@ -103,30 +106,31 @@ type TxAmount struct {
 	Unit string `json:"unit"`
 }
 
+type TransactionInput struct {
+	Address             string     `json:"address"`
+	Amount              []TxAmount `json:"amount"`
+	OutputIndex         float32    `json:"output_index"`
+	TxHash              string     `json:"tx_hash"`
+	DataHash            *string    `json:"data_hash"`
+	Collateral          bool       `json:"collateral"`
+	InlineDatum         *string    `json:"inline_datum"`
+	ReferenceScriptHash *string    `json:"reference_script_hash"`
+	Reference           *bool      `json:"reference"`
+}
+
+type TransactionOutput struct {
+	Address             string     `json:"address"`
+	Amount              []TxAmount `json:"amount"`
+	OutputIndex         int        `json:"output_index"`
+	DataHash            *string    `json:"data_hash"`
+	InlineDatum         *string    `json:"inline_datum"`
+	ReferenceScriptHash *string    `json:"reference_script_hash"`
+}
 type TransactionUTXOs struct {
 	// Transaction hash
-	Hash   string `json:"hash"`
-	Inputs []struct {
-		// Input address
-		Address string     `json:"address"`
-		Amount  []TxAmount `json:"amount"`
-
-		// UTXO index in the transaction
-		OutputIndex float32 `json:"output_index"`
-
-		// Hash of the UTXO transaction
-		TxHash string `json:"tx_hash"`
-
-		DataHash   string `json:"data_hash"`
-		Collateral bool   `json:"collateral"`
-	} `json:"inputs"`
-	Outputs []struct {
-		// Output address
-		Address     string     `json:"address"`
-		Amount      []TxAmount `json:"amount"`
-		OutputIndex int        `json:"output_index"`
-		DataHash    string     `json:"data_hash"`
-	} `json:"outputs"`
+	Hash    string              `json:"hash"`
+	Inputs  []TransactionInput  `json:"inputs"`
+	Outputs []TransactionOutput `json:"outputs"`
 }
 
 type TransactionStakeAddressCert struct {
@@ -191,7 +195,7 @@ type TransactionPoolCert struct {
 
 	// Margin tax cost of the stake pool
 	MarginCost float32 `json:"margin_cost"`
-	Metadata   struct {
+	Metadata   *struct {
 		// Description of the stake pool
 		Description string `json:"description"`
 
@@ -261,19 +265,62 @@ type TransactionMetadata struct {
 }
 
 type TransactionMetadataCbor struct {
+	// Deprecated: Use Metadata instead.
+	CborMetadata *string `json:"cbor_metadata"`
 	// Content of the CBOR metadata
-	CborMetadata string `json:"cbor_metadata"`
+	Metadata string `json:"metadata"`
 
 	// Metadata label
 	Label string `json:"label"`
 }
 
 type TransactionRedeemer struct {
-	TxIndex   int    `json:"tx_index"`
-	Purpose   string `json:"purpose"`
-	UnitMem   string `json:"unit_mem"`
-	UnitSteps string `json:"unit_steps"`
-	Fee       string `json:"fee"`
+	TxIndex          int    `json:"tx_index"`
+	Purpose          string `json:"purpose"`
+	ScriptHash       string `json:"script_hash"`
+	RedeemerDataHash string `json:"redeemer_data_hash"`
+	UnitMem          string `json:"unit_mem"`
+	UnitSteps        string `json:"unit_steps"`
+	Fee              string `json:"fee"`
+}
+
+type Quantity string
+
+type Value struct {
+	Coins  Quantity            `json:"coins"`
+	Assets map[string]Quantity `json:"assets,omitempty"`
+}
+
+type TxOutScript interface{}
+
+type AdditionalUtxoSetTxIn struct {
+	TxID  string `json:"txId"`
+	Index int    `json:"index"`
+}
+
+type AdditionalUtxoSetTxOut struct {
+	Address   string       `json:"address"`
+	Value     Value        `json:"value"`
+	DatumHash *string      `json:"datumHash"`
+	Datum     interface{}  `json:"datum"` // Could be various types
+	Script    *TxOutScript `json:"script"`
+}
+
+// AdditionalUtxoSet represents a slice of tuples (TxIn, TxOut)
+type AdditionalUtxoSet []struct {
+	TxIn  AdditionalUtxoSetTxIn  `json:"txIn"`
+	TxOut AdditionalUtxoSetTxOut `json:"txOut"`
+}
+
+type OgmiosResponse struct {
+	Type        string `json:"type"`
+	Version     string `json:"version"`
+	ServiceName string `json:"servicename"`
+	MethodName  string `json:"methodname"`
+	Reflection  struct {
+		Id string `json:"id"`
+	} `json:"reflection"`
+	Result json.RawMessage `json:"result"`
 }
 
 func (c *apiClient) Transaction(ctx context.Context, hash string) (tc TransactionContent, err error) {
@@ -397,7 +444,7 @@ func (c *apiClient) TransactionMetadata(ctx context.Context, hash string) (tm []
 }
 
 func (c *apiClient) TransactionMetadataInCBORs(ctx context.Context, hash string) (tmc []TransactionMetadataCbor, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata, resourceCbor))
 	if err != nil {
 		return
 	}
@@ -417,7 +464,7 @@ func (c *apiClient) TransactionMetadataInCBORs(ctx context.Context, hash string)
 }
 
 func (c *apiClient) TransactionRedeemers(ctx context.Context, hash string) (tm []TransactionRedeemer, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxMetadata, resourceCbor))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxRedeemers))
 	if err != nil {
 		return
 	}
@@ -535,4 +582,70 @@ func (c *apiClient) TransactionSubmit(ctx context.Context, cbor []byte) (hash st
 		return
 	}
 	return hash, nil
+}
+
+func (c *apiClient) TransactionEvaluate(ctx context.Context, cbor []byte) (jsonResponse OgmiosResponse, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceTxEvaluate))
+
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl.String(), bytes.NewReader(cbor))
+	if err != nil {
+		return
+	}
+	req.Header.Add("Content-Type", "application/cbor")
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&jsonResponse); err != nil {
+		return
+	}
+	return jsonResponse, nil
+}
+
+func (c *apiClient) TransactionEvaluateUTXOs(ctx context.Context, cbor []byte, additionalUtxoSet AdditionalUtxoSet) (jsonResponse OgmiosResponse, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceTxEvaluateUtxos))
+	if err != nil {
+		return
+	}
+
+	// Convert addition utxo set from custom go data type (array of struct with TxIn, TxOut properties) to
+	// format required by the API endpoint ([[TxIn, TxOut], ...])
+	convertedAdditionalUtxoSet := make([][]interface{}, len(additionalUtxoSet))
+	for i, utxo := range additionalUtxoSet {
+		convertedAdditionalUtxoSet[i] = []interface{}{utxo.TxIn, utxo.TxOut}
+	}
+
+	payload := struct {
+		Cbor              string          `json:"cbor"`
+		AdditionalUtxoSet [][]interface{} `json:"additionalUtxoSet"`
+	}{
+		Cbor:              string(cbor),
+		AdditionalUtxoSet: convertedAdditionalUtxoSet,
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl.String(), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return
+	}
+	req.Header.Add("Content-Type", "application/json")
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&jsonResponse); err != nil {
+		return
+	}
+
+	return jsonResponse, nil
 }

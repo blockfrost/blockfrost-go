@@ -25,10 +25,15 @@ type EpochStake struct {
 	Amount       string `json:"amount"`
 }
 
+type EpochStakeByPool struct {
+	StakeAddress string `json:"stake_address"`
+	Amount       string `json:"amount"`
+}
+
 // Epoch contains information on an epoch.
 type Epoch struct {
 	// Sum of all the active stakes within the epoch in Lovelaces
-	ActiveStake string `json:"active_stake"`
+	ActiveStake *string `json:"active_stake"`
 
 	// Number of blocks within the epoch
 	BlockCount int `json:"block_count"`
@@ -85,9 +90,9 @@ type EpochParameters struct {
 
 	// Maximum transaction size
 	MaxTxSize int `json:"max_tx_size"`
-	
+
 	// The maximum Val size
-	MaxValSize string `json:"max_val_size"`
+	MaxValSize *string `json:"max_val_size	"`
 
 	// The linear factor for the minimum fee calculation for given epoch
 	MinFeeA int `json:"min_fee_a"`
@@ -121,9 +126,40 @@ type EpochParameters struct {
 
 	// Treasury expansion
 	Tau float32 `json:"tau"`
-	
-	// The cost per UTXO word
+
+	// Cost per UTxO word for Alonzo. Cost per UTxO byte for Babbage and later.
+	// Deprecated: Use CoinsPerUTxOSize instead
 	CoinsPerUtxOWord string `json:"coins_per_utxo_word"`
+
+	// Cost models parameters for Plutus Core scripts
+	CostModels *interface{} `json:"cost_models"`
+
+	// The per word cost of script memory usage
+	PriceMem *float32 `json:"price_mem"`
+
+	// The cost of script execution step usage
+	PriceStep *float32 `json:"price_step"`
+
+	// The maximum number of execution memory allowed to be used in a single transaction
+	MaxTxExMem *string `json:"max_tx_ex_mem"`
+
+	// The maximum number of execution steps allowed to be used in a single transaction
+	MaxTxExSteps *string `json:"max_tx_ex_steps"`
+
+	// The maximum number of execution memory allowed to be used in a single block
+	MaxBlockExMem *string `json:"max_block_ex_mem"`
+
+	// The maximum number of execution steps allowed to be used in a single block
+	MaxBlockExSteps *string `json:"max_block_ex_steps"`
+
+	// The percentage of the transactions fee which must be provided as collateral when including non-native scripts
+	CollateralPercent *int `json:"collateral_percent"`
+
+	// The maximum number of collateral inputs allowed in a transaction
+	MaxCollateralInputs *int `json:"max_collateral_inputs"`
+
+	// Cost per UTxO word for Alonzo. Cost per UTxO byte for Babbage and later.
+	CoinsPerUTxOSize *string `json:"coins_per_utxo_size"`
 }
 
 type EpochResult struct {
@@ -133,6 +169,10 @@ type EpochResult struct {
 
 type EpochStakeResult struct {
 	Res []EpochStake
+	Err error
+}
+type EpochStakeByPoolResult struct {
+	Res []EpochStakeByPool
 	Err error
 }
 
@@ -263,11 +303,11 @@ func (c *apiClient) EpochNextAll(ctx context.Context, epochNumber int) <-chan Ep
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -334,11 +374,11 @@ func (c *apiClient) EpochPreviousAll(ctx context.Context, epochNumber int) <-cha
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -405,11 +445,11 @@ func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber i
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -422,7 +462,7 @@ func (c *apiClient) EpochStakeDistributionAll(ctx context.Context, epochNumber i
 }
 
 // EpochStakeDistributionByPool returns the active stake distribution for the epoch specified by stake pool.
-func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) (eps []EpochStake, err error) {
+func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) (eps []EpochStakeByPool, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%d/%s/%s", c.server, resourceEpochs, epochNumber, resourceEpochsStakes, poolId))
 	if err != nil {
 		return
@@ -449,8 +489,8 @@ func (c *apiClient) EpochStakeDistributionByPool(ctx context.Context, epochNumbe
 
 // EpochStakeDistributionByPoolAll fetches all active stake distribution for the epoch specified by stake pool.
 // Returns a channel of type EpochStakeResult
-func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeResult {
-	ch := make(chan EpochStakeResult, c.routines)
+func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeByPoolResult {
+	ch := make(chan EpochStakeByPoolResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
 	quit := make(chan bool, 1)
 
@@ -458,7 +498,7 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 
 	for i := 0; i < c.routines; i++ {
 		wg.Add(1)
-		go func(jobs chan methodOptions, ch chan EpochStakeResult, wg *sync.WaitGroup) {
+		go func(jobs chan methodOptions, ch chan EpochStakeByPoolResult, wg *sync.WaitGroup) {
 			defer wg.Done()
 			for j := range jobs {
 				eps, err := c.EpochStakeDistributionByPool(j.ctx, epochNumber, poolId, j.query)
@@ -468,7 +508,7 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 					default:
 					}
 				}
-				res := EpochStakeResult{Res: eps, Err: err}
+				res := EpochStakeByPoolResult{Res: eps, Err: err}
 				ch <- res
 			}
 
@@ -476,11 +516,11 @@ func (c *apiClient) EpochStakeDistributionByPoolAll(ctx context.Context, epochNu
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -547,11 +587,11 @@ func (c *apiClient) EpochBlockDistributionAll(ctx context.Context, epochNumber i
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -618,11 +658,11 @@ func (c *apiClient) EpochBlockDistributionByPoolAll(ctx context.Context, epochNu
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}

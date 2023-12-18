@@ -55,10 +55,24 @@ type Asset struct {
 	// Count of mint and burn transactions
 	MintOrBurnCount int `json:"mint_or_burn_count"`
 
-	// On-chain metadata stored in the minting transaction under label 721,
-	// community discussion around the standard ongoing at https://github.com/cardano-foundation/CIPs/pull/85
-	OnchainMetadata AssetOnchainMetadata `json:"onchain_metadata"`
-	Metadata        AssetMetadata        `json:"metadata"`
+	// On-chain metadata which SHOULD adhere to the valid standards, based on which we perform the look up and display the asset (best effort)
+	OnchainMetadata *AssetOnchainMetadata `json:"onchain_metadata"`
+	// Enum: "CIP25v1" "CIP25v2" "CIP68v1"
+	// If on-chain metadata passes validation, we display the standard under which it is valid
+	OnchainMetadataStandard *string `json:"onchain_metadata_standard"`
+	// Arbitrary plutus data (CIP68).
+	OnchainMetadataExtra *string `json:"onchain_metadata_extra"`
+	// Off-chain metadata fetched from GitHub based on network.
+	Metadata *AssetMetadata `json:"metadata"`
+}
+
+// Assets minted under a specific policy.
+type AssetByPolicy struct {
+	// Hex-encoded asset full name
+	Asset string `json:"asset"`
+
+	// Current asset quantity
+	Quantity string `json:"quantity"`
 }
 
 // AssetHistory contains history of an asset.
@@ -102,6 +116,10 @@ type AssetResult struct {
 	Res []Asset
 	Err error
 }
+type AssetByPolicyResult struct {
+	Res []AssetByPolicy
+	Err error
+}
 
 type AssetAddressesAll struct {
 	Res []AssetAddress
@@ -109,7 +127,7 @@ type AssetAddressesAll struct {
 }
 
 // Assets returns a paginated list of assets.
-func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset, err error) {
+func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []AssetByPolicy, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceAssets))
 	if err != nil {
 		return
@@ -135,8 +153,8 @@ func (c *apiClient) Assets(ctx context.Context, query APIQueryParams) (a []Asset
 }
 
 // AssetsAll returns all assets.
-func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
-	ch := make(chan AssetResult, c.routines)
+func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetByPolicyResult {
+	ch := make(chan AssetByPolicyResult, c.routines)
 	jobs := make(chan methodOptions, c.routines)
 	quit := make(chan bool, 1)
 
@@ -144,7 +162,7 @@ func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
 
 	for i := 0; i < c.routines; i++ {
 		wg.Add(1)
-		go func(jobs chan methodOptions, ch chan AssetResult, wg *sync.WaitGroup) {
+		go func(jobs chan methodOptions, ch chan AssetByPolicyResult, wg *sync.WaitGroup) {
 			defer wg.Done()
 			for j := range jobs {
 				assets, err := c.Assets(j.ctx, j.query)
@@ -154,7 +172,7 @@ func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
 					default:
 					}
 				}
-				res := AssetResult{Res: assets, Err: err}
+				res := AssetByPolicyResult{Res: assets, Err: err}
 				ch <- res
 			}
 
@@ -162,11 +180,11 @@ func (c *apiClient) AssetsAll(ctx context.Context) <-chan AssetResult {
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -300,11 +318,11 @@ func (c *apiClient) AssetAddressesAll(ctx context.Context, asset string) <-chan 
 	}
 	go func() {
 		defer close(ch)
-		fetchScripts := true
-		for i := 1; fetchScripts; i++ {
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
 			select {
 			case <-quit:
-				fetchScripts = false
+				fetchNextPage = false
 			default:
 				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
 			}
@@ -317,7 +335,7 @@ func (c *apiClient) AssetAddressesAll(ctx context.Context, asset string) <-chan 
 }
 
 // AssetsByPolicy returns list of assets minted under a specific policy.
-func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []Asset, err error) {
+func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []AssetByPolicy, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourcePolicyAssets, policyId))
 	if err != nil {
 		return

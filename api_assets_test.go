@@ -21,11 +21,11 @@ func TestAssetUnmarshal(t *testing.T) {
 		InitialMintTxHash: "6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad",
 		MintOrBurnCount:   1,
 		Quantity:          "12000",
-		OnchainMetadata: blockfrost.AssetOnchainMetadata{
+		OnchainMetadata: &blockfrost.AssetOnchainMetadata{
 			Image: "ipfs://ipfs/QmfKyJ4tuvHowwKQCbCHj4L5T3fSj8cjs7Aau8V7BWv226",
 			Name:  "My NFT token",
 		},
-		Metadata: blockfrost.AssetMetadata{
+		Metadata: &blockfrost.AssetMetadata{
 			Name:        "nutcoin",
 			Description: "The Nut Coin",
 			Ticker:      "nutc",
@@ -46,7 +46,7 @@ func TestResourceAssetsIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
-	want := []blockfrost.Asset{}
+	want := []blockfrost.AssetByPolicy{}
 	testIntUtil(t, fp, &got, &want)
 }
 
@@ -112,7 +112,7 @@ func TestResourceAssetsByPolicyIntegration(t *testing.T) {
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
 
-	want := []blockfrost.Asset{}
+	want := []blockfrost.AssetByPolicy{}
 	testIntUtil(t, fp, &got, &want)
 }
 
@@ -136,6 +136,13 @@ func testIntUtil(t *testing.T, fp string, got interface{}, want interface{}, opt
 	}
 
 	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("expected %v got %v", want, got)
+		gotJSON, err := json.Marshal(got)
+		wantJSON, err := json.Marshal(want)
+		if err != nil {
+			t.Fatalf("\nexpected %v \ngot %v", want, got)
+		}
+
+		t.Fatalf("\nexpected %s \ngot %s", string(wantJSON), string(gotJSON))
+
 	}
 }

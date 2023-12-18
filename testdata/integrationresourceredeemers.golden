@@ -1,0 +1,11 @@
+[
+  {
+    "tx_hash": "a95d16e891e51f98a3b1d3fe862ed355ebc8abffb7a7269d86f775553d9e653f",
+    "tx_index": 0,
+    "purpose": "spend",
+    "datum_hash": "5a595ce795815e81d22a1a522cf3987d546dc5bb016de61b002edd63a5413ec4",
+    "unit_mem": "520448",
+    "unit_steps": "211535239",
+    "fee": "45282"
+  }
+]

@@ -6,6 +6,6 @@
   "quantity": "1",
   "initial_mint_tx_hash": "0b28244fade854bb15f0358de44872cfb2216744b95dc0855704dac34619f382",
   "mint_or_burn_count": 1,
-  "onchain_metadata": {},
-  "metadata": {}
+  "onchain_metadata": null,
+  "metadata": null
 }

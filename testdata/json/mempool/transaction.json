@@ -1,0 +1,55 @@
+{
+    "tx": {
+        "hash": "1f96d3824eb2aeeb0b09b99748bb70ac681e0cae6e37e01c43958b79ca69c986",
+        "output_amount": [
+            {
+                "unit": "lovelace",
+                "quantity": "2837715"
+            }
+        ],
+        "fees": "369133",
+        "deposit": "0",
+        "size": 4683,
+        "invalid_before": null,
+        "invalid_hereafter": "109798439",
+        "utxo_count": 2,
+        "withdrawal_count": 0,
+        "mir_cert_count": 0,
+        "delegation_count": 0,
+        "stake_cert_count": 0,
+        "pool_update_count": 0,
+        "pool_retire_count": 0,
+        "asset_mint_or_burn_count": 0,
+        "redeemer_count": 0,
+        "valid_contract": true
+    },
+    "inputs": [
+        {
+            "address": "addr1vx9wkegx062xmmdzfd69jz6dt48p5mse4v35mml5h6ceznq8ap8fz",
+            "tx_hash": "7aa461f4f924586864c74141d457e70cfb26b2b5b9cfea4c5d5580f037ef41da",
+            "output_index": 0,
+            "collateral": false,
+            "reference": false
+        }
+    ],
+    "outputs": [
+        {
+            "address": "addr1vx9wkegx062xmmdzfd69jz6dt48p5mse4v35mml5h6ceznq8ap8fz",
+            "amount": [
+                {
+                    "unit": "lovelace",
+                    "quantity": "2837715"
+                },
+                {
+                    "unit": "6787a47e9f73efe4002d763337140da27afa8eb9a39413d2c39d4286524144546f6b656e73",
+                    "quantity": "15000"
+                }
+            ],
+            "output_index": 0,
+            "data_hash": null,
+            "inline_datum": null,
+            "collateral": false,
+            "reference_script_hash": null
+        }
+    ]
+}

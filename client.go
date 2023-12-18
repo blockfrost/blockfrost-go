@@ -32,7 +32,7 @@ type APIClientOptions struct {
 	Client *http.Client
 }
 
-// NewAPICLient creates a client from APIClientOptions. If no options are provided,
+// NewAPIClient creates a client from APIClientOptions. If no options are provided,
 // client with default configurations is returned.
 func NewAPIClient(options APIClientOptions) APIClient {
 	if options.Server == "" {
@@ -78,6 +78,8 @@ type APIClient interface {
 	BlocksPrevious(ctx context.Context, hashOrNumber string) ([]Block, error)
 	BlockBySlot(ctx context.Context, slotNumber int) (Block, error)
 	BlocksBySlotAndEpoch(ctx context.Context, slotNumber int, epochNumber int) (Block, error)
+	BlocksAddresses(ctx context.Context, hashOrNumber string, query APIQueryParams) ([]BlockAffectedAddresses, error)
+	BlocksAddressesAll(ctx context.Context, hashOrNumber string) <-chan BlockAffectedAddressesResult
 	EpochLatest(ctx context.Context) (Epoch, error)
 	LatestEpochParameters(ctx context.Context) (EpochParameters, error)
 	Epoch(ctx context.Context, epochNumber int) (Epoch, error)
@@ -87,8 +89,8 @@ type APIClient interface {
 	EpochPreviousAll(ctx context.Context, epochNumber int) <-chan EpochResult
 	EpochStakeDistribution(ctx context.Context, epochNumber int, query APIQueryParams) ([]EpochStake, error)
 	EpochStakeDistributionAll(ctx context.Context, epochNumber int) <-chan EpochStakeResult
-	EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) ([]EpochStake, error)
-	EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeResult
+	EpochStakeDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) ([]EpochStakeByPool, error)
+	EpochStakeDistributionByPoolAll(ctx context.Context, epochNumber int, poolId string) <-chan EpochStakeByPoolResult
 	EpochBlockDistribution(ctx context.Context, epochNumber int, query APIQueryParams) ([]string, error)
 	EpochBlockDistributionAll(ctx context.Context, epochNumber int) <-chan BlockDistributionResult
 	EpochBlockDistributionByPool(ctx context.Context, epochNumber int, poolId string, query APIQueryParams) ([]string, error)
@@ -100,6 +102,8 @@ type APIClient interface {
 	AddressTransactionsAll(ctx context.Context, address string) <-chan AddressTxResult
 	AddressUTXOs(ctx context.Context, address string, query APIQueryParams) ([]AddressUTXO, error)
 	AddressUTXOsAll(ctx context.Context, address string) <-chan AddressUTXOResult
+	AddressUTXOsAsset(ctx context.Context, address, asset string, query APIQueryParams) ([]AddressUTXO, error)
+	AddressUTXOsAssetAll(ctx context.Context, address, asset string) <-chan AddressUTXOResult
 	Account(ctx context.Context, stakeAddress string) (Account, error)
 	AccountHistory(ctx context.Context, stakeAddress string, query APIQueryParams) ([]AccountHistory, error)
 	AccountHistoryAll(ctx context.Context, address string) <-chan AccountHistoryResult
@@ -118,14 +122,19 @@ type APIClient interface {
 	AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIQueryParams) ([]AccountAssociatedAsset, error)
 	AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll
 	Asset(ctx context.Context, asset string) (Asset, error)
-	Assets(ctx context.Context, query APIQueryParams) ([]Asset, error)
-	AssetsAll(ctx context.Context) <-chan AssetResult
+	Assets(ctx context.Context, query APIQueryParams) ([]AssetByPolicy, error)
+	AssetsAll(ctx context.Context) <-chan AssetByPolicyResult
 	AssetHistory(ctx context.Context, asset string) ([]AssetHistory, error)
 	AssetTransactions(ctx context.Context, asset string) ([]AssetTransaction, error)
 	AssetAddresses(ctx context.Context, asset string, query APIQueryParams) ([]AssetAddress, error)
 	AssetAddressesAll(ctx context.Context, asset string) <-chan AssetAddressesAll
-	AssetsByPolicy(ctx context.Context, policyId string) ([]Asset, error)
+	AssetsByPolicy(ctx context.Context, policyId string) ([]AssetByPolicy, error)
 	Genesis(ctx context.Context) (GenesisBlock, error)
+	Mempool(ctx context.Context, query APIQueryParams) ([]Mempool, error)
+	MempoolAll(ctx context.Context) <-chan MempoolResult
+	MempoolTx(ctx context.Context, hash string) (MempoolTransactionContent, error)
+	MempoolByAddress(ctx context.Context, address string, query APIQueryParams) ([]Mempool, error)
+	MempoolByAddressAll(ctx context.Context, address string) <-chan MempoolResult
 	MetadataTxLabels(ctx context.Context, query APIQueryParams) ([]MetadataTxLabel, error)
 	MetadataTxLabelsAll(ctx context.Context) <-chan MetadataTxLabelResult
 	MetadataTxContentInJSON(ctx context.Context, label string, query APIQueryParams) ([]MetadataTxContentInJSON, error)
@@ -175,4 +184,6 @@ type APIClient interface {
 	TransactionPoolUpdateCerts(ctx context.Context, hash string) ([]TransactionPoolCert, error)
 	TransactionPoolRetirementCerts(ctx context.Context, hash string) ([]TransactionPoolCert, error)
 	TransactionSubmit(ctx context.Context, cbor []byte) (string, error)
+	TransactionEvaluate(ctx context.Context, cbor []byte) (OgmiosResponse, error)
+	TransactionEvaluateUTXOs(ctx context.Context, cbor []byte, additionalUtxoSet AdditionalUtxoSet) (OgmiosResponse, error)
 }
