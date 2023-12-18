@@ -17,11 +17,6 @@ const (
 	resourcePolicyAssets      = "assets/policy"
 )
 
-type AssetOnchainMetadata struct {
-	Name  string `json:"name"`
-	Image string `json:"image"`
-}
-
 // Contains metadata information about an asset.
 type AssetMetadata struct {
 	Name        string `json:"name"`
@@ -56,7 +51,7 @@ type Asset struct {
 	MintOrBurnCount int `json:"mint_or_burn_count"`
 
 	// On-chain metadata which SHOULD adhere to the valid standards, based on which we perform the look up and display the asset (best effort)
-	OnchainMetadata *AssetOnchainMetadata `json:"onchain_metadata"`
+	OnchainMetadata *interface{} `json:"onchain_metadata"`
 	// Enum: "CIP25v1" "CIP25v2" "CIP68v1"
 	// If on-chain metadata passes validation, we display the standard under which it is valid
 	OnchainMetadataStandard *string `json:"onchain_metadata_standard"`
