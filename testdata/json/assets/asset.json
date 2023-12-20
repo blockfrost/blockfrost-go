@@ -7,15 +7,16 @@
     "initial_mint_tx_hash": "6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad",
     "mint_or_burn_count": 1,
     "onchain_metadata": {
-      "name": "My NFT token",
-      "image": "ipfs://ipfs/QmfKyJ4tuvHowwKQCbCHj4L5T3fSj8cjs7Aau8V7BWv226"
+        "name": "My NFT token",
+        "image": "ipfs://ipfs/QmfKyJ4tuvHowwKQCbCHj4L5T3fSj8cjs7Aau8V7BWv226",
+        "description": "optional"
     },
     "metadata": {
-      "name": "nutcoin",
-      "description": "The Nut Coin",
-      "ticker": "nutc",
-      "url": "https://www.stakenuts.com/",
-      "logo": "42",
-      "decimals": 6
+        "name": "nutcoin",
+        "description": "The Nut Coin",
+        "ticker": "nutc",
+        "url": "https://www.stakenuts.com/",
+        "logo": "42",
+        "decimals": 6
     }
 }

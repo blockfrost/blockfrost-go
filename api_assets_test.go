@@ -12,6 +12,13 @@ import (
 )
 
 func TestAssetUnmarshal(t *testing.T) {
+
+	var onchainMetadata interface{} = map[string]interface{}{
+		"image":       "ipfs://ipfs/QmfKyJ4tuvHowwKQCbCHj4L5T3fSj8cjs7Aau8V7BWv226",
+		"name":        "My NFT token",
+		"description": "optional",
+	}
+
 	fp := filepath.Join(testdata, "json", "assets", "asset.json")
 	want := blockfrost.Asset{
 		Asset:             "b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e",
@@ -21,10 +28,7 @@ func TestAssetUnmarshal(t *testing.T) {
 		InitialMintTxHash: "6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad",
 		MintOrBurnCount:   1,
 		Quantity:          "12000",
-		OnchainMetadata: &blockfrost.AssetOnchainMetadata{
-			Image: "ipfs://ipfs/QmfKyJ4tuvHowwKQCbCHj4L5T3fSj8cjs7Aau8V7BWv226",
-			Name:  "My NFT token",
-		},
+		OnchainMetadata:   &onchainMetadata,
 		Metadata: &blockfrost.AssetMetadata{
 			Name:        "nutcoin",
 			Description: "The Nut Coin",
@@ -52,6 +56,18 @@ func TestResourceAssetsIntegration(t *testing.T) {
 
 func TestResourceAssetIntegration(t *testing.T) {
 	asset := "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e4669727374636f696e"
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
+	got, err := api.Asset(context.TODO(), asset)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	want := blockfrost.Asset{}
+	testIntUtil(t, fp, &got, &want)
+}
+func TestResourceAssetMetadataIntegration(t *testing.T) {
+	asset := "14696a4676909f4e3cb1f2e60e2e08e5abed70caf5c02699be97113943554259"
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
 	got, err := api.Asset(context.TODO(), asset)
