@@ -10,7 +10,7 @@ import (
 
 const (
 	Major      = 0
-	Minor      = 1
+	Minor      = 2
 	Patch      = 0
 	Prerelease = ""
 )
