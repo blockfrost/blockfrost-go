@@ -49,33 +49,32 @@ type WebhookEventCommon struct {
 	WebhookID  string `json:"webhook_id"`
 	Created    int    `json:"created"`
 	APIVersion int    `json:"api_version,omitempty"` // omitempty because test fixtures do not include it
+	Type       string `json:"type"`                  // block, transaction, delegation, epoch
 }
 
 type WebhookEventBlock struct {
 	WebhookEventCommon
-	Type    string `json:"type"` // "block"
-	Payload Block  `json:"payload"`
+	Payload Block `json:"payload"`
 }
 
 type WebhookEventTransaction struct {
 	WebhookEventCommon
-	Type    string               `json:"type"` // "transaction"
 	Payload []TransactionPayload `json:"payload"`
 }
 
 type WebhookEventEpoch struct {
 	WebhookEventCommon
-	Type    string       `json:"type"` // "epoch"
 	Payload EpochPayload `json:"payload"`
 }
 
 type WebhookEventDelegation struct {
 	WebhookEventCommon
-	Type    string                   `json:"type"` // "delegation"
 	Payload []StakeDelegationPayload `json:"payload"`
 }
 
-type WebhookEvent interface{}
+type WebhookEvent struct {
+	WebhookEventCommon
+}
 
 const (
 	// Signatures older than this will be rejected by ConstructEvent
@@ -152,67 +151,47 @@ func parseSignatureHeader(header string) (*signedHeader, error) {
 	return sh, nil
 }
 
-func VerifyWebhookSignature(payload []byte, header string, secret string) (WebhookEvent, error) {
+func VerifyWebhookSignature(payload []byte, header string, secret string) (*WebhookEvent, error) {
 	return VerifyWebhookSignatureWithTolerance(payload, header, secret, DefaultTolerance)
 }
 
-func VerifyWebhookSignatureWithTolerance(payload []byte, header string, secret string, tolerance time.Duration) (WebhookEvent, error) {
+func VerifyWebhookSignatureWithTolerance(payload []byte, header string, secret string, tolerance time.Duration) (*WebhookEvent, error) {
 	return verifyWebhookSignature(payload, header, secret, tolerance, true)
 }
 
-func VerifyWebhookSignatureIgnoringTolerance(payload []byte, header string, secret string) (WebhookEvent, error) {
+func VerifyWebhookSignatureIgnoringTolerance(payload []byte, header string, secret string) (*WebhookEvent, error) {
 	return verifyWebhookSignature(payload, header, secret, 0*time.Second, false)
 }
 
-func verifyWebhookSignature(payload []byte, sigHeader string, secret string, tolerance time.Duration, enforceTolerance bool) (WebhookEvent, error) {
+func verifyWebhookSignature(payload []byte, sigHeader string, secret string, tolerance time.Duration, enforceTolerance bool) (*WebhookEvent, error) {
 	// First unmarshal into a generic map to inspect the type
 	var genericEvent map[string]interface{}
 	if err := json.Unmarshal(payload, &genericEvent); err != nil {
-		return nil, fmt.Errorf("failed to parse webhook body json: %s", err)
-	}
-
-	// Determine the specific event type
-	eventType, ok := genericEvent["type"].(string)
-	if !ok {
-		return nil, errors.New("event type not found")
+		return nil, fmt.Errorf("Failed to parse webhook body json: %s", err)
 	}
 
 	var event WebhookEvent
 
-	// Unmarshal into the specific event type based on the eventType
-	switch eventType {
-	case string(WebhookEventTypeBlock):
-		event = new(WebhookEventBlock)
-	case string(WebhookEventTypeTransaction):
-		event = new(WebhookEventTransaction)
-	case string(WebhookEventTypeEpoch):
-		event = new(WebhookEventEpoch)
-	case string(WebhookEventTypeDelegation):
-		event = new(WebhookEventDelegation)
-	default:
-		return nil, fmt.Errorf("unknown event type: %s", eventType)
-	}
-
 	if err := json.Unmarshal(payload, &event); err != nil {
-		return nil, fmt.Errorf("failed to parse specific webhook event json: %s", err)
+		return nil, fmt.Errorf("Failed to parse specific webhook event json: %s", err)
 	}
 
 	header, err := parseSignatureHeader(sigHeader)
 	if err != nil {
-		return event, err
+		return &event, err
 	}
 
 	expectedSignature := computeSignature(header.timestamp, payload, secret)
 	expiredTimestamp := time.Since(header.timestamp) > tolerance
 	if enforceTolerance && expiredTimestamp {
-		return event, ErrTooOld
+		return &event, ErrTooOld
 	}
 
 	for _, sig := range header.signatures {
 		if hmac.Equal(expectedSignature, sig) {
-			return event, nil
+			return &event, nil
 		}
 	}
 
-	return event, ErrNoValidSignature
+	return &event, ErrNoValidSignature
 }
