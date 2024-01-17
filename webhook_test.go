@@ -15,13 +15,21 @@ func TestVerifyWebhookSignature(t *testing.T) {
 		"t=1650013856,v1=abc,t=1650013856,v1=f4c3bb2a8b0c8e21fa7d5fdada2ee87c9c6f6b0b159cc22e483146917e195c3e",
 		"59a1eb46-96f4-4f0b-8a03-b4d26e70593a")
 
-	_, ok := event.(*blockfrost.WebhookEventBlock)
-	if !ok {
-		jsonData, _ := json.Marshal(event)
-		t.Fatalf("Invalid webhook type %s", jsonData)
+	// Unmarshal the event data into an appropriate struct depending on its Type
+	var blockEvent blockfrost.WebhookEventBlock
+	switch event.Type {
+	case "block":
+		err := json.Unmarshal([]byte(validPayload), &blockEvent)
+
+		if err != nil {
+			t.Fatalf("Error parsing webhook JSON: %v\n", err)
+			return
+		}
+	default:
+		t.Fatalf("Invalid webhook type: %s\n", event.Type)
 	}
 
-	jsonData, err := json.Marshal(event)
+	jsonData, err := json.Marshal(blockEvent)
 	if err != nil {
 		t.Fatalf("Error marshaling to JSON: %s", err)
 	}
