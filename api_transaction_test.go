@@ -207,6 +207,18 @@ func TestTransactionRedeemersIntegration(t *testing.T) {
 	testIntUtil(t, fp, &got, &want)
 }
 
+func TestTransactionRequiredSignersIntegration(t *testing.T) {
+	hash := "b024ad35c6309a71a8e613d8bfea2a8185d81eda379ca9128877adefcde1c515"
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+	got, err := api.TransactionRequiredSigners(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.TransactionRequiredSigner{}
+	testIntUtil(t, fp, &got, &want)
+}
+
 func TestTransactionDelegationCertsIntegration(t *testing.T) {
 	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
