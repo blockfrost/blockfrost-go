@@ -10,20 +10,21 @@ import (
 )
 
 const (
-	resourceTxs             = "txs"
-	resourceTx              = "tx"
-	resourceTxStakes        = "stakes"
-	resourceTxUTXOs         = "utxos"
-	resourceTxWithdrawals   = "withdrawals"
-	resourceTxMetadata      = "metadata"
-	resourceTxRedeemers     = "redeemers"
-	resourceCbor            = "cbor"
-	resourceTxDelegations   = "delegations"
-	resourceTxPoolUpdates   = "pool_updates"
-	resourceTxPoolRetires   = "pool_retires"
-	resourceTxSubmit        = "submit"
-	resourceTxEvaluate      = "utils/txs/evaluate"
-	resourceTxEvaluateUtxos = "utils/txs/evaluate/utxos"
+	resourceTxs               = "txs"
+	resourceTx                = "tx"
+	resourceTxStakes          = "stakes"
+	resourceTxUTXOs           = "utxos"
+	resourceTxWithdrawals     = "withdrawals"
+	resourceTxMetadata        = "metadata"
+	resourceTxRedeemers       = "redeemers"
+	resourceTxRequiredSigners = "required_signers"
+	resourceCbor              = "cbor"
+	resourceTxDelegations     = "delegations"
+	resourceTxPoolUpdates     = "pool_updates"
+	resourceTxPoolRetires     = "pool_retires"
+	resourceTxSubmit          = "submit"
+	resourceTxEvaluate        = "utils/txs/evaluate"
+	resourceTxEvaluateUtxos   = "utils/txs/evaluate/utxos"
 )
 
 type TransactionContent struct {
@@ -282,6 +283,10 @@ type TransactionRedeemer struct {
 	UnitMem          string `json:"unit_mem"`
 	UnitSteps        string `json:"unit_steps"`
 	Fee              string `json:"fee"`
+}
+
+type TransactionRequiredSigner struct {
+	WitnessHash string `json:"witness_hash"`
 }
 
 type Quantity string
@@ -561,6 +566,26 @@ func (c *apiClient) TransactionPoolRetirementCerts(ctx context.Context, hash str
 		return
 	}
 	return tcs, nil
+}
+
+func (c *apiClient) TransactionRequiredSigners(ctx context.Context, hash string) (tm []TransactionRequiredSigner, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxRequiredSigners))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tm); err != nil {
+		return
+	}
+	return tm, nil
 }
 
 func (c *apiClient) TransactionSubmit(ctx context.Context, cbor []byte) (hash string, err error) {
