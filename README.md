@@ -30,6 +30,7 @@ $ go get https://github.com/blockfrost/blockfrost-go
 ## Usage
 
 ### Cardano API
+
 ```go
 package main
 
@@ -100,6 +101,20 @@ func main() {
 ```
 
 More examples of usage can be found in [`example`](https://github.com/blockfrost/blockfrost-go/tree/master/example) folder.
+
+## Developing
+
+To run specific test:
+
+```
+go test -run <name>
+```
+
+To run all tests:
+
+```
+make test
+```
 
 ## License
 

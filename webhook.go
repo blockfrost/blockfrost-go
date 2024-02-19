@@ -22,13 +22,13 @@ const (
 )
 
 type TransactionPayload struct {
-	Tx      Transaction         `json:"tx"`
+	Tx      TransactionContent  `json:"tx"`
 	Inputs  []TransactionInput  `json:"inputs"`
 	Outputs []TransactionOutput `json:"outputs"`
 }
 
 type StakeDelegationPayload struct {
-	Tx          Transaction `json:"tx"`
+	Tx          TransactionContent `json:"tx"`
 	Delegations []struct {
 		TransactionDelegation
 		Pool Pool `json:"pool"`
