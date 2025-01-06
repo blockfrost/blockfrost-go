@@ -146,6 +146,20 @@ func TestResourceAddressDetails(t *testing.T) {
 	testIntUtil(t, fp, &got, &want)
 }
 
+func TestResourceAddressExtended(t *testing.T) {
+	addr := "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
+	got, err := api.AddressExtended(context.TODO(), addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	want := blockfrost.AddressExtended{}
+
+	testIntUtil(t, fp, &got, &want)
+}
+
 func TestResourceAddressTransactions(t *testing.T) {
 	addr := "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
 

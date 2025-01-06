@@ -1,0 +1,14 @@
+{
+  "address": "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz",
+  "amount": [
+    {
+      "unit": "lovelace",
+      "quantity": "0",
+      "decimals": 6,
+      "has_nft_onchain_metadata": false
+    }
+  ],
+  "stake_address": "stake1ux3u6x5cs388djqz6awnyuvez2f6n8jzjhqq59s4yxhm8jskeh0t9",
+  "type": "shelley",
+  "script": false
+}
