@@ -54,6 +54,35 @@ func TestAddressDetailsUnMarshall(t *testing.T) {
 	testStructGotWant(t, fp, &got, &want)
 }
 
+func TestAddressExtendedUnMarshall(t *testing.T) {
+	StakeAddress := "stake1ux3g2c9dx2nhhehyrezyxpkstartcqmu9hk63qgfkccw5rqttygt7"
+	Decimals := 6
+
+	want := blockfrost.AddressExtended{
+		Address: "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz",
+		Amount: []blockfrost.AddressAmountExtended{
+			{
+				Unit:                  "lovelace",
+				Quantity:              "42000000",
+				Decimals:              &Decimals,
+				HasNftOnchainMetadata: false},
+			{
+				Unit:                  "b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e",
+				Quantity:              "12",
+				Decimals:              nil,
+				HasNftOnchainMetadata: true,
+			},
+		},
+		StakeAddress: &StakeAddress,
+		Type:         "shelley",
+		Script:       false,
+	}
+
+	fp := filepath.Join(testdata, "json", "address", "address_extended.json")
+	got := blockfrost.AddressDetails{}
+	testStructGotWant(t, fp, &got, &want)
+}
+
 func WriteGoldenFile(t *testing.T, path string, bytes []byte) {
 	t.Helper()
 	err := os.MkdirAll(filepath.Dir(path), 0777)
@@ -113,6 +142,20 @@ func TestResourceAddressDetails(t *testing.T) {
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
 	want := blockfrost.AddressDetails{}
+
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestResourceAddressExtended(t *testing.T) {
+	addr := "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
+	got, err := api.AddressExtended(context.TODO(), addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimLeft(t.Name(), "Test"))+".golden")
+	want := blockfrost.AddressExtended{}
 
 	testIntUtil(t, fp, &got, &want)
 }
