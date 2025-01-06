@@ -14,11 +14,19 @@ const (
 	resourceTotal        = "total"
 	resourceTransactions = "transactions"
 	resourceUTXOs        = "utxos"
+	resourceExtended     = "extended"
 )
 
 type AddressAmount struct {
 	Unit     string `json:"unit"`
 	Quantity string `json:"quantity"`
+}
+
+type AddressAmountExtended struct {
+	Unit                  string `json:"unit"`
+	Quantity              string `json:"quantity"`
+	Decimals              *int   `json:"decimals"`
+	HasNftOnchainMetadata bool   `json:"has_nft_onchain_metadata"`
 }
 
 type Address struct {
@@ -45,6 +53,22 @@ type AddressDetails struct {
 
 	// Count of all transactions on the address
 	TxCount int `json:"tx_count"`
+}
+
+type AddressExtended struct {
+	// Bech32 encoded addresses
+	Address string                  `json:"address"`
+	Amount  []AddressAmountExtended `json:"amount"`
+
+	// Stake address that controls the key
+	StakeAddress *string `json:"stake_address"`
+
+	// Address era.
+	// Enum: "byron" "shelley"
+	Type string `json:"type"`
+
+	// True if this is a script address
+	Script bool `json:"script"`
 }
 
 type AddressTransactions struct {
@@ -341,4 +365,27 @@ func (c *apiClient) AddressUTXOsAssetAll(ctx context.Context, address, asset str
 		wg.Wait()
 	}()
 	return ch
+}
+
+func (c *apiClient) AddressExtended(ctx context.Context, address string) (addrExtended AddressExtended, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAddresses, address, resourceExtended))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&addrExtended); err != nil {
+		return
+	}
+	return addrExtended, nil
 }

@@ -98,6 +98,7 @@ type APIClient interface {
 	EpochParameters(ctx context.Context, epochNumber int) (EpochParameters, error)
 	Address(ctx context.Context, address string) (Address, error)
 	AddressDetails(ctx context.Context, address string) (AddressDetails, error)
+	AddressExtended(ctx context.Context, address string) (AddressExtended, error)
 	AddressTransactions(ctx context.Context, address string, query APIQueryParams) ([]AddressTransactions, error)
 	AddressTransactionsAll(ctx context.Context, address string) <-chan AddressTxResult
 	AddressUTXOs(ctx context.Context, address string, query APIQueryParams) ([]AddressUTXO, error)
