@@ -306,9 +306,9 @@ type AdditionalUtxoSetTxIn struct {
 type AdditionalUtxoSetTxOut struct {
 	Address   string       `json:"address"`
 	Value     Value        `json:"value"`
-	DatumHash *string      `json:"datumHash"`
-	Datum     interface{}  `json:"datum"` // Could be various types
-	Script    *TxOutScript `json:"script"`
+	DatumHash *string      `json:"datum_hash,omitempty"`
+	Datum     interface{}  `json:"datum,omitempty"` // Could be various types
+	Script    *TxOutScript `json:"script,omitempty"`
 }
 
 // AdditionalUtxoSet represents a slice of tuples (TxIn, TxOut)
