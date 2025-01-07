@@ -180,6 +180,7 @@ type APIClient interface {
 	TransactionMetadata(ctx context.Context, hash string) ([]TransactionMetadata, error)
 	TransactionMetadataInCBORs(ctx context.Context, hash string) ([]TransactionMetadataCbor, error)
 	TransactionRedeemers(ctx context.Context, hash string) ([]TransactionRedeemer, error)
+	TransactionRequiredSigners(ctx context.Context, hash string) ([]TransactionRequiredSigner, error)
 	TransactionDelegationCerts(ctx context.Context, hash string) ([]TransactionDelegation, error)
 	TransactionPoolUpdates(ctx context.Context, hash string) ([]TransactionPoolCert, error)
 	TransactionPoolUpdateCerts(ctx context.Context, hash string) ([]TransactionPoolCert, error)
