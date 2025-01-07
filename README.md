@@ -104,6 +104,12 @@ More examples of usage can be found in [`example`](https://github.com/blockfrost
 
 ## Developing
 
+Set `BLOCKFROST_PROJECT_ID` env variable:
+
+```
+export BLOCKFROST_PROJECT_ID=<MAINNET_TOKEN>
+```
+
 To run specific test:
 
 ```
@@ -114,6 +120,12 @@ To run all tests:
 
 ```
 make test
+```
+
+To generate missing .golden file
+
+```
+go test -gen
 ```
 
 ## License

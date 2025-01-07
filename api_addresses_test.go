@@ -79,7 +79,7 @@ func TestAddressExtendedUnMarshall(t *testing.T) {
 	}
 
 	fp := filepath.Join(testdata, "json", "address", "address_extended.json")
-	got := blockfrost.AddressDetails{}
+	got := blockfrost.AddressExtended{}
 	testStructGotWant(t, fp, &got, &want)
 }
 
