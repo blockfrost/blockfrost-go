@@ -99,6 +99,10 @@ type TransactionContent struct {
 	WithdrawalCount int `json:"withdrawal_count"`
 }
 
+type TransactionCBOR struct {
+	Cbor string `json:"cbor"`
+}
+
 type TxAmount struct {
 	// The quantity of the unit
 	Quantity string `json:"quantity"`
@@ -330,6 +334,26 @@ type OgmiosResponse struct {
 
 func (c *apiClient) Transaction(ctx context.Context, hash string) (tc TransactionContent, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceTxs, hash))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&tc); err != nil {
+		return
+	}
+	return tc, nil
+}
+
+func (c *apiClient) TransactionCBOR(ctx context.Context, hash string) (tc TransactionCBOR, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceCbor))
 	if err != nil {
 		return
 	}
@@ -611,7 +635,6 @@ func (c *apiClient) TransactionSubmit(ctx context.Context, cbor []byte) (hash st
 
 func (c *apiClient) TransactionEvaluate(ctx context.Context, cbor []byte) (jsonResponse OgmiosResponse, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceTxEvaluate))
-
 	if err != nil {
 		return
 	}

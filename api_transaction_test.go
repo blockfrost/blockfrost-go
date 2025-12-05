@@ -39,6 +39,15 @@ func TestTransactionContentUnmarshal(t *testing.T) {
 	testStructGotWant(t, fp, &got, &want)
 }
 
+func TestTransactionCBORUnmarshal(t *testing.T) {
+	want := blockfrost.TransactionCBOR{
+		Cbor: "83a40081825820c84dbd7b780ff9be2bcc6990f043030fe649342f9fa7ba1bfa6fb5c0079501a400018282582b82d818582183581cf810f5ffa3613a7edcc1e733d0d73c89645d02221648a031436fd840a0001a4f7ed7fd1a45bb41e082581d619fc8d50cd36af0e35f43db0e2f220e4ccb774925f2ef3542875b37701a000f4240021a00030d40031a00f9c7cca102818458205e3eb96f2cfd7844b5eed5498fe487fc5271178fb251ebf3d33c5d8f49036d9358403c9ef2ce22b8a3fce622472f84c932679f95e0f3e139378fe9d6ab5442c60a9b87de374a0bc37667b1bf8d5c6bffb436ffd84b0fa56a7c86342962b9c293390758208ed6ca9faabd8499f021c2e51745436c99f9eab6c92f4b09b255bdd9f39bae2a41a0f6",
+	}
+	fp := filepath.Join(testdata, "json", "transactions", "transaction_cbor.json")
+	got := blockfrost.TransactionCBOR{}
+	testStructGotWant(t, fp, &got, &want)
+}
+
 func TestTransactionStakeAddressCertUnmarshall(t *testing.T) {
 	fp := filepath.Join(testdata, "json", "transactions", "tx_stakeaddr_cert.json")
 	want := []blockfrost.TransactionStakeAddressCert{
@@ -115,6 +124,19 @@ func TestTransactionIntegration(t *testing.T) {
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
 	want := blockfrost.TransactionContent{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestTransactionCBORIntegration(t *testing.T) {
+	hash := "6e5f825c82c1c6d6b77f2a14092f3b78c8f1b66db6f4cf8caec1555b6f967b3b"
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
+	got, err := api.TransactionCBOR(context.TODO(), hash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := blockfrost.TransactionCBOR{}
 	testIntUtil(t, fp, &got, &want)
 }
 
@@ -270,7 +292,6 @@ func TestTransactionPoolRetirementsIntegration(t *testing.T) {
 }
 
 func TestTransactionEvaluateIntegration(t *testing.T) {
-
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 	got, err := api.TransactionEvaluate(context.TODO(), tx_cbor)
 	if err != nil {
@@ -285,8 +306,8 @@ func TestTransactionEvaluateIntegration(t *testing.T) {
 
 	testIntUtil(t, fp, &got, &want)
 }
-func TestTransactionEvaluateUTXOsIntegration(t *testing.T) {
 
+func TestTransactionEvaluateUTXOsIntegration(t *testing.T) {
 	additionalUtxoSet := blockfrost.AdditionalUtxoSet{
 		{
 			TxIn: blockfrost.AdditionalUtxoSetTxIn{

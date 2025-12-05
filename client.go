@@ -173,6 +173,7 @@ type APIClient interface {
 	PoolUpdates(ctx context.Context, poolID string, query APIQueryParams) ([]PoolUpdate, error)
 	PoolUpdatesAll(ctx context.Context, poolId string) <-chan PoolUpdateResult
 	Transaction(ctx context.Context, hash string) (TransactionContent, error)
+	TransactionCBOR(ctx context.Context, hash string) (TransactionCBOR, error)
 	TransactionUTXOs(ctx context.Context, hash string) (TransactionUTXOs, error)
 	TransactionStakeAddressCerts(ctx context.Context, hash string) ([]TransactionStakeAddressCert, error)
 	TransactionWithdrawals(ctx context.Context, hash string) ([]TransactionWidthrawal, error)
