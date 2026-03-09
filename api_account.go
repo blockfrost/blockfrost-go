@@ -57,7 +57,7 @@ type Account struct {
 	PoolID *string `json:"pool_id"`
 
 	// Bech32 DRep ID associated with the account
-	DrepId *string `json:"drep_id"`
+	DrepID *string `json:"drep_id"`
 
 	// Registration state of an account
 	Registered bool `json:"registered"`
