@@ -72,8 +72,10 @@ type APIClient interface {
 	MetricsEndpoints(ctx context.Context) ([]MetricsEndpoint, error)
 	Block(ctx context.Context, hashOrNumber string) (Block, error)
 	BlockLatest(ctx context.Context) (Block, error)
-	BlockLatestTransactions(ctx context.Context) ([]Transaction, error)
-	BlockTransactions(ctx context.Context, hashOrNumer string) ([]Transaction, error)
+	BlockLatestTransactions(ctx context.Context, query APIQueryParams) ([]Transaction, error)
+	BlockLatestTransactionsAll(ctx context.Context) <-chan BlockTransactionResult
+	BlockTransactions(ctx context.Context, hashOrNumer string, query APIQueryParams) ([]Transaction, error)
+	BlockTransactionsAll(ctx context.Context, hashOrNumber string) <-chan BlockTransactionResult
 	BlocksNext(ctx context.Context, hashOrNumber string) ([]Block, error)
 	BlocksPrevious(ctx context.Context, hashOrNumber string) ([]Block, error)
 	BlockBySlot(ctx context.Context, slotNumber int) (Block, error)
@@ -122,14 +124,20 @@ type APIClient interface {
 	AccountAssociatedAddressesAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAddressesAll
 	AccountAssociatedAssets(ctx context.Context, stakeAddress string, query APIQueryParams) ([]AccountAssociatedAsset, error)
 	AccountAssociatedAssetsAll(ctx context.Context, stakeAddress string) <-chan AccountAssociatedAssetsAll
+	AccountAddressesTotal(ctx context.Context, stakeAddress string) (AccountAddressesTotal, error)
+	AccountTransactions(ctx context.Context, stakeAddress string, query APIQueryParams) ([]AccountTransaction, error)
+	AccountTransactionsAll(ctx context.Context, stakeAddress string) <-chan AccountTransactionResult
 	Asset(ctx context.Context, asset string) (Asset, error)
 	Assets(ctx context.Context, query APIQueryParams) ([]AssetByPolicy, error)
 	AssetsAll(ctx context.Context) <-chan AssetByPolicyResult
-	AssetHistory(ctx context.Context, asset string) ([]AssetHistory, error)
-	AssetTransactions(ctx context.Context, asset string) ([]AssetTransaction, error)
+	AssetHistory(ctx context.Context, asset string, query APIQueryParams) ([]AssetHistory, error)
+	AssetHistoryAll(ctx context.Context, asset string) <-chan AssetHistoryResult
+	AssetTransactions(ctx context.Context, asset string, query APIQueryParams) ([]AssetTransaction, error)
+	AssetTransactionsAll(ctx context.Context, asset string) <-chan AssetTransactionResult
 	AssetAddresses(ctx context.Context, asset string, query APIQueryParams) ([]AssetAddress, error)
 	AssetAddressesAll(ctx context.Context, asset string) <-chan AssetAddressesAll
-	AssetsByPolicy(ctx context.Context, policyId string) ([]AssetByPolicy, error)
+	AssetsByPolicy(ctx context.Context, policyId string, query APIQueryParams) ([]AssetByPolicy, error)
+	AssetsByPolicyAll(ctx context.Context, policyId string) <-chan AssetByPolicyResult
 	Genesis(ctx context.Context) (GenesisBlock, error)
 	Mempool(ctx context.Context, query APIQueryParams) ([]Mempool, error)
 	MempoolAll(ctx context.Context) <-chan MempoolResult
@@ -143,6 +151,7 @@ type APIClient interface {
 	MetadataTxContentInCBOR(ctx context.Context, label string, query APIQueryParams) ([]MetadataTxContentInCBOR, error)
 	MetadataTxContentInCBORAll(ctx context.Context, label string) <-chan MetadataTxContentInCBORResult
 	Network(ctx context.Context) (NetworkInfo, error)
+	NetworkEras(ctx context.Context) ([]NetworkEra, error)
 	Nutlink(ctx context.Context, address string) (NutlinkAddress, error)
 	Tickers(ctx context.Context, address string, query APIQueryParams) ([]Ticker, error)
 	TickersAll(ctx context.Context, address string) <-chan TickerResult
@@ -155,6 +164,10 @@ type APIClient interface {
 	ScriptsAll(ctx context.Context) <-chan ScriptAllResult
 	ScriptRedeemers(ctx context.Context, address string, query APIQueryParams) ([]ScriptRedeemer, error)
 	ScriptRedeemersAll(ctx context.Context, address string) <-chan ScriptRedeemerResult
+	ScriptJSON(ctx context.Context, scriptHash string) (ScriptJSON, error)
+	ScriptCBOR(ctx context.Context, scriptHash string) (ScriptCBOR, error)
+	ScriptDatum(ctx context.Context, datumHash string) (ScriptDatum, error)
+	ScriptDatumCBOR(ctx context.Context, datumHash string) (ScriptDatumCBOR, error)
 	Pool(ctx context.Context, poolID string) (Pool, error)
 	Pools(ctx context.Context, query APIQueryParams) (Pools, error)
 	PoolsAll(ctx context.Context) <-chan PoolsResult
@@ -172,6 +185,27 @@ type APIClient interface {
 	PoolBlocksAll(ctx context.Context, poolId string) <-chan PoolBlocksResult
 	PoolUpdates(ctx context.Context, poolID string, query APIQueryParams) ([]PoolUpdate, error)
 	PoolUpdatesAll(ctx context.Context, poolId string) <-chan PoolUpdateResult
+	PoolsExtended(ctx context.Context, query APIQueryParams) ([]PoolExtended, error)
+	PoolsExtendedAll(ctx context.Context) <-chan PoolsExtendedResult
+	Dreps(ctx context.Context, query APIQueryParams) ([]Drep, error)
+	DrepsAll(ctx context.Context) <-chan DrepResult
+	DrepDetails(ctx context.Context, drepId string) (DrepDetails, error)
+	DrepMetadata(ctx context.Context, drepId string) (DrepMetadata, error)
+	DrepDelegators(ctx context.Context, drepId string, query APIQueryParams) ([]DrepDelegator, error)
+	DrepDelegatorsAll(ctx context.Context, drepId string) <-chan DrepDelegatorResult
+	DrepUpdates(ctx context.Context, drepId string, query APIQueryParams) ([]DrepUpdate, error)
+	DrepUpdatesAll(ctx context.Context, drepId string) <-chan DrepUpdateResult
+	DrepVotes(ctx context.Context, drepId string, query APIQueryParams) ([]DrepVote, error)
+	DrepVotesAll(ctx context.Context, drepId string) <-chan DrepVoteResult
+	Proposals(ctx context.Context, query APIQueryParams) ([]Proposal, error)
+	ProposalsAll(ctx context.Context) <-chan ProposalResult
+	Proposal(ctx context.Context, txHash string, certIndex int) (ProposalDetails, error)
+	ProposalParameters(ctx context.Context, txHash string, certIndex int) (ProposalParameters, error)
+	ProposalMetadata(ctx context.Context, txHash string, certIndex int) (ProposalMetadata, error)
+	ProposalWithdrawals(ctx context.Context, txHash string, certIndex int, query APIQueryParams) ([]ProposalWithdrawal, error)
+	ProposalWithdrawalsAll(ctx context.Context, txHash string, certIndex int) <-chan ProposalWithdrawalResult
+	ProposalVotes(ctx context.Context, txHash string, certIndex int, query APIQueryParams) ([]ProposalVote, error)
+	ProposalVotesAll(ctx context.Context, txHash string, certIndex int) <-chan ProposalVoteResult
 	Transaction(ctx context.Context, hash string) (TransactionContent, error)
 	TransactionCBOR(ctx context.Context, hash string) (TransactionCBOR, error)
 	TransactionUTXOs(ctx context.Context, hash string) (TransactionUTXOs, error)

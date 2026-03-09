@@ -1,0 +1,765 @@
+package blockfrost
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
+	"sync"
+)
+
+const (
+	resourceGovernanceDreps     = "governance/dreps"
+	resourceGovernanceProposals = "governance/proposals"
+	resourceDrepDelegators      = "delegators"
+	resourceDrepMetadata        = "metadata"
+	resourceDrepUpdates         = "updates"
+	resourceDrepVotes           = "votes"
+	resourceProposalParameters  = "parameters"
+	resourceProposalWithdrawals = "withdrawals"
+	resourceProposalVotes       = "votes"
+	resourceProposalMetadata    = "metadata"
+)
+
+type Drep struct {
+	DrepID string `json:"drep_id"`
+	Hex    string `json:"hex"`
+}
+
+type DrepDetails struct {
+	DrepID          string `json:"drep_id"`
+	Hex             string `json:"hex"`
+	Amount          string `json:"amount"`
+	Active          bool   `json:"active"`
+	ActiveEpoch     *int   `json:"active_epoch"`
+	HasScript       bool   `json:"has_script"`
+	Retired         bool   `json:"retired"`
+	Expired         bool   `json:"expired"`
+	LastActiveEpoch *int   `json:"last_active_epoch"`
+}
+
+type DrepMetadata struct {
+	DrepID       string      `json:"drep_id"`
+	Hex          string      `json:"hex"`
+	URL          string      `json:"url"`
+	Hash         string      `json:"hash"`
+	JSONMetadata interface{} `json:"json_metadata"`
+	Bytes        *string     `json:"bytes"`
+}
+
+type DrepDelegator struct {
+	Address string `json:"address"`
+	Amount  string `json:"amount"`
+}
+
+type DrepUpdate struct {
+	TxHash    string `json:"tx_hash"`
+	CertIndex int    `json:"cert_index"`
+	Action    string `json:"action"`
+}
+
+type DrepVote struct {
+	TxHash            string `json:"tx_hash"`
+	CertIndex         int    `json:"cert_index"`
+	ProposalTxHash    string `json:"proposal_tx_hash"`
+	ProposalCertIndex int    `json:"proposal_cert_index"`
+	ProposalID        string `json:"proposal_id"`
+	Vote              string `json:"vote"`
+}
+
+type Proposal struct {
+	TxHash         string `json:"tx_hash"`
+	CertIndex      int    `json:"cert_index"`
+	GovernanceType string `json:"governance_type"`
+	ID             string `json:"id"`
+}
+
+type ProposalDetails struct {
+	TxHash                string      `json:"tx_hash"`
+	CertIndex             int         `json:"cert_index"`
+	GovernanceType        string      `json:"governance_type"`
+	ID                    string      `json:"id"`
+	Deposit               string      `json:"deposit"`
+	ReturnAddress         string      `json:"return_address"`
+	GovernanceDescription interface{} `json:"governance_description"`
+	RatifiedEpoch         *int        `json:"ratified_epoch"`
+	EnactedEpoch          *int        `json:"enacted_epoch"`
+	DroppedEpoch          *int        `json:"dropped_epoch"`
+	ExpiredEpoch          *int        `json:"expired_epoch"`
+	Expiration            int         `json:"expiration"`
+}
+
+type ProposalParameters struct {
+	TxHash     string      `json:"tx_hash"`
+	CertIndex  int         `json:"cert_index"`
+	ID         string      `json:"id"`
+	Parameters interface{} `json:"parameters"`
+}
+
+type ProposalWithdrawal struct {
+	StakeAddress string `json:"stake_address"`
+	Amount       string `json:"amount"`
+}
+
+type ProposalVote struct {
+	TxHash    string `json:"tx_hash"`
+	CertIndex int    `json:"cert_index"`
+	Voter     string `json:"voter"`
+	VoterRole string `json:"voter_role"`
+	Vote      string `json:"vote"`
+}
+
+type ProposalMetadata struct {
+	TxHash       string      `json:"tx_hash"`
+	CertIndex    int         `json:"cert_index"`
+	ID           string      `json:"id"`
+	URL          string      `json:"url"`
+	Hash         string      `json:"hash"`
+	JSONMetadata interface{} `json:"json_metadata"`
+	Bytes        string      `json:"bytes"`
+}
+
+type DrepResult struct {
+	Res []Drep
+	Err error
+}
+
+type DrepDelegatorResult struct {
+	Res []DrepDelegator
+	Err error
+}
+
+type DrepUpdateResult struct {
+	Res []DrepUpdate
+	Err error
+}
+
+type DrepVoteResult struct {
+	Res []DrepVote
+	Err error
+}
+
+type ProposalResult struct {
+	Res []Proposal
+	Err error
+}
+
+type ProposalWithdrawalResult struct {
+	Res []ProposalWithdrawal
+	Err error
+}
+
+type ProposalVoteResult struct {
+	Res []ProposalVote
+	Err error
+}
+
+// Dreps returns the List of registered DReps.
+func (c *apiClient) Dreps(ctx context.Context, query APIQueryParams) (ds []Drep, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceGovernanceDreps))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&ds); err != nil {
+		return
+	}
+	return ds, nil
+}
+
+func (c *apiClient) DrepsAll(ctx context.Context) <-chan DrepResult {
+	ch := make(chan DrepResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan DrepResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				dreps, err := c.Dreps(j.ctx, j.query)
+				if len(dreps) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := DrepResult{Res: dreps, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// DrepDetails returns the details of a specific DRep.
+func (c *apiClient) DrepDetails(ctx context.Context, drepId string) (dd DrepDetails, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceGovernanceDreps, drepId))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&dd); err != nil {
+		return
+	}
+	return dd, nil
+}
+
+// DrepMetadata returns the metadata of a specific DRep.
+func (c *apiClient) DrepMetadata(ctx context.Context, drepId string) (dm DrepMetadata, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceGovernanceDreps, drepId, resourceDrepMetadata))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&dm); err != nil {
+		return
+	}
+	return dm, nil
+}
+
+// DrepDelegators returns the list of delegators for a specific DRep.
+func (c *apiClient) DrepDelegators(ctx context.Context, drepId string, query APIQueryParams) (dd []DrepDelegator, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceGovernanceDreps, drepId, resourceDrepDelegators))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&dd); err != nil {
+		return
+	}
+	return dd, nil
+}
+
+func (c *apiClient) DrepDelegatorsAll(ctx context.Context, drepId string) <-chan DrepDelegatorResult {
+	ch := make(chan DrepDelegatorResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan DrepDelegatorResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				delegators, err := c.DrepDelegators(j.ctx, drepId, j.query)
+				if len(delegators) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := DrepDelegatorResult{Res: delegators, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// DrepUpdates returns the list of updates for a specific DRep.
+func (c *apiClient) DrepUpdates(ctx context.Context, drepId string, query APIQueryParams) (du []DrepUpdate, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceGovernanceDreps, drepId, resourceDrepUpdates))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&du); err != nil {
+		return
+	}
+	return du, nil
+}
+
+func (c *apiClient) DrepUpdatesAll(ctx context.Context, drepId string) <-chan DrepUpdateResult {
+	ch := make(chan DrepUpdateResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan DrepUpdateResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				updates, err := c.DrepUpdates(j.ctx, drepId, j.query)
+				if len(updates) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := DrepUpdateResult{Res: updates, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// DrepVotes returns the list of votes for a specific DRep.
+func (c *apiClient) DrepVotes(ctx context.Context, drepId string, query APIQueryParams) (dv []DrepVote, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceGovernanceDreps, drepId, resourceDrepVotes))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&dv); err != nil {
+		return
+	}
+	return dv, nil
+}
+
+func (c *apiClient) DrepVotesAll(ctx context.Context, drepId string) <-chan DrepVoteResult {
+	ch := make(chan DrepVoteResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan DrepVoteResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				votes, err := c.DrepVotes(j.ctx, drepId, j.query)
+				if len(votes) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := DrepVoteResult{Res: votes, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// Proposals returns the List of governance proposals.
+func (c *apiClient) Proposals(ctx context.Context, query APIQueryParams) (ps []Proposal, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceGovernanceProposals))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&ps); err != nil {
+		return
+	}
+	return ps, nil
+}
+
+func (c *apiClient) ProposalsAll(ctx context.Context) <-chan ProposalResult {
+	ch := make(chan ProposalResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan ProposalResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				proposals, err := c.Proposals(j.ctx, j.query)
+				if len(proposals) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := ProposalResult{Res: proposals, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// Proposal returns the details of a specific governance proposal.
+func (c *apiClient) Proposal(ctx context.Context, txHash string, certIndex int) (pd ProposalDetails, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%d", c.server, resourceGovernanceProposals, txHash, certIndex))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&pd); err != nil {
+		return
+	}
+	return pd, nil
+}
+
+// ProposalParameters returns the parameters of a specific governance proposal.
+func (c *apiClient) ProposalParameters(ctx context.Context, txHash string, certIndex int) (pp ProposalParameters, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%d/%s", c.server, resourceGovernanceProposals, txHash, certIndex, resourceProposalParameters))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&pp); err != nil {
+		return
+	}
+	return pp, nil
+}
+
+// ProposalMetadata returns the metadata of a specific governance proposal.
+func (c *apiClient) ProposalMetadata(ctx context.Context, txHash string, certIndex int) (pm ProposalMetadata, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%d/%s", c.server, resourceGovernanceProposals, txHash, certIndex, resourceProposalMetadata))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&pm); err != nil {
+		return
+	}
+	return pm, nil
+}
+
+// ProposalWithdrawals returns the withdrawals of a specific governance proposal.
+func (c *apiClient) ProposalWithdrawals(ctx context.Context, txHash string, certIndex int, query APIQueryParams) (pw []ProposalWithdrawal, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%d/%s", c.server, resourceGovernanceProposals, txHash, certIndex, resourceProposalWithdrawals))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&pw); err != nil {
+		return
+	}
+	return pw, nil
+}
+
+func (c *apiClient) ProposalWithdrawalsAll(ctx context.Context, txHash string, certIndex int) <-chan ProposalWithdrawalResult {
+	ch := make(chan ProposalWithdrawalResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan ProposalWithdrawalResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				withdrawals, err := c.ProposalWithdrawals(j.ctx, txHash, certIndex, j.query)
+				if len(withdrawals) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := ProposalWithdrawalResult{Res: withdrawals, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// ProposalVotes returns the votes of a specific governance proposal.
+func (c *apiClient) ProposalVotes(ctx context.Context, txHash string, certIndex int, query APIQueryParams) (pv []ProposalVote, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%d/%s", c.server, resourceGovernanceProposals, txHash, certIndex, resourceProposalVotes))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&pv); err != nil {
+		return
+	}
+	return pv, nil
+}
+
+func (c *apiClient) ProposalVotesAll(ctx context.Context, txHash string, certIndex int) <-chan ProposalVoteResult {
+	ch := make(chan ProposalVoteResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan ProposalVoteResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				votes, err := c.ProposalVotes(j.ctx, txHash, certIndex, j.query)
+				if len(votes) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := ProposalVoteResult{Res: votes, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}

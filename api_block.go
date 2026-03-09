@@ -79,6 +79,11 @@ type BlockAffectedAddressesResult struct {
 	Err error
 }
 
+type BlockTransactionResult struct {
+	Res []Transaction
+	Err error
+}
+
 // BlocksLatest Return the latest block available to the backends, also known as the
 // tip of the blockchain.
 func (c *apiClient) BlockLatest(ctx context.Context) (b Block, err error) {
@@ -180,7 +185,7 @@ func (c *apiClient) BlocksPrevious(ctx context.Context, hashorNumber string) (bl
 
 // BlocksTransactions returns slice of Transaction within the block specified
 // by a hash or block number
-func (c *apiClient) BlockTransactions(ctx context.Context, hashOrNumber string) (txs []Transaction, err error) {
+func (c *apiClient) BlockTransactions(ctx context.Context, hashOrNumber string, query APIQueryParams) (txs []Transaction, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceBlock, hashOrNumber, "txs"))
 	if err != nil {
 		return
@@ -189,6 +194,11 @@ func (c *apiClient) BlockTransactions(ctx context.Context, hashOrNumber string) 
 	if err != nil {
 		return
 	}
+
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
 	res, err := c.handleRequest(req)
 	if err != nil {
 		return
@@ -203,7 +213,7 @@ func (c *apiClient) BlockTransactions(ctx context.Context, hashOrNumber string) 
 }
 
 // BlockLatestTransactions returns the transactions within the latest block.
-func (c *apiClient) BlockLatestTransactions(ctx context.Context) (txs []Transaction, err error) {
+func (c *apiClient) BlockLatestTransactions(ctx context.Context, query APIQueryParams) (txs []Transaction, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourceBlocksLatestTransactions))
 	if err != nil {
 		return
@@ -212,6 +222,10 @@ func (c *apiClient) BlockLatestTransactions(ctx context.Context) (txs []Transact
 	if err != nil {
 		return
 	}
+
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 
 	res, err := c.handleRequest(req)
 	if err != nil {
@@ -321,6 +335,95 @@ func (c *apiClient) BlocksAddressesAll(ctx context.Context, hashOrNumber string)
 					}
 				}
 				res := BlockAffectedAddressesResult{Res: affectedAddresses, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// BlockTransactionsAll returns all transactions within the block specified
+// by a hash or block number.
+func (c *apiClient) BlockTransactionsAll(ctx context.Context, hashOrNumber string) <-chan BlockTransactionResult {
+	ch := make(chan BlockTransactionResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan BlockTransactionResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				txs, err := c.BlockTransactions(j.ctx, hashOrNumber, j.query)
+				if len(txs) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := BlockTransactionResult{Res: txs, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// BlockLatestTransactionsAll returns all transactions within the latest block.
+func (c *apiClient) BlockLatestTransactionsAll(ctx context.Context) <-chan BlockTransactionResult {
+	ch := make(chan BlockTransactionResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan BlockTransactionResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				txs, err := c.BlockLatestTransactions(j.ctx, j.query)
+				if len(txs) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := BlockTransactionResult{Res: txs, Err: err}
 				ch <- res
 			}
 

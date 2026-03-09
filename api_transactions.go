@@ -97,6 +97,8 @@ type TransactionContent struct {
 
 	// Count of the withdrawals within the transaction
 	WithdrawalCount int `json:"withdrawal_count"`
+
+	TreasuryDonation string `json:"treasury_donation"`
 }
 
 type TransactionCBOR struct {
@@ -130,6 +132,7 @@ type TransactionOutput struct {
 	DataHash            *string    `json:"data_hash"`
 	InlineDatum         *string    `json:"inline_datum"`
 	ReferenceScriptHash *string    `json:"reference_script_hash"`
+	ConsumedByTx        *string    `json:"consumed_by_tx"`
 }
 type TransactionUTXOs struct {
 	// Transaction hash

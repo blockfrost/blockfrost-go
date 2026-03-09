@@ -65,7 +65,7 @@ func TestBlockLatestTransactionsIntegration(t *testing.T) {
 	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	got, err := api.BlockLatestTransactions(context.TODO())
+	got, err := api.BlockLatestTransactions(context.TODO(), blockfrost.APIQueryParams{})
 	testErrorHelper(t, err)
 	nullGot := []blockfrost.Transaction{}
 	if reflect.DeepEqual(got, nullGot) {
@@ -78,7 +78,7 @@ func TestBlockTransactions(t *testing.T) {
 	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	got, err := api.BlockTransactions(context.TODO(), block)
+	got, err := api.BlockTransactions(context.TODO(), block, blockfrost.APIQueryParams{})
 	testErrorHelper(t, err)
 	nullGot := []blockfrost.Transaction{}
 	if reflect.DeepEqual(got, nullGot) {

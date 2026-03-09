@@ -10,12 +10,12 @@ import (
 )
 
 const (
-	resourceScripts   = "scripts"
-	resourceRedeemers = "redeemers"
-	// resourceScriptsJson = "json"
-	// resourceScriptsCbor = "cbor"
-	// resourceDatum       = "datum"
-	// resourceDatumCbor   = "cbor"
+	resourceScripts         = "scripts"
+	resourceRedeemers       = "redeemers"
+	resourceScriptJSON      = "json"
+	resourceScriptCBOR      = "cbor"
+	resourceScriptDatum     = "scripts/datum"
+	resourceScriptDatumCBOR = "cbor"
 )
 
 // Script contains information about a script
@@ -67,6 +67,22 @@ type ScriptAllResult struct {
 type ScriptRedeemerResult struct {
 	Res []ScriptRedeemer
 	Err error
+}
+
+type ScriptJSON struct {
+	JSON interface{} `json:"json"`
+}
+
+type ScriptCBOR struct {
+	CBOR *string `json:"cbor"`
+}
+
+type ScriptDatum struct {
+	JSONValue interface{} `json:"json_value"`
+}
+
+type ScriptDatumCBOR struct {
+	CBOR string `json:"cbor"`
 }
 
 // Scripts returns a paginated list of scripts.
@@ -228,4 +244,84 @@ func (c *apiClient) ScriptRedeemersAll(ctx context.Context, address string) <-ch
 		wg.Wait()
 	}()
 	return ch
+}
+
+func (c *apiClient) ScriptJSON(ctx context.Context, scriptHash string) (sj ScriptJSON, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceScripts, scriptHash, resourceScriptJSON))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&sj); err != nil {
+		return
+	}
+	return sj, nil
+}
+
+func (c *apiClient) ScriptCBOR(ctx context.Context, scriptHash string) (sc ScriptCBOR, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceScripts, scriptHash, resourceScriptCBOR))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&sc); err != nil {
+		return
+	}
+	return sc, nil
+}
+
+func (c *apiClient) ScriptDatum(ctx context.Context, datumHash string) (sd ScriptDatum, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceScriptDatum, datumHash))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&sd); err != nil {
+		return
+	}
+	return sd, nil
+}
+
+func (c *apiClient) ScriptDatumCBOR(ctx context.Context, datumHash string) (sdc ScriptDatumCBOR, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceScriptDatum, datumHash, resourceScriptDatumCBOR))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&sdc); err != nil {
+		return
+	}
+	return sdc, nil
 }

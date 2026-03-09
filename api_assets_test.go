@@ -83,7 +83,7 @@ func TestResourceAssetHistoryIntegration(t *testing.T) {
 	asset := "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e4669727374636f696e"
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
-	got, err := api.AssetHistory(context.TODO(), asset)
+	got, err := api.AssetHistory(context.TODO(), asset, blockfrost.APIQueryParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +96,7 @@ func TestResourceAssetTransactionIntegration(t *testing.T) {
 	asset := "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e4669727374636f696e"
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
-	got, err := api.AssetTransactions(context.TODO(), asset)
+	got, err := api.AssetTransactions(context.TODO(), asset, blockfrost.APIQueryParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,7 +122,7 @@ func TestResourceAssetsByPolicyIntegration(t *testing.T) {
 	policy := "3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e"
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
-	got, err := api.AssetsByPolicy(context.TODO(), policy)
+	got, err := api.AssetsByPolicy(context.TODO(), policy, blockfrost.APIQueryParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
