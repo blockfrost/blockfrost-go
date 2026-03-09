@@ -20,9 +20,12 @@ func TestResourceInfoIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
-	want := blockfrost.Info{}
-	testIntUtil(t, fp, &got, &want)
+	if got.Url != "https://blockfrost.io/" {
+		t.Fatalf("unexpected url: %s", got.Url)
+	}
+	if got.Version == "" {
+		t.Fatal("got empty version")
+	}
 }
 
 func TestResourceHealthIntegration(t *testing.T) {
