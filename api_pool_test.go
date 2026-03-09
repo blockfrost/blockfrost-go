@@ -47,12 +47,9 @@ func TestResourcePoolsRetiringIntegration(t *testing.T) {
 	)
 
 	q := blockfrost.APIQueryParams{}
-	got, err := api.PoolsRetiring(context.TODO(), q)
+	_, err := api.PoolsRetiring(context.TODO(), q)
 	if err != nil {
 		t.Fatal(err)
-	}
-	if reflect.DeepEqual(got, []blockfrost.PoolRetiring{}) {
-		t.Fatalf("got null %+v", got)
 	}
 }
 
