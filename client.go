@@ -219,7 +219,7 @@ type APIClient interface {
 	TransactionDelegationCerts(ctx context.Context, hash string) ([]TransactionDelegation, error)
 	TransactionPoolUpdates(ctx context.Context, hash string) ([]TransactionPoolCert, error)
 	TransactionPoolUpdateCerts(ctx context.Context, hash string) ([]TransactionPoolCert, error)
-	TransactionPoolRetirementCerts(ctx context.Context, hash string) ([]TransactionPoolCert, error)
+	TransactionPoolRetirementCerts(ctx context.Context, hash string) ([]TransactionPoolRetires, error)
 	TransactionSubmit(ctx context.Context, cbor []byte) (string, error)
 	TransactionEvaluate(ctx context.Context, cbor []byte) (OgmiosResponse, error)
 	TransactionEvaluateUTXOs(ctx context.Context, cbor []byte, additionalUtxoSet AdditionalUtxoSet) (OgmiosResponse, error)

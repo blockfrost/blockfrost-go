@@ -552,7 +552,7 @@ func (c *apiClient) TransactionDelegationCerts(ctx context.Context, hash string)
 }
 
 func (c *apiClient) TransactionPoolUpdates(ctx context.Context, hash string) (td []TransactionPoolCert, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxDelegations))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxPoolUpdates))
 	if err != nil {
 		return
 	}
@@ -591,7 +591,7 @@ func (c *apiClient) TransactionPoolUpdateCerts(ctx context.Context, hash string)
 	return tcs, nil
 }
 
-func (c *apiClient) TransactionPoolRetirementCerts(ctx context.Context, hash string) (tcs []TransactionPoolCert, err error) {
+func (c *apiClient) TransactionPoolRetirementCerts(ctx context.Context, hash string) (tcs []TransactionPoolRetires, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxPoolRetires))
 	if err != nil {
 		return
