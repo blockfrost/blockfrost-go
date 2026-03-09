@@ -63,9 +63,15 @@ func TestResourcePoolsRetiringIntegration(t *testing.T) {
 	)
 
 	q := blockfrost.APIQueryParams{}
-	_, err := api.PoolsRetiring(context.TODO(), q)
+	got, err := api.PoolsRetiring(context.TODO(), q)
 	if err != nil {
 		t.Fatal(err)
+	}
+	// Validate marshalling: if data is present, check it decoded properly
+	if len(got) > 0 {
+		if reflect.DeepEqual(got[0], blockfrost.PoolRetiring{}) {
+			t.Fatalf("got zero-valued struct, marshalling may be broken: %+v", got[0])
+		}
 	}
 }
 
