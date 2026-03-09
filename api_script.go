@@ -70,7 +70,7 @@ type ScriptRedeemerResult struct {
 }
 
 type ScriptJSON struct {
-	JSON json.RawMessage `json:"json"`
+	JSON interface{} `json:"json"`
 }
 
 type ScriptCBOR struct {
@@ -78,7 +78,7 @@ type ScriptCBOR struct {
 }
 
 type ScriptDatum struct {
-	JSONValue json.RawMessage `json:"json_value"`
+	JSONValue interface{} `json:"json_value"`
 }
 
 type ScriptDatumCBOR struct {

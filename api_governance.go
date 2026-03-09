@@ -44,8 +44,8 @@ type DrepMetadata struct {
 	Hex          string      `json:"hex"`
 	URL          string      `json:"url"`
 	Hash         string      `json:"hash"`
-	JSONMetadata json.RawMessage `json:"json_metadata"`
-	Bytes        *string         `json:"bytes"`
+	JSONMetadata interface{} `json:"json_metadata"`
+	Bytes        *string     `json:"bytes"`
 }
 
 type DrepDelegator struct {
@@ -82,7 +82,7 @@ type ProposalDetails struct {
 	ID                    string      `json:"id"`
 	Deposit               string      `json:"deposit"`
 	ReturnAddress         string      `json:"return_address"`
-	GovernanceDescription json.RawMessage `json:"governance_description"`
+	GovernanceDescription interface{} `json:"governance_description"`
 	RatifiedEpoch         *int        `json:"ratified_epoch"`
 	EnactedEpoch          *int        `json:"enacted_epoch"`
 	DroppedEpoch          *int        `json:"dropped_epoch"`
@@ -94,7 +94,7 @@ type ProposalParameters struct {
 	TxHash     string      `json:"tx_hash"`
 	CertIndex  int         `json:"cert_index"`
 	ID         string      `json:"id"`
-	Parameters json.RawMessage `json:"parameters"`
+	Parameters interface{} `json:"parameters"`
 }
 
 type ProposalWithdrawal struct {
@@ -116,8 +116,8 @@ type ProposalMetadata struct {
 	ID           string      `json:"id"`
 	URL          string      `json:"url"`
 	Hash         string      `json:"hash"`
-	JSONMetadata json.RawMessage `json:"json_metadata"`
-	Bytes        string          `json:"bytes"`
+	JSONMetadata interface{} `json:"json_metadata"`
+	Bytes        string      `json:"bytes"`
 }
 
 type DrepResult struct {
