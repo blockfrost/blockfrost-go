@@ -298,6 +298,22 @@ type TransactionRequiredSigner struct {
 
 type Quantity string
 
+// MarshalJSON marshals Quantity as a JSON number (without quotes).
+// The API expects numeric values for coins/assets in request payloads
+// like additionalUtxoSet, even though responses return them as strings.
+func (q Quantity) MarshalJSON() ([]byte, error) {
+	if q == "" {
+		return []byte("0"), nil
+	}
+	// Validate it's a proper integer to avoid injection
+	for _, c := range q {
+		if c < '0' || c > '9' {
+			return json.Marshal(string(q))
+		}
+	}
+	return []byte(q), nil
+}
+
 type Value struct {
 	Coins  Quantity            `json:"coins"`
 	Assets map[string]Quantity `json:"assets,omitempty"`
