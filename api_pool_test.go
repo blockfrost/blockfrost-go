@@ -23,6 +23,22 @@ func TestResourcePoolsIntegration(t *testing.T) {
 	}
 }
 
+func TestResourcePoolsExtendedIntegration(t *testing.T) {
+	t.Parallel()
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	q := blockfrost.APIQueryParams{}
+	got, err := api.PoolsExtended(context.TODO(), q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) == 0 {
+		t.Fatal("got empty extended pools list")
+	}
+}
+
 func TestResourcePoolsRetiredIntegration(t *testing.T) {
 	t.Parallel()
 

@@ -111,6 +111,43 @@ func TestBlockPreviousIntegration(t *testing.T) {
 		t.Fatal("got null struct")
 	}
 }
+func TestBlockTransactionsAllIntegration(t *testing.T) {
+	// Shelley block with txs from blockfrost-tests fixtures
+	block := "7474d633ece405cec979714186a72b5a1221cebf356831dbe568aaa1f6c3b077"
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	var allTxs []blockfrost.Transaction
+	for result := range api.BlockTransactionsAll(context.TODO(), block) {
+		if result.Err != nil {
+			t.Fatal(result.Err)
+		}
+		allTxs = append(allTxs, result.Res...)
+	}
+	if len(allTxs) == 0 {
+		t.Fatal("got empty block transactions")
+	}
+
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.Transaction{}
+	testIntUtil(t, fp, &allTxs, &want)
+}
+
+func TestBlockLatestTransactionsAllIntegration(t *testing.T) {
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	for result := range api.BlockLatestTransactionsAll(context.TODO()) {
+		if result.Err != nil {
+			t.Fatal(result.Err)
+		}
+		// Just verify streaming works, don't need all pages
+		break
+	}
+}
+
 func TestBlocksAddressesIntegration(t *testing.T) {
 	hash := "5ea1ba291e8eef538635a53e59fddba7810d1679631cc3aed7c8e6c4091a516a"
 	api := blockfrost.NewAPIClient(

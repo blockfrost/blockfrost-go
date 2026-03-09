@@ -185,3 +185,36 @@ func TestResourceAccountAssociatedAssetsIntegration(t *testing.T) {
 		t.Fatalf(err.Error())
 	}
 }
+
+func TestResourceAccountAddressTotalIntegration(t *testing.T) {
+	t.Parallel()
+	inputStakeAddr := "stake1ux3g2c9dx2nhhehyrezyxpkstartcqmu9hk63qgfkccw5rqttygt7"
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	got, err := api.AccountAddressesTotal(context.TODO(), inputStakeAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reflect.DeepEqual(got, blockfrost.AccountAddressesTotal{}) {
+		t.Fatalf("got null %+v", got)
+	}
+}
+
+func TestResourceAccountTransactionsIntegration(t *testing.T) {
+	t.Parallel()
+	inputStakeAddr := "stake1ux3g2c9dx2nhhehyrezyxpkstartcqmu9hk63qgfkccw5rqttygt7"
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	q := blockfrost.APIQueryParams{Count: 1}
+	got, err := api.AccountTransactions(context.TODO(), inputStakeAddr, q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) == 0 {
+		t.Fatal("got empty account transactions")
+	}
+}
