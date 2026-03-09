@@ -65,8 +65,12 @@ func TestBlockLatestTransactionsIntegration(t *testing.T) {
 	api := blockfrost.NewAPIClient(
 		blockfrost.APIClientOptions{},
 	)
-	_, err := api.BlockLatestTransactions(context.TODO(), blockfrost.APIQueryParams{})
+	got, err := api.BlockLatestTransactions(context.TODO(), blockfrost.APIQueryParams{})
 	testErrorHelper(t, err)
+	nullGot := []blockfrost.Transaction{}
+	if reflect.DeepEqual(got, nullGot) {
+		t.Fatal("got null struct")
+	}
 }
 
 func TestBlockTransactions(t *testing.T) {
