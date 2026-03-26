@@ -40,12 +40,13 @@ type DrepDetails struct {
 }
 
 type DrepMetadata struct {
-	DrepID       string      `json:"drep_id"`
-	Hex          string      `json:"hex"`
-	URL          string      `json:"url"`
-	Hash         string      `json:"hash"`
-	JSONMetadata interface{} `json:"json_metadata"`
-	Bytes        *string     `json:"bytes"`
+	DrepID       string         `json:"drep_id"`
+	Hex          string         `json:"hex"`
+	URL          string         `json:"url"`
+	Hash         string         `json:"hash"`
+	JSONMetadata interface{}    `json:"json_metadata"`
+	Bytes        *string        `json:"bytes"`
+	Error        *MetadataError `json:"error"`
 }
 
 type DrepDelegator struct {
@@ -76,25 +77,25 @@ type Proposal struct {
 }
 
 type ProposalDetails struct {
-	TxHash                string      `json:"tx_hash"`
-	CertIndex             int         `json:"cert_index"`
-	GovernanceType        string      `json:"governance_type"`
-	ID                    string      `json:"id"`
-	Deposit               string      `json:"deposit"`
-	ReturnAddress         string      `json:"return_address"`
-	GovernanceDescription interface{} `json:"governance_description"`
-	RatifiedEpoch         *int        `json:"ratified_epoch"`
-	EnactedEpoch          *int        `json:"enacted_epoch"`
-	DroppedEpoch          *int        `json:"dropped_epoch"`
-	ExpiredEpoch          *int        `json:"expired_epoch"`
-	Expiration            int         `json:"expiration"`
+	TxHash                string                  `json:"tx_hash"`
+	CertIndex             int                     `json:"cert_index"`
+	GovernanceType        string                  `json:"governance_type"`
+	ID                    string                  `json:"id"`
+	Deposit               string                  `json:"deposit"`
+	ReturnAddress         string                  `json:"return_address"`
+	GovernanceDescription *map[string]interface{} `json:"governance_description"`
+	RatifiedEpoch         *int                    `json:"ratified_epoch"`
+	EnactedEpoch          *int                    `json:"enacted_epoch"`
+	DroppedEpoch          *int                    `json:"dropped_epoch"`
+	ExpiredEpoch          *int                    `json:"expired_epoch"`
+	Expiration            int                     `json:"expiration"`
 }
 
 type ProposalParameters struct {
-	TxHash     string      `json:"tx_hash"`
-	CertIndex  int         `json:"cert_index"`
-	ID         string      `json:"id"`
-	Parameters interface{} `json:"parameters"`
+	TxHash     string                 `json:"tx_hash"`
+	CertIndex  int                    `json:"cert_index"`
+	ID         string                 `json:"id"`
+	Parameters map[string]interface{} `json:"parameters"`
 }
 
 type ProposalWithdrawal struct {
@@ -118,6 +119,17 @@ type ProposalMetadata struct {
 	Hash         string      `json:"hash"`
 	JSONMetadata interface{} `json:"json_metadata"`
 	Bytes        string      `json:"bytes"`
+}
+
+type ProposalMetadataV2 struct {
+	TxHash       string         `json:"tx_hash"`
+	CertIndex    int            `json:"cert_index"`
+	ID           string         `json:"id"`
+	URL          string         `json:"url"`
+	Hash         string         `json:"hash"`
+	JSONMetadata interface{}    `json:"json_metadata"`
+	Bytes        *string        `json:"bytes"`
+	Error        *MetadataError `json:"error"`
 }
 
 type DrepResult struct {
@@ -604,6 +616,29 @@ func (c *apiClient) ProposalParameters(ctx context.Context, txHash string, certI
 // ProposalMetadata returns the metadata of a specific governance proposal.
 func (c *apiClient) ProposalMetadata(ctx context.Context, txHash string, certIndex int) (pm ProposalMetadata, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%d/%s", c.server, resourceGovernanceProposals, txHash, certIndex, resourceProposalMetadata))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&pm); err != nil {
+		return
+	}
+	return pm, nil
+}
+
+// ProposalMetadataByGovActionID returns the metadata of a governance proposal by its CIP-0129 governance action ID.
+func (c *apiClient) ProposalMetadataByGovActionID(ctx context.Context, govActionID string) (pm ProposalMetadataV2, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceGovernanceProposals, govActionID, resourceProposalMetadata))
 	if err != nil {
 		return
 	}

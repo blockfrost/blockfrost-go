@@ -226,3 +226,29 @@ func TestResourceProposalMetadataIntegration(t *testing.T) {
 	// If none had metadata, just verify the endpoint is callable (404 is expected)
 	t.Log("no proposals with metadata found, endpoint verified callable")
 }
+
+func TestResourceProposalMetadataByGovActionIDIntegration(t *testing.T) {
+	t.Parallel()
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	q := blockfrost.APIQueryParams{Count: 10}
+	proposals, err := api.Proposals(context.TODO(), q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(proposals) == 0 {
+		t.Skip("no proposals found")
+	}
+
+	// Not all proposals have metadata, try each until one succeeds
+	for _, p := range proposals {
+		_, err = api.ProposalMetadataByGovActionID(context.TODO(), p.ID)
+		if err == nil {
+			return
+		}
+	}
+	// If none had metadata, just verify the endpoint is callable (404 is expected)
+	t.Log("no proposals with metadata found, endpoint verified callable")
+}

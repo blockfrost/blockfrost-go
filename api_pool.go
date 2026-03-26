@@ -40,22 +40,22 @@ type PoolRetiring struct {
 
 // Pool information.
 type Pool struct {
-	PoolID         string   `json:"pool_id"`
-	Hex            string   `json:"hex"`
-	VrfKey         string   `json:"vrf_key"`
-	BlocksMinted   int      `json:"blocks_minted"`
-	LiveStake      string   `json:"live_stake"`
-	LiveSize       float64  `json:"live_size"`
-	LiveSaturation float64  `json:"live_saturation"`
-	LiveDelegators int      `json:"live_delegators"`
-	ActiveStake    string   `json:"active_stake"`
-	ActiveSize     float64  `json:"active_size"`
-	DeclaredPledge string   `json:"declared_pledge"`
-	LivePledge     string   `json:"live_pledge"`
-	MarginCost     float64  `json:"margin_cost"`
-	FixedCost      string   `json:"fixed_cost"`
-	RewardAccount  string   `json:"reward_account"`
-	Owners         []string `json:"owners"`
+	PoolID         string      `json:"pool_id"`
+	Hex            string      `json:"hex"`
+	VrfKey         string      `json:"vrf_key"`
+	BlocksMinted   int         `json:"blocks_minted"`
+	LiveStake      string      `json:"live_stake"`
+	LiveSize       float64     `json:"live_size"`
+	LiveSaturation float64     `json:"live_saturation"`
+	LiveDelegators int         `json:"live_delegators"`
+	ActiveStake    string      `json:"active_stake"`
+	ActiveSize     float64     `json:"active_size"`
+	DeclaredPledge string      `json:"declared_pledge"`
+	LivePledge     string      `json:"live_pledge"`
+	MarginCost     float64     `json:"margin_cost"`
+	FixedCost      string      `json:"fixed_cost"`
+	RewardAccount  string      `json:"reward_account"`
+	Owners         []string    `json:"owners"`
 	Registration   []string    `json:"registration"`
 	Retirement     []string    `json:"retirement"`
 	CalidusKey     *CalidusKey `json:"calidus_key"`
@@ -86,13 +86,13 @@ type PoolHistory struct {
 // PoolMetadata return Stake pool metadata
 // Stake pool registration metadata.
 type PoolMetadata struct {
-	PoolID      string  `json:"pool_id"`
-	Hex         string  `json:"hex"`
-	URL         *string `json:"url"`
-	Hash        *string `json:"hash"`
-	Ticker      *string `json:"ticker"`
-	Name        *string `json:"name"`
-	Description *string `json:"description"`
+	PoolID      string         `json:"pool_id"`
+	Hex         string         `json:"hex"`
+	URL         *string        `json:"url"`
+	Hash        *string        `json:"hash"`
+	Ticker      *string        `json:"ticker"`
+	Name        *string        `json:"name"`
+	Description *string        `json:"description"`
 	Homepage    *string        `json:"homepage"`
 	Error       *MetadataError `json:"error"`
 }

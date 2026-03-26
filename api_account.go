@@ -191,6 +191,8 @@ type AccountAssociatedAsset struct {
 	Quantity string `json:"quantity"`
 }
 
+// AccountAddressesTotal return Account addresses total
+// Obtain the total sent and received amounts in all addresses associated with a given account.
 type AccountAddressesTotal struct {
 	StakeAddress string `json:"stake_address"`
 	ReceivedSum  []struct {
@@ -204,6 +206,8 @@ type AccountAddressesTotal struct {
 	TxCount int `json:"tx_count"`
 }
 
+// AccountTransaction return Account transaction
+// Obtain transactions associated with a given account.
 type AccountTransaction struct {
 	TxHash      string `json:"tx_hash"`
 	TxIndex     int    `json:"tx_index"`

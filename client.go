@@ -74,7 +74,7 @@ type APIClient interface {
 	BlockLatest(ctx context.Context) (Block, error)
 	BlockLatestTransactions(ctx context.Context, query APIQueryParams) ([]Transaction, error)
 	BlockLatestTransactionsAll(ctx context.Context) <-chan BlockTransactionResult
-	BlockTransactions(ctx context.Context, hashOrNumer string, query APIQueryParams) ([]Transaction, error)
+	BlockTransactions(ctx context.Context, hashOrNumber string, query APIQueryParams) ([]Transaction, error)
 	BlockTransactionsAll(ctx context.Context, hashOrNumber string) <-chan BlockTransactionResult
 	BlocksNext(ctx context.Context, hashOrNumber string) ([]Block, error)
 	BlocksPrevious(ctx context.Context, hashOrNumber string) ([]Block, error)
@@ -202,6 +202,7 @@ type APIClient interface {
 	Proposal(ctx context.Context, txHash string, certIndex int) (ProposalDetails, error)
 	ProposalParameters(ctx context.Context, txHash string, certIndex int) (ProposalParameters, error)
 	ProposalMetadata(ctx context.Context, txHash string, certIndex int) (ProposalMetadata, error)
+	ProposalMetadataByGovActionID(ctx context.Context, govActionID string) (ProposalMetadataV2, error)
 	ProposalWithdrawals(ctx context.Context, txHash string, certIndex int, query APIQueryParams) ([]ProposalWithdrawal, error)
 	ProposalWithdrawalsAll(ctx context.Context, txHash string, certIndex int) <-chan ProposalWithdrawalResult
 	ProposalVotes(ctx context.Context, txHash string, certIndex int, query APIQueryParams) ([]ProposalVote, error)
