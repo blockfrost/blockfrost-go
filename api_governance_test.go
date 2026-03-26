@@ -227,6 +227,51 @@ func TestResourceProposalMetadataIntegration(t *testing.T) {
 	t.Log("no proposals with metadata found, endpoint verified callable")
 }
 
+func TestResourceProposalByGovActionIDIntegration(t *testing.T) {
+	t.Parallel()
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	q := blockfrost.APIQueryParams{Count: 1}
+	proposals, err := api.Proposals(context.TODO(), q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(proposals) == 0 {
+		t.Skip("no proposals found")
+	}
+
+	got, err := api.ProposalByGovActionID(context.TODO(), proposals[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reflect.DeepEqual(got, blockfrost.ProposalDetails{}) {
+		t.Fatalf("got null %+v", got)
+	}
+}
+
+func TestResourceProposalParametersByGovActionIDIntegration(t *testing.T) {
+	t.Parallel()
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	q := blockfrost.APIQueryParams{Count: 1}
+	proposals, err := api.Proposals(context.TODO(), q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(proposals) == 0 {
+		t.Skip("no proposals found")
+	}
+
+	_, err = api.ProposalParametersByGovActionID(context.TODO(), proposals[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestResourceProposalMetadataByGovActionIDIntegration(t *testing.T) {
 	t.Parallel()
 	api := blockfrost.NewAPIClient(
@@ -251,4 +296,46 @@ func TestResourceProposalMetadataByGovActionIDIntegration(t *testing.T) {
 	}
 	// If none had metadata, just verify the endpoint is callable (404 is expected)
 	t.Log("no proposals with metadata found, endpoint verified callable")
+}
+
+func TestResourceProposalWithdrawalsByGovActionIDIntegration(t *testing.T) {
+	t.Parallel()
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	q := blockfrost.APIQueryParams{Count: 1}
+	proposals, err := api.Proposals(context.TODO(), q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(proposals) == 0 {
+		t.Skip("no proposals found")
+	}
+
+	_, err = api.ProposalWithdrawalsByGovActionID(context.TODO(), proposals[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestResourceProposalVotesByGovActionIDIntegration(t *testing.T) {
+	t.Parallel()
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	q := blockfrost.APIQueryParams{Count: 1}
+	proposals, err := api.Proposals(context.TODO(), q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(proposals) == 0 {
+		t.Skip("no proposals found")
+	}
+
+	_, err = api.ProposalVotesByGovActionID(context.TODO(), proposals[0].ID, blockfrost.APIQueryParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
 }

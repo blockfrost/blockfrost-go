@@ -202,7 +202,12 @@ type APIClient interface {
 	Proposal(ctx context.Context, txHash string, certIndex int) (ProposalDetails, error)
 	ProposalParameters(ctx context.Context, txHash string, certIndex int) (ProposalParameters, error)
 	ProposalMetadata(ctx context.Context, txHash string, certIndex int) (ProposalMetadata, error)
+	ProposalByGovActionID(ctx context.Context, govActionID string) (ProposalDetails, error)
+	ProposalParametersByGovActionID(ctx context.Context, govActionID string) (ProposalParameters, error)
 	ProposalMetadataByGovActionID(ctx context.Context, govActionID string) (ProposalMetadataV2, error)
+	ProposalWithdrawalsByGovActionID(ctx context.Context, govActionID string) ([]ProposalWithdrawal, error)
+	ProposalVotesByGovActionID(ctx context.Context, govActionID string, query APIQueryParams) ([]ProposalVote, error)
+	ProposalVotesByGovActionIDAll(ctx context.Context, govActionID string) <-chan ProposalVoteResult
 	ProposalWithdrawals(ctx context.Context, txHash string, certIndex int, query APIQueryParams) ([]ProposalWithdrawal, error)
 	ProposalWithdrawalsAll(ctx context.Context, txHash string, certIndex int) <-chan ProposalWithdrawalResult
 	ProposalVotes(ctx context.Context, txHash string, certIndex int, query APIQueryParams) ([]ProposalVote, error)

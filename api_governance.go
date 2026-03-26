@@ -636,6 +636,52 @@ func (c *apiClient) ProposalMetadata(ctx context.Context, txHash string, certInd
 	return pm, nil
 }
 
+// ProposalByGovActionID returns the details of a governance proposal by its CIP-0129 governance action ID.
+func (c *apiClient) ProposalByGovActionID(ctx context.Context, govActionID string) (pd ProposalDetails, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourceGovernanceProposals, govActionID))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&pd); err != nil {
+		return
+	}
+	return pd, nil
+}
+
+// ProposalParametersByGovActionID returns the parameters of a governance proposal by its CIP-0129 governance action ID.
+func (c *apiClient) ProposalParametersByGovActionID(ctx context.Context, govActionID string) (pp ProposalParameters, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceGovernanceProposals, govActionID, resourceProposalParameters))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&pp); err != nil {
+		return
+	}
+	return pp, nil
+}
+
 // ProposalMetadataByGovActionID returns the metadata of a governance proposal by its CIP-0129 governance action ID.
 func (c *apiClient) ProposalMetadataByGovActionID(ctx context.Context, govActionID string) (pm ProposalMetadataV2, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceGovernanceProposals, govActionID, resourceProposalMetadata))
@@ -657,6 +703,101 @@ func (c *apiClient) ProposalMetadataByGovActionID(ctx context.Context, govAction
 		return
 	}
 	return pm, nil
+}
+
+// ProposalWithdrawalsByGovActionID returns the withdrawals of a governance proposal by its CIP-0129 governance action ID.
+func (c *apiClient) ProposalWithdrawalsByGovActionID(ctx context.Context, govActionID string) (pw []ProposalWithdrawal, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceGovernanceProposals, govActionID, resourceProposalWithdrawals))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&pw); err != nil {
+		return
+	}
+	return pw, nil
+}
+
+// ProposalVotesByGovActionID returns the votes of a governance proposal by its CIP-0129 governance action ID.
+func (c *apiClient) ProposalVotesByGovActionID(ctx context.Context, govActionID string, query APIQueryParams) (pv []ProposalVote, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceGovernanceProposals, govActionID, resourceProposalVotes))
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	if err = json.NewDecoder(res.Body).Decode(&pv); err != nil {
+		return
+	}
+	return pv, nil
+}
+
+func (c *apiClient) ProposalVotesByGovActionIDAll(ctx context.Context, govActionID string) <-chan ProposalVoteResult {
+	ch := make(chan ProposalVoteResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan ProposalVoteResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				votes, err := c.ProposalVotesByGovActionID(j.ctx, govActionID, j.query)
+				if len(votes) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+					ch <- ProposalVoteResult{Res: votes, Err: err}
+					return
+				}
+				ch <- ProposalVoteResult{Res: votes, Err: err}
+			}
+		}(jobs, ch, &wg)
+	}
+
+	go func() {
+		defer close(ch)
+		fetchScripts := true
+		for i := 1; fetchScripts; i++ {
+			select {
+			case <-quit:
+				fetchScripts = false
+				continue
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
 }
 
 // ProposalWithdrawals returns the withdrawals of a specific governance proposal.
