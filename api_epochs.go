@@ -160,6 +160,33 @@ type EpochParameters struct {
 
 	// Cost per UTxO word for Alonzo. Cost per UTxO byte for Babbage and later.
 	CoinsPerUTxOSize *string `json:"coins_per_utxo_size"`
+
+	// Cost models parameters for Plutus Core scripts in raw list form
+	CostModelsRaw map[string]interface{} `json:"cost_models_raw"`
+
+	// Conway era governance parameters
+	PvtMotionNoConfidence      *float64 `json:"pvt_motion_no_confidence"`
+	PvtCommitteeNormal         *float64 `json:"pvt_committee_normal"`
+	PvtCommitteeNoConfidence   *float64 `json:"pvt_committee_no_confidence"`
+	PvtHardForkInitiation      *float64 `json:"pvt_hard_fork_initiation"`
+	PvtPPSecurityGroup         *float64 `json:"pvt_p_p_security_group"`
+	DvtMotionNoConfidence      *float64 `json:"dvt_motion_no_confidence"`
+	DvtCommitteeNormal         *float64 `json:"dvt_committee_normal"`
+	DvtCommitteeNoConfidence   *float64 `json:"dvt_committee_no_confidence"`
+	DvtUpdateToConstitution    *float64 `json:"dvt_update_to_constitution"`
+	DvtHardForkInitiation      *float64 `json:"dvt_hard_fork_initiation"`
+	DvtPPNetworkGroup          *float64 `json:"dvt_p_p_network_group"`
+	DvtPPEconomicGroup         *float64 `json:"dvt_p_p_economic_group"`
+	DvtPPTechnicalGroup        *float64 `json:"dvt_p_p_technical_group"`
+	DvtPPGovGroup              *float64 `json:"dvt_p_p_gov_group"`
+	DvtTreasuryWithdrawal      *float64 `json:"dvt_treasury_withdrawal"`
+	CommitteeMinSize           *string  `json:"committee_min_size"`
+	CommitteeMaxTermLength     *string  `json:"committee_max_term_length"`
+	GovActionLifetime          *string  `json:"gov_action_lifetime"`
+	GovActionDeposit           *string  `json:"gov_action_deposit"`
+	DrepDeposit                *string  `json:"drep_deposit"`
+	DrepActivity               *string  `json:"drep_activity"`
+	MinFeeRefScriptCostPerByte *float64 `json:"min_fee_ref_script_cost_per_byte"`
 }
 
 type EpochResult struct {

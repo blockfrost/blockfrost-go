@@ -97,6 +97,9 @@ type TransactionContent struct {
 
 	// Count of the withdrawals within the transaction
 	WithdrawalCount int `json:"withdrawal_count"`
+
+	// Treasury donation amount in Lovelaces
+	TreasuryDonation string `json:"treasury_donation"`
 }
 
 type TransactionCBOR struct {
@@ -128,8 +131,10 @@ type TransactionOutput struct {
 	Amount              []TxAmount `json:"amount"`
 	OutputIndex         int        `json:"output_index"`
 	DataHash            *string    `json:"data_hash"`
+	Collateral          bool       `json:"collateral"`
 	InlineDatum         *string    `json:"inline_datum"`
 	ReferenceScriptHash *string    `json:"reference_script_hash"`
+	ConsumedByTx        *string    `json:"consumed_by_tx"`
 }
 type TransactionUTXOs struct {
 	// Transaction hash
@@ -294,6 +299,50 @@ type TransactionRequiredSigner struct {
 }
 
 type Quantity string
+
+// MarshalJSON marshals Quantity as a JSON number (without quotes).
+// The API expects numeric values for coins/assets in request payloads
+// like additionalUtxoSet, even though responses return them as strings.
+func (q Quantity) MarshalJSON() ([]byte, error) {
+	s := string(q)
+	if s == "" {
+		return []byte("0"), nil
+	}
+	// Validate it's a proper integer to avoid injection
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			return nil, fmt.Errorf("invalid quantity: non-digit character in %q", s)
+		}
+	}
+	// Reject leading zeros (invalid JSON number), except for "0" itself
+	if len(s) > 1 && s[0] == '0' {
+		return nil, fmt.Errorf("invalid quantity: leading zeros in %q", s)
+	}
+	return []byte(s), nil
+}
+
+// UnmarshalJSON unmarshals Quantity from both JSON numbers and JSON strings.
+func (q *Quantity) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return fmt.Errorf("unexpected end of JSON input")
+	}
+	// JSON string (quoted)
+	if data[0] == '"' {
+		var s string
+		if err := json.Unmarshal(data, &s); err != nil {
+			return err
+		}
+		*q = Quantity(s)
+		return nil
+	}
+	// JSON number (unquoted) or null
+	if string(data) == "null" {
+		*q = ""
+		return nil
+	}
+	*q = Quantity(data)
+	return nil
+}
 
 type Value struct {
 	Coins  Quantity            `json:"coins"`
@@ -533,7 +582,7 @@ func (c *apiClient) TransactionDelegationCerts(ctx context.Context, hash string)
 }
 
 func (c *apiClient) TransactionPoolUpdates(ctx context.Context, hash string) (td []TransactionPoolCert, err error) {
-	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxDelegations))
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxPoolUpdates))
 	if err != nil {
 		return
 	}
@@ -572,7 +621,7 @@ func (c *apiClient) TransactionPoolUpdateCerts(ctx context.Context, hash string)
 	return tcs, nil
 }
 
-func (c *apiClient) TransactionPoolRetirementCerts(ctx context.Context, hash string) (tcs []TransactionPoolCert, err error) {
+func (c *apiClient) TransactionPoolRetirementCerts(ctx context.Context, hash string) (tcs []TransactionPoolRetires, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceTxs, hash, resourceTxPoolRetires))
 	if err != nil {
 		return

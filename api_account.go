@@ -19,6 +19,8 @@ const (
 	resourceAccountMIRHistory                  = "mirs"
 	resourceAccountAssociatedAddress           = "addresses"
 	resourceAccountAddressWithAssetsAssociated = "addresses/assets"
+	resourceAccountAddressesTotal              = "addresses/total"
+	resourceAccountTransactions                = "transactions"
 )
 
 // Account return Specific account address
@@ -53,6 +55,12 @@ type Account struct {
 
 	// Bech32 pool ID that owns the account
 	PoolID *string `json:"pool_id"`
+
+	// Bech32 DRep ID associated with the account
+	DrepID *string `json:"drep_id"`
+
+	// Registration state of an account
+	Registered bool `json:"registered"`
 }
 
 // AccountRewardsHist return Account reward history
@@ -95,6 +103,15 @@ type AccountDelegationHistory struct {
 
 	// Bech32 ID of pool being delegated to
 	PoolID string `json:"pool_id"`
+
+	// Slot of the transaction
+	TxSlot int `json:"tx_slot"`
+
+	// Block time of the transaction
+	BlockTime int `json:"block_time"`
+
+	// Block height of the transaction
+	BlockHeight int `json:"block_height"`
 }
 
 // AccountRegistrationHistory return Account registration history
@@ -106,6 +123,15 @@ type AccountRegistrationHistory struct {
 	// Action in the certificate
 	// Enum: "registered" "deregistered"
 	Action string `json:"action"`
+
+	// Slot of the transaction
+	TxSlot int `json:"tx_slot"`
+
+	// Block time of the transaction
+	BlockTime int `json:"block_time"`
+
+	// Block height of the transaction
+	BlockHeight int `json:"block_height"`
 }
 
 // AccountWithdrawalHistory return Account withdrawal history
@@ -116,6 +142,15 @@ type AccountWithdrawalHistory struct {
 
 	// Withdrawal amount in Lovelaces
 	Amount string `json:"amount"`
+
+	// Slot of the transaction
+	TxSlot int `json:"tx_slot"`
+
+	// Block time of the transaction
+	BlockTime int `json:"block_time"`
+
+	// Block height of the transaction
+	BlockHeight int `json:"block_height"`
 }
 
 // AccountMIRHistory return Account MIR history
@@ -126,6 +161,15 @@ type AccountMIRHistory struct {
 
 	// MIR amount in Lovelaces
 	Amount string `json:"amount"`
+
+	// Slot of the transaction
+	TxSlot int `json:"tx_slot"`
+
+	// Block time of the transaction
+	BlockTime int `json:"block_time"`
+
+	// Block height of the transaction
+	BlockHeight int `json:"block_height"`
 }
 
 // AccountAssociatedAddress return Account associated addresses
@@ -145,6 +189,31 @@ type AccountAssociatedAsset struct {
 
 	// The quantity of the unit
 	Quantity string `json:"quantity"`
+}
+
+// AccountAddressesTotal return Account addresses total
+// Obtain the total sent and received amounts in all addresses associated with a given account.
+type AccountAddressesTotal struct {
+	StakeAddress string `json:"stake_address"`
+	ReceivedSum  []struct {
+		Unit     string `json:"unit"`
+		Quantity string `json:"quantity"`
+	} `json:"received_sum"`
+	SentSum []struct {
+		Unit     string `json:"unit"`
+		Quantity string `json:"quantity"`
+	} `json:"sent_sum"`
+	TxCount int `json:"tx_count"`
+}
+
+// AccountTransaction return Account transaction
+// Obtain transactions associated with a given account.
+type AccountTransaction struct {
+	TxHash      string `json:"tx_hash"`
+	TxIndex     int    `json:"tx_index"`
+	BlockHeight int    `json:"block_height"`
+	BlockTime   int    `json:"block_time"`
+	Address     string `json:"address"`
 }
 
 type AccountHistoryResult struct {
@@ -184,6 +253,11 @@ type AccountAssociatedAddressesAll struct {
 
 type AccountAssociatedAssetsAll struct {
 	Res []AccountAssociatedAsset
+	Err error
+}
+
+type AccountTransactionResult struct {
+	Res []AccountTransaction
 	Err error
 }
 
@@ -763,6 +837,96 @@ func (c *apiClient) AccountAssociatedAssetsAll(ctx context.Context, stakeAddress
 					}
 				}
 				res := AccountAssociatedAssetsAll{Res: as, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// AccountAddressesTotal returns the content of a requested Account by the specific stake account.
+// Obtain information about the total addresses.
+func (c *apiClient) AccountAddressesTotal(ctx context.Context, stakeAddress string) (aat AccountAddressesTotal, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountAddressesTotal))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&aat); err != nil {
+		return
+	}
+	return aat, nil
+}
+
+// AccountTransactions returns the content of a requested Account by the specific stake account.
+// Obtain information about the transactions.
+func (c *apiClient) AccountTransactions(ctx context.Context, stakeAddress string, query APIQueryParams) (at []AccountTransaction, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAccount, stakeAddress, resourceAccountTransactions))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&at); err != nil {
+		return
+	}
+	return at, nil
+}
+
+func (c *apiClient) AccountTransactionsAll(ctx context.Context, stakeAddress string) <-chan AccountTransactionResult {
+	ch := make(chan AccountTransactionResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AccountTransactionResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				txs, err := c.AccountTransactions(j.ctx, stakeAddress, j.query)
+				if len(txs) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := AccountTransactionResult{Res: txs, Err: err}
 				ch <- res
 			}
 

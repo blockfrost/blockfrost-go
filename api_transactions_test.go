@@ -254,7 +254,8 @@ func TestTransactionDelegationCertsIntegration(t *testing.T) {
 }
 
 func TestTransactionPoolUpdatesIntegration(t *testing.T) {
-	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	// Tx with pool update certs from blockfrost-tests fixtures
+	hash := "28bd5e8c342ab89d6642e446cb299058ea36256af1718e4af9326898ce4192d7"
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
 	got, err := api.TransactionPoolUpdates(context.TODO(), hash)
@@ -267,7 +268,8 @@ func TestTransactionPoolUpdatesIntegration(t *testing.T) {
 }
 
 func TestTransactionPoolUpdateCertsIntegration(t *testing.T) {
-	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	// Tx with pool update certs from blockfrost-tests fixtures
+	hash := "28bd5e8c342ab89d6642e446cb299058ea36256af1718e4af9326898ce4192d7"
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 
 	got, err := api.TransactionPoolUpdateCerts(context.TODO(), hash)
@@ -280,14 +282,15 @@ func TestTransactionPoolUpdateCertsIntegration(t *testing.T) {
 }
 
 func TestTransactionPoolRetirementsIntegration(t *testing.T) {
-	hash := "6d619f41ba2e11b78c0d5647fb71ee5df05622fda1748a9124446226e54e6b50"
+	// Tx with pool retirement cert from blockfrost-tests fixtures
+	hash := "33770d42c7bc8a9a0bc9830ffb97941574dc61dc534796dd8614b99b6aadace4"
 	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
 	got, err := api.TransactionPoolRetirementCerts(context.TODO(), hash)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
-	want := []blockfrost.TransactionPoolCert{}
+	want := []blockfrost.TransactionPoolRetires{}
 	testIntUtil(t, fp, &got, &want)
 }
 

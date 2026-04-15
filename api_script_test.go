@@ -105,3 +105,59 @@ func TestIntegrationResourceScript(t *testing.T) {
 		t.Fatalf("got null %+v", got)
 	}
 }
+
+func TestIntegrationResourceScriptJSON(t *testing.T) {
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
+	// Timelock script from blockfrost-tests fixtures
+	got, err := api.ScriptJSON(context.TODO(), "65c197d565e88a20885e535f93755682444d3c02fd44dd70883fe89e")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := blockfrost.ScriptJSON{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestIntegrationResourceScriptCBOR(t *testing.T) {
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
+	// PlutusV1 script from blockfrost-tests fixtures
+	got, err := api.ScriptCBOR(context.TODO(), "4f590a3d80ae0312bad0b64d540c3ff5080e77250e9dbf5011630016")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := blockfrost.ScriptCBOR{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestIntegrationResourceScriptDatum(t *testing.T) {
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
+	// Datum hash from blockfrost-tests fixtures
+	got, err := api.ScriptDatum(context.TODO(), "5a595ce795815e81d22a1a522cf3987d546dc5bb016de61b002edd63a5413ec4")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := blockfrost.ScriptDatum{}
+	testIntUtil(t, fp, &got, &want)
+}
+
+func TestIntegrationResourceScriptDatumCBOR(t *testing.T) {
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{})
+
+	// Datum hash from blockfrost-tests fixtures
+	got, err := api.ScriptDatumCBOR(context.TODO(), "5a595ce795815e81d22a1a522cf3987d546dc5bb016de61b002edd63a5413ec4")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := blockfrost.ScriptDatumCBOR{}
+	testIntUtil(t, fp, &got, &want)
+}

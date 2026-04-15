@@ -19,6 +19,7 @@ const (
 	resourcePoolDelegator = "delegators"
 	resourcePoolBlocks    = "blocks"
 	resourcePoolUpdate    = "updates"
+	resourcePoolExtended  = "pools/extended"
 )
 
 // List of stake pools
@@ -39,24 +40,35 @@ type PoolRetiring struct {
 
 // Pool information.
 type Pool struct {
-	PoolID         string   `json:"pool_id"`
-	Hex            string   `json:"hex"`
-	VrfKey         string   `json:"vrf_key"`
-	BlocksMinted   int      `json:"blocks_minted"`
-	LiveStake      string   `json:"live_stake"`
-	LiveSize       float64  `json:"live_size"`
-	LiveSaturation float64  `json:"live_saturation"`
-	LiveDelegators int      `json:"live_delegators"`
-	ActiveStake    string   `json:"active_stake"`
-	ActiveSize     float64  `json:"active_size"`
-	DeclaredPledge string   `json:"declared_pledge"`
-	LivePledge     string   `json:"live_pledge"`
-	MarginCost     float64  `json:"margin_cost"`
-	FixedCost      string   `json:"fixed_cost"`
-	RewardAccount  string   `json:"reward_account"`
-	Owners         []string `json:"owners"`
-	Registration   []string `json:"registration"`
-	Retirement     []string `json:"retirement"`
+	PoolID         string      `json:"pool_id"`
+	Hex            string      `json:"hex"`
+	VrfKey         string      `json:"vrf_key"`
+	BlocksMinted   int         `json:"blocks_minted"`
+	LiveStake      string      `json:"live_stake"`
+	LiveSize       float64     `json:"live_size"`
+	LiveSaturation float64     `json:"live_saturation"`
+	LiveDelegators int         `json:"live_delegators"`
+	ActiveStake    string      `json:"active_stake"`
+	ActiveSize     float64     `json:"active_size"`
+	DeclaredPledge string      `json:"declared_pledge"`
+	LivePledge     string      `json:"live_pledge"`
+	MarginCost     float64     `json:"margin_cost"`
+	FixedCost      string      `json:"fixed_cost"`
+	RewardAccount  string      `json:"reward_account"`
+	Owners         []string    `json:"owners"`
+	Registration   []string    `json:"registration"`
+	Retirement     []string    `json:"retirement"`
+	CalidusKey     *CalidusKey `json:"calidus_key"`
+}
+
+type CalidusKey struct {
+	ID          string `json:"id"`
+	PubKey      string `json:"pub_key"`
+	Nonce       int    `json:"nonce"`
+	TxHash      string `json:"tx_hash"`
+	BlockHeight int    `json:"block_height"`
+	BlockTime   int    `json:"block_time"`
+	Epoch       int    `json:"epoch"`
 }
 
 // PoolHistory return Stake pool history
@@ -74,14 +86,20 @@ type PoolHistory struct {
 // PoolMetadata return Stake pool metadata
 // Stake pool registration metadata.
 type PoolMetadata struct {
-	PoolID      string  `json:"pool_id"`
-	Hex         string  `json:"hex"`
-	URL         *string `json:"url"`
-	Hash        *string `json:"hash"`
-	Ticker      *string `json:"ticker"`
-	Name        *string `json:"name"`
-	Description *string `json:"description"`
-	Homepage    *string `json:"homepage"`
+	PoolID      string         `json:"pool_id"`
+	Hex         string         `json:"hex"`
+	URL         *string        `json:"url"`
+	Hash        *string        `json:"hash"`
+	Ticker      *string        `json:"ticker"`
+	Name        *string        `json:"name"`
+	Description *string        `json:"description"`
+	Homepage    *string        `json:"homepage"`
+	Error       *MetadataError `json:"error"`
+}
+
+type MetadataError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
 }
 
 // PoolRelay return Stake pool relays
@@ -145,6 +163,34 @@ type PoolBlocksResult struct {
 
 type PoolUpdateResult struct {
 	Res []PoolUpdate
+	Err error
+}
+
+type PoolExtendedMetadata struct {
+	URL         *string        `json:"url"`
+	Hash        *string        `json:"hash"`
+	Ticker      *string        `json:"ticker"`
+	Name        *string        `json:"name"`
+	Description *string        `json:"description"`
+	Homepage    *string        `json:"homepage"`
+	Error       *MetadataError `json:"error"`
+}
+
+type PoolExtended struct {
+	PoolID         string                `json:"pool_id"`
+	Hex            string                `json:"hex"`
+	ActiveStake    string                `json:"active_stake"`
+	LiveStake      string                `json:"live_stake"`
+	LiveSaturation float64               `json:"live_saturation"`
+	BlocksMinted   int                   `json:"blocks_minted"`
+	MarginCost     float64               `json:"margin_cost"`
+	FixedCost      string                `json:"fixed_cost"`
+	DeclaredPledge string                `json:"declared_pledge"`
+	Metadata       *PoolExtendedMetadata `json:"metadata"`
+}
+
+type PoolsExtendedResult struct {
+	Res []PoolExtended
 	Err error
 }
 
@@ -702,6 +748,72 @@ func (c *apiClient) PoolUpdatesAll(ctx context.Context, poolId string) <-chan Po
 					}
 				}
 				res := PoolUpdateResult{Res: pools, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+func (c *apiClient) PoolsExtended(ctx context.Context, query APIQueryParams) (pe []PoolExtended, err error) {
+	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.server, resourcePoolExtended))
+	if err != nil {
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl.String(), nil)
+	if err != nil {
+		return
+	}
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
+	res, err := c.handleRequest(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if err = json.NewDecoder(res.Body).Decode(&pe); err != nil {
+		return
+	}
+	return pe, nil
+}
+
+func (c *apiClient) PoolsExtendedAll(ctx context.Context) <-chan PoolsExtendedResult {
+	ch := make(chan PoolsExtendedResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan PoolsExtendedResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				pools, err := c.PoolsExtended(j.ctx, j.query)
+				if len(pools) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := PoolsExtendedResult{Res: pools, Err: err}
 				ch <- res
 			}
 

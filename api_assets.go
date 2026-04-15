@@ -116,6 +116,16 @@ type AssetByPolicyResult struct {
 	Err error
 }
 
+type AssetHistoryResult struct {
+	Res []AssetHistory
+	Err error
+}
+
+type AssetTransactionResult struct {
+	Res []AssetTransaction
+	Err error
+}
+
 type AssetAddressesAll struct {
 	Res []AssetAddress
 	Err error
@@ -213,7 +223,7 @@ func (c *apiClient) Asset(ctx context.Context, asset string) (a Asset, err error
 }
 
 // AssetHistory returns history of a specific asset.
-func (c *apiClient) AssetHistory(ctx context.Context, asset string) (hist []AssetHistory, err error) {
+func (c *apiClient) AssetHistory(ctx context.Context, asset string, query APIQueryParams) (hist []AssetHistory, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetHistory))
 	if err != nil {
 		return
@@ -222,6 +232,10 @@ func (c *apiClient) AssetHistory(ctx context.Context, asset string) (hist []Asse
 	if err != nil {
 		return
 	}
+
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 
 	res, err := c.handleRequest(req)
 	if err != nil {
@@ -236,7 +250,7 @@ func (c *apiClient) AssetHistory(ctx context.Context, asset string) (hist []Asse
 }
 
 // AssetTransactions returns list of a specific asset transactions.
-func (c *apiClient) AssetTransactions(ctx context.Context, asset string) (trs []AssetTransaction, err error) {
+func (c *apiClient) AssetTransactions(ctx context.Context, asset string, query APIQueryParams) (trs []AssetTransaction, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s/%s", c.server, resourceAssets, asset, resourceAssetTransactions))
 	if err != nil {
 		return
@@ -245,6 +259,10 @@ func (c *apiClient) AssetTransactions(ctx context.Context, asset string) (trs []
 	if err != nil {
 		return
 	}
+
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 
 	res, err := c.handleRequest(req)
 	if err != nil {
@@ -330,7 +348,7 @@ func (c *apiClient) AssetAddressesAll(ctx context.Context, asset string) <-chan 
 }
 
 // AssetsByPolicy returns list of assets minted under a specific policy.
-func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []AssetByPolicy, err error) {
+func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string, query APIQueryParams) (a []AssetByPolicy, err error) {
 	requestUrl, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.server, resourcePolicyAssets, policyId))
 	if err != nil {
 		return
@@ -339,6 +357,10 @@ func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []As
 	if err != nil {
 		return
 	}
+
+	v := req.URL.Query()
+	v = formatParams(v, query)
+	req.URL.RawQuery = v.Encode()
 
 	res, err := c.handleRequest(req)
 	if err != nil {
@@ -350,4 +372,136 @@ func (c *apiClient) AssetsByPolicy(ctx context.Context, policyId string) (a []As
 		return
 	}
 	return a, nil
+}
+
+// AssetHistoryAll returns the entire history of a specific asset.
+func (c *apiClient) AssetHistoryAll(ctx context.Context, asset string) <-chan AssetHistoryResult {
+	ch := make(chan AssetHistoryResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AssetHistoryResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				hist, err := c.AssetHistory(j.ctx, asset, j.query)
+				if len(hist) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := AssetHistoryResult{Res: hist, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// AssetTransactionsAll returns all transactions of a specific asset.
+func (c *apiClient) AssetTransactionsAll(ctx context.Context, asset string) <-chan AssetTransactionResult {
+	ch := make(chan AssetTransactionResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AssetTransactionResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				trs, err := c.AssetTransactions(j.ctx, asset, j.query)
+				if len(trs) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := AssetTransactionResult{Res: trs, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
+}
+
+// AssetsByPolicyAll returns all assets minted under a specific policy.
+func (c *apiClient) AssetsByPolicyAll(ctx context.Context, policyId string) <-chan AssetByPolicyResult {
+	ch := make(chan AssetByPolicyResult, c.routines)
+	jobs := make(chan methodOptions, c.routines)
+	quit := make(chan bool, 1)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < c.routines; i++ {
+		wg.Add(1)
+		go func(jobs chan methodOptions, ch chan AssetByPolicyResult, wg *sync.WaitGroup) {
+			defer wg.Done()
+			for j := range jobs {
+				assets, err := c.AssetsByPolicy(j.ctx, policyId, j.query)
+				if len(assets) != j.query.Count || err != nil {
+					select {
+					case quit <- true:
+					default:
+					}
+				}
+				res := AssetByPolicyResult{Res: assets, Err: err}
+				ch <- res
+			}
+
+		}(jobs, ch, &wg)
+	}
+	go func() {
+		defer close(ch)
+		fetchNextPage := true
+		for i := 1; fetchNextPage; i++ {
+			select {
+			case <-quit:
+				fetchNextPage = false
+			default:
+				jobs <- methodOptions{ctx: ctx, query: APIQueryParams{Count: 100, Page: i}}
+			}
+		}
+
+		close(jobs)
+		wg.Wait()
+	}()
+	return ch
 }

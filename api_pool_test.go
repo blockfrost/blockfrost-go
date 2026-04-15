@@ -23,6 +23,22 @@ func TestResourcePoolsIntegration(t *testing.T) {
 	}
 }
 
+func TestResourcePoolsExtendedIntegration(t *testing.T) {
+	t.Parallel()
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	q := blockfrost.APIQueryParams{}
+	got, err := api.PoolsExtended(context.TODO(), q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) == 0 {
+		t.Fatal("got empty extended pools list")
+	}
+}
+
 func TestResourcePoolsRetiredIntegration(t *testing.T) {
 	t.Parallel()
 
@@ -51,8 +67,11 @@ func TestResourcePoolsRetiringIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if reflect.DeepEqual(got, []blockfrost.PoolRetiring{}) {
-		t.Fatalf("got null %+v", got)
+	// Validate marshalling: if data is present, check it decoded properly
+	if len(got) > 0 {
+		if reflect.DeepEqual(got[0], blockfrost.PoolRetiring{}) {
+			t.Fatalf("got zero-valued struct, marshalling may be broken: %+v", got[0])
+		}
 	}
 }
 

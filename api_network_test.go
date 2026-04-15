@@ -4,6 +4,7 @@ import (
 	"context"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/blockfrost/blockfrost-go"
@@ -45,4 +46,22 @@ func TestResourceNetworkIntegration(t *testing.T) {
 		t.Fatalf("got null %+v", got)
 	}
 
+}
+
+func TestResourceNetworkErasIntegration(t *testing.T) {
+	api := blockfrost.NewAPIClient(
+		blockfrost.APIClientOptions{},
+	)
+
+	got, err := api.NetworkEras(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) == 0 {
+		t.Fatal("got empty network eras")
+	}
+
+	fp := filepath.Join(testdata, strings.ToLower(strings.TrimPrefix(t.Name(), "Test"))+".golden")
+	want := []blockfrost.NetworkEra{}
+	testIntUtil(t, fp, &got, &want)
 }
