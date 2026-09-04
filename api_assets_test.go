@@ -3,6 +3,9 @@ package blockfrost_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -10,6 +13,32 @@ import (
 
 	"github.com/blockfrost/blockfrost-go"
 )
+
+func TestAssetTransactionsQueryParams(t *testing.T) {
+	const asset = "asset"
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != fmt.Sprintf("/assets/%s/transactions", asset) {
+			t.Errorf("unexpected path: %s", r.URL.Path)
+		}
+		if got := r.URL.Query().Get("from"); got != "8929261" {
+			t.Errorf("unexpected from query parameter: %s", got)
+		}
+		if got := r.URL.Query().Get("to"); got != "9999269:10" {
+			t.Errorf("unexpected to query parameter: %s", got)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte("[]"))
+	}))
+	defer server.Close()
+
+	api := blockfrost.NewAPIClient(blockfrost.APIClientOptions{Server: server.URL})
+	if _, err := api.AssetTransactions(context.Background(), asset, blockfrost.APIQueryParams{
+		From: "8929261",
+		To:   "9999269:10",
+	}); err != nil {
+		t.Fatal(err)
+	}
+}
 
 func TestAssetUnmarshal(t *testing.T) {
 
